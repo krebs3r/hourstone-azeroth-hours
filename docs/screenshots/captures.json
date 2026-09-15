@@ -1,0 +1,33 @@
+{
+  "source": "Browser screenshots of the preserved HTML mockups, with fictional data. No native in-game rendering.",
+  "captures": [
+    {
+      "file": "mockup-05-retail.png",
+      "source": "docs/mockup-05/index.html",
+      "width": 720,
+      "height": 500,
+      "sha256": "5b25d9a755d086e43ac5ccd0d57eaccb523058fa2a40ba8c441b3ad80eaecb58"
+    },
+    {
+      "file": "mockup-05-classic-hours.png",
+      "source": "docs/mockup-05/index.html",
+      "width": 720,
+      "height": 500,
+      "sha256": "f04f0da2b9252d3eb98b28a948ff0c924efe5aa9b948c8a2562d4cc101ca1405"
+    },
+    {
+      "file": "mockup-05-compact-classic.png",
+      "source": "docs/mockup-05/index.html",
+      "width": 720,
+      "height": 248,
+      "sha256": "6a1c59298213550c8e64b1107d04027474be42b48b6855a5c632bafd9a9a9f53"
+    },
+    {
+      "file": "mockup-04-retail.png",
+      "source": "docs/mockup/index.html",
+      "width": 980,
+      "height": 626,
+      "sha256": "fbb8e9f285666a4aa760ed9822c7c02ff3360f13989a4c13e87b6724bc36c3e8"
+    }
+  ]
+}

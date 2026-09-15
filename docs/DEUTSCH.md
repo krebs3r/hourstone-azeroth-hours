@@ -4,6 +4,12 @@
 
 Hourstone zeigt die gesamte Spielzeit deiner erfassten WoW-Charaktere. Der graue Runenstein mit blauer Rune und goldener Sanduhr gehört gestalterisch zur Familie von [Soundstone – Azeroth Audio](https://github.com/krebs3r/soundstone-azeroth-audio).
 
+## Warum ich Hourstone entwickelt habe
+
+Ich wünsche mir schon lange eine übersichtliche Spielzeitanzeige im Battle.net-Launcher. Ich wollte sehen, wie viel Zeit ich insgesamt in Azeroth verbracht habe und wie sie sich auf meine Charaktere verteilt. Daraus ist Hourstone entstanden: ein Addon, das diese Zahlen an einem Ort zusammenführt.
+
+Ich hoffe weiterhin, dass Blizzard eine Spielzeiterfassung direkt in Battle.net integriert. Bis dahin bietet uns Hourstone diesen Überblick in einem kompakten Fenster, das sich in WoW einfügt.
+
 ## Installation
 
 1. Lade `Hourstone-0.1.1.zip` von [GitHub Releases](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.1.1) herunter.

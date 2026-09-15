@@ -8,6 +8,12 @@ A standalone World of Warcraft addon that keeps a list of your characters and th
 
 [Download Hourstone 0.1.1](https://github.com/krebs3r/hourstone-azeroth-hours/releases/download/v0.1.1/Hourstone-0.1.1.zip) · [CurseForge](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
+## Why I built Hourstone
+
+Hourstone grew out of something I've wanted in the Battle.net launcher for years: a clear overview of my playtime. I wanted to see how much time I've spent in Azeroth and how it's spread across my characters, so I built an addon that brings those numbers together in one place.
+
+I still hope Blizzard adds playtime tracking directly to Battle.net. Until then, Hourstone gives us that overview in a compact window that feels at home in WoW.
+
 ## Features
 
 - Class-colored character names, level, realm, total playtime and last update.
@@ -17,6 +23,28 @@ A standalone World of Warcraft addon that keeps a list of your characters and th
 - Movable window, saved position and scale, compact rows and an optional draggable minimap button.
 - German on `deDE` clients, English on all other locales.
 - No dependencies or external service. Your data stays in WoW's local SavedVariables.
+
+## Mockup screenshots
+
+**Design previews with fictional characters and playtime.** These captures show the approved Mockup 05 that shaped Hourstone's compact interface. The released addon uses WoW's native fonts and includes later refinements to button widths, the checkbox and minimap sizing.
+
+### Retail — character overview
+
+Eight characters with playtime shown as days, hours and minutes.
+
+![Mockup 05: Retail character overview with eight sample characters and combined playtime](docs/screenshots/mockup-05-retail.png)
+
+### Classic — playtime in hours
+
+The Classic frame with the decimal-hours display selected.
+
+![Mockup 05: Classic character overview with decimal hours](docs/screenshots/mockup-05-classic-hours.png)
+
+### Compact — one character
+
+The window shrinks to fit the list. This example also shows the German interface.
+
+![Mockup 05: compact Classic window with one sample character and German labels](docs/screenshots/mockup-05-compact-classic.png)
 
 ## Supported clients
 
@@ -76,9 +104,20 @@ The settings menu uses the native `UICheckButtonTemplate` for the minimap checkb
 
 See the [German game-test guide](docs/TESTING-0.1.1-DE.md). The supplied test3 game capture confirms the full title, statistics and compact single-character layout at 1440p with 80% global UI scale. It exposed truncation of the combined-format button, addressed in test 4. **100% remains the default**, as requested; saved 110–120% preferences remain unchanged. The size setting is independent of global UI scale. The next native capture identified the flat checkbox appearance and oversized minimap circle. Both corrections were accepted by the user before publication.
 
-## Design preview
+## Design history
 
-The approved [interactive Mockup 05](docs/mockup-05/index.html) contains **sample data and browser rendering**, not an in-game screenshot. [Mockup 04](docs/mockup/index.html) remains available for comparison. Open the HTML locally to interact with it. Mockup 05 uses Georgia as a browser approximation of WoW's native font. The approved stone/hourglass logo is unchanged. The [native game capture](docs/curseforge/screenshots/compact-ingame.png) documents the preceding test3 layout; the later label, checkbox and minimap corrections are described in its gallery caption.
+The approved [interactive Mockup 05](docs/mockup-05/index.html) and the earlier [Mockup 04](docs/mockup/index.html) remain available as self-contained HTML files. Download and open them locally to try the previews. Their fonts and controls are browser approximations.
+
+<details>
+<summary>Earlier concept: Mockup 04</summary>
+
+This wider design was refined into Mockup 05's smaller window and dynamic list height. It is included as a look at the design process, not as the current addon interface.
+
+![Earlier Mockup 04: wider Retail layout with five character columns](docs/screenshots/mockup-04-retail.png)
+
+</details>
+
+For an actual game view, see the [native test3 capture](docs/curseforge/screenshots/compact-ingame.png). It predates the final label, checkbox and minimap corrections in v0.1.1.
 
 ## Development
 

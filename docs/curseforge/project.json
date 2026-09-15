@@ -11,6 +11,7 @@
     "TBC Anniversary 2.5.6"
   ],
   "project_id": 1697059,
+  "game_versions": ["12.1.0", "2.5.6"],
   "project_url": "https://www.curseforge.com/wow/addons/hourstone-azeroth-hours",
   "allow_third_party_distribution": true
 }

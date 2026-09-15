@@ -23,4 +23,4 @@ Im [Autoren-Dashboard](https://authors.curseforge.com/#/projects/1697059/files) 
 - GitHub- und CurseForge-CDN-Rückdownloads wurden vom Remotehost abgebrochen. Die GitHub-Asset-Prüfsumme und die tatsächlich für CurseForge ausgewählte lokale ZIP sind geprüft; ein vollständiger CDN-Rückdownload ist noch nicht belegt.
 - Installation über die CurseForge-App sowie zusätzliche Clientfamilien und separat dokumentierte manuelle Detailprüfungen.
 
-Der erste CurseForge-Upload erfolgte manuell über das Autoren-Dashboard. GitHub baut und veröffentlicht Releases automatisch; ein automatischer CurseForge-Upload ist für Hourstone noch nicht eingerichtet.
+Der erste CurseForge-Upload erfolgte manuell über das Autoren-Dashboard. Der Release-Workflow enthält jetzt einen nachgelagerten CurseForge-Upload mit Prüfsummenprüfung und Schutz vor doppelten Uploads. Die Aktivierung benötigt das GitHub-Actions-Secret `CF_API_TOKEN`; Einrichtung und Wiederholungen sind in [README.md](README.md) beschrieben. Ein echter automatischer Release-Upload steht noch aus.

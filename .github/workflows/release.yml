@@ -54,3 +54,28 @@ jobs:
           fi
           gh release create "$RELEASE_TAG" "dist/Hourstone-$version.zip" "dist/Hourstone-$version.zip.sha256" \
             --verify-tag --title "Hourstone $version – Azeroth Hours" --notes-file docs/RELEASE-NOTES.md
+  curseforge:
+    name: Upload release to CurseForge
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Upload the published ZIP and record the CurseForge file ID
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: python tools/curseforge.py --tag "$RELEASE_TAG"
+      - name: Preserve upload evidence, including an interrupted attempt
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: curseforge-upload-${{ github.run_id }}-${{ github.run_attempt }}
+          path: dist/curseforge/*.json
+          if-no-files-found: ignore

@@ -116,7 +116,7 @@ python tools/package.py --tag v0.1.1
 
 `python tools/preview.py` generates a browser preview from the Lua frame definitions for layout review. Fonts and native controls are approximated; visual changes still need to be checked in game.
 
-Pushes and pull requests run the **Validate** workflow and produce an installable ZIP. The **Release** workflow publishes version tags after the same checks pass.
+Pushes and pull requests run the **Validate** workflow and produce an installable ZIP. The **Release** workflow publishes version tags after the same checks pass, then uploads the exact GitHub release ZIP to CurseForge. Setup and retry instructions are in the [CurseForge publishing guide](docs/curseforge/README.md).
 
 See the [changelog](CHANGELOG.md), [validation report](docs/VALIDATION.md) and [German testing guide](docs/TESTING-0.1.1-DE.md) for release history and testing details.
 

@@ -1,0 +1,15 @@
+## Interface: 120100, 50504, 20506, 11509
+## Title: Hourstone - Azeroth Hours
+## Notes: Your characters. Your time. Account-wide character playtime tracker.
+## Notes-deDE: Deine Charaktere. Deine Spielzeit. Spielzeit aller erfassten Charaktere.
+## Author: krebs3r
+## Version: 0.1.0
+## SavedVariables: HourstoneDB
+## IconTexture: Interface\AddOns\Hourstone\Media\Logo.tga
+
+Locale.lua
+Compat.lua
+Model.lua
+Tracker.lua
+UI.lua
+Core.lua

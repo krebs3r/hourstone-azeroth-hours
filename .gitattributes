@@ -1,0 +1,10 @@
+* text=auto
+*.lua text eol=lf
+*.py text eol=lf
+*.toc text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.tga binary
+*.png binary
+*.webp binary
+*.zip binary

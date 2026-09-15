@@ -1,0 +1,71 @@
+local _, H = ...
+local T, C, M = {}, H.C, H.M
+H.T = T
+function T:Init(db)
+    self.db, self.started, self.wantSync = db, false, false
+end
+function T:UpdateIdentity(level)
+    local identity = C.Identity()
+    if not identity then return false end
+    self.key = identity.key
+    local record = self.db.characters[self.key]
+    if type(record) ~= "table" then record = {}; self.db.characters[self.key] = record end
+    for k, v in pairs(identity) do if k ~= "key" then record[k] = v end end
+    if M.Number(level) then record.level = level end
+    self.record = record
+    return true
+end
+function T:Begin(isReload)
+    if self.started then return end
+    if not self:UpdateIdentity() then return end
+    local now, saved = C.Now(), self.db.runtime
+    local carry, gap = 0, 0
+    -- Only the client's explicit reload flag may restore a session. Never use wall-clock
+    -- time to infer that a new login is a continuation of the previous session.
+    if isReload and type(saved) == "table" and saved.key == self.key and M.Number(saved.at)
+        and now >= saved.at and M.Number(saved.session) then
+        carry, gap = saved.session, now - saved.at
+    end
+    self.sessionBase, self.sessionAt = carry + gap, now
+    self.base = M.Number(self.record.seconds) and (self.record.seconds + gap) or nil
+    self.baseAt, self.started = now, true
+    self.db.runtime = nil
+    self:Request()
+end
+function T:Value(key, record)
+    if self.started and key == self.key then
+        if self.base == nil then return nil end
+        return self.base + math.max(0, C.Now() - self.baseAt)
+    end
+    return M.Number(record.seconds) and record.seconds or nil
+end
+function T:Session()
+    if not self.started then return 0 end
+    return self.sessionBase + math.max(0, C.Now() - self.sessionAt)
+end
+function T:Request()
+    self.wantSync = true
+    return self:TryRequest()
+end
+function T:TryRequest()
+    if not self.started or not self.wantSync then return false end
+    local now = C.Epoch()
+    if M.Number(self.db.lastRequest) and now - self.db.lastRequest < 60 then return false end
+    self.db.lastRequest = now
+    RequestTimePlayed()
+    return true
+end
+function T:Receive(total)
+    if not self.started or not M.Number(total) then return false end
+    -- A server answer is a replacement baseline, including answers to manual /played.
+    self.base, self.baseAt, self.wantSync = total, C.Now(), false
+    self.record.seconds, self.record.updatedAt, self.record.syncedAt = total, C.Epoch(), C.Epoch()
+    return true
+end
+function T:Save()
+    if not self.started then return end
+    self:UpdateIdentity()
+    local total = self:Value(self.key, self.record)
+    if total then self.record.seconds, self.record.updatedAt = total, C.Epoch() end
+    self.db.runtime = { key = self.key, at = C.Now(), session = self:Session() }
+end

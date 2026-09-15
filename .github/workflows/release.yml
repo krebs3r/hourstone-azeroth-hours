@@ -53,4 +53,4 @@ jobs:
             exit 1
           fi
           gh release create "$RELEASE_TAG" "dist/Hourstone-$version.zip" "dist/Hourstone-$version.zip.sha256" \
-            --verify-tag --title "Hourstone $version â€“ Azeroth Hours" --notes-file docs/RELEASE-NOTES.md
+            --verify-tag --title "Hourstone $version – Azeroth Hours" --notes-file docs/RELEASE-NOTES.md

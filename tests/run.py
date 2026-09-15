@@ -2,15 +2,31 @@
 import os
 from pathlib import Path
 import sys
+import re
+from functools import lru_cache
+from PIL import ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 if os.environ.get("HOURSTONE_TEST_DEPS"):
     sys.path.insert(0, os.environ["HOURSTONE_TEST_DEPS"])
 from lupa.lua51 import LuaRuntime
 
+@lru_cache(maxsize=32)
+def font(path,size):
+    # Blizzard fonts are client-owned. Gelasio is a licensed metric approximation
+    # for simulation only; native font selection is checked separately.
+    if path.endswith("FRIZQT__.TTF"):
+        path="Gelasio-Regular.ttf"
+    return ImageFont.truetype(str(ROOT/"Hourstone/Media/Fonts"/path.split("\\")[-1]),round(size*64))
+
+def measure(path,size,text):
+    return font(path,size).getlength(re.sub(r"\|c[0-9a-fA-F]{8}|\|r","",text))/64
+
 def runtime(project=1, locale="deDE", backdrop=True):
     lua = LuaRuntime(unpack_returned_tuples=True)
     lua.globals().TEST_LOCALE = locale
+    lua.globals().TEST_VERSION = re.search(r"## Version: (.+)",(ROOT/"Hourstone/Hourstone.toc").read_text())[1]
+    lua.globals().MEASURE_TEXT = measure
     lua.globals().WOW_PROJECT_ID = project
     lua.globals().BackdropTemplateMixin = lua.table() if backdrop else None
     lua.execute((ROOT / "tests/wow_mock.lua").read_text(encoding="utf-8"))

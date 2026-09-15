@@ -16,7 +16,6 @@ function M.Init(db)
     s.scale = M.Number(s.scale) and math.max(.65, math.min(1.3, s.scale)) or 1
     s.minimap = s.minimap ~= false
     s.minimapAngle = M.Number(s.minimapAngle) and s.minimapAngle % 360 or 225
-    s.compact = s.compact == true
     if type(s.position) ~= "table" or not M.Number(math.abs(tonumber(s.position.x) or math.huge))
         or not M.Number(math.abs(tonumber(s.position.y) or math.huge)) then s.position = nil
     else s.position.x, s.position.y = tonumber(s.position.x), tonumber(s.position.y) end
@@ -26,12 +25,22 @@ function M.Format(seconds, mode)
     if not M.Number(seconds) then return L.unavailable end
     if mode == "hours" then
         local value = string.format("%.1f", seconds / 3600)
-        if H.de then value = value:gsub("%.", ",") end
+        local whole,fraction=value:match("^(%d+)%.(%d)$")
+        local grouped=whole:reverse():gsub("(%d%d%d)","%1"..(H.de and "." or ",")):reverse():gsub("^[.,]","")
+        value=grouped..(H.de and "," or ".")..fraction
         return value .. " " .. L.hoursUnit
     end
     local minutes = math.floor(seconds / 60)
+    if not H.de then return string.format("%dd %dh %dm",math.floor(minutes/1440),math.floor(minutes/60)%24,minutes%60) end
     return string.format("%d %s %d %s %d %s", math.floor(minutes / 1440), L.daysUnit,
         math.floor(minutes / 60) % 24, L.hoursUnit, minutes % 60, L.minutesUnit)
+end
+function M.SessionFormat(seconds)
+    if not M.Number(seconds) then return L.unavailable end
+    if seconds >= 86400 then return M.Format(seconds,"combined") end
+    local minutes=math.floor(seconds/60)
+    if not H.de then return string.format("%dh %dm",math.floor(minutes/60),minutes%60) end
+    return string.format("%d %s %d %s",math.floor(minutes/60),L.hoursUnit,minutes%60,L.minutesUnit)
 end
 function M.Age(epoch, now)
     if not M.Number(epoch) then return L.unavailable end
@@ -39,6 +48,7 @@ function M.Age(epoch, now)
     if age < 60 then return L.now end
     if age < 3600 then return string.format(L.minuteAgo, math.floor(age / 60)) end
     if age < 86400 then return string.format(L.hourAgo, math.floor(age / 3600)) end
+    if age < 172800 then return L.yesterday end
     return string.format(L.dayAgo, math.floor(age / 86400))
 end
 function M.List(db, search, realm, sort, descending, valueFor)

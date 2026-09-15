@@ -6,23 +6,23 @@ Hourstone zeigt die gesamte Spielzeit deiner erfassten WoW-Charaktere. Der graue
 
 ## Installation
 
-1. Lade `Hourstone-0.1.0.zip` aus den [GitHub-Releases](https://github.com/krebs3r/hourstone-azeroth-hours/releases).
+1. Lade `Hourstone-0.1.1.zip` von [GitHub Releases](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.1.1) herunter.
 2. Beende WoW und entpacke das ZIP in `Interface/AddOns` des gewünschten Clients.
 3. Die Datei muss anschließend unter `Interface/AddOns/Hourstone/Hourstone.toc` liegen.
 4. Aktiviere Hourstone in der Addon-Liste und logge dich ein.
 
-Die Vorabversion ist für Retail, Mists of Pandaria Classic, Burning Crusade Classic Anniversary sowie Classic Era inklusive Hardcore und Season of Discovery vorbereitet. **Echte Tests in diesen Clients stehen noch aus.** Die automatisierten Prüfungen verwenden simulierte WoW-Ereignisse und UI-APIs.
+Die Vorabversion ist für Retail, Mists of Pandaria Classic, Burning Crusade Classic Anniversary sowie Classic Era inklusive Hardcore und Season of Discovery vorbereitet. **Der Nutzer hat Retail und TBC Anniversary bestätigt. Die übrigen Clientfamilien stehen für Ingame-Tests noch aus.** Die automatisierten Prüfungen verwenden simulierte WoW-Ereignisse und UI-APIs.
 
 ## Bedienung
 
 - Öffnen und schließen: Minimap-Button, `/hourstone` oder `/azerothhours`.
 - Das Fenster lässt sich am Kopfbereich verschieben. Position und Skalierung werden gespeichert.
-- Das Zahnrad öffnet Einstellungen für Minimap-Button, Zeilenabstand, Größe und Positionsrücksetzung.
-- Suche nach Namen, filtere einen Realm oder sortiere durch Klick auf eine Spaltenüberschrift.
+- Das Zahnrad öffnet Einstellungen für Minimap-Button, Größe und Positionsrücksetzung.
+- Suche nach Namen und filtere nach Realm. Im Charakter-Tabellenkopf wählst du Name, Level oder Realm zur Sortierung. Spielzeit und Aktualisierung sortierst du direkt über die Überschrift; erneuter Klick kehrt die Reihenfolge um.
 - Wähle zwischen `312,5 Std.` und `13 T. 0 Std. 30 Min.`. Bei Filtern erscheint zusätzlich die Summe der sichtbaren Charaktere.
 - Lange Namen und der letzte Serverabgleich sind im Tooltip lesbar.
 - `/hourstone minimap` blendet einen versteckten Minimap-Button wieder ein. `/hourstone reset` setzt die Fensterposition zurück.
-- Escape und beide roten Kopfschaltflächen schließen das Fenster.
+- Escape und das rote X schließen das Fenster.
 
 ## Welche Zeit wird gezählt?
 
@@ -34,8 +34,22 @@ Ausgeloggte Zeit zählt nicht. AFK-Zeit zählt wie bei `/played`. `/reload` erh�
 
 Gespeichert wird accountweit in `HourstoneDB`, **getrennt je WoW-Installation und WoW-Account**. Es gibt keine automatische Synchronisierung zwischen Retail und Classic. Unbesuchte Charaktere können nicht automatisch abgefragt werden. Das Erstelldatum wird nicht angezeigt.
 
+## Oberfläche v0.1.1
+
+Die native Umsetzung folgt dem freigegebenen **Mockup 05**: **720 Pixel breit**, mit **248 Pixeln Höhe bei null oder einem Treffer** und maximal **500 Pixeln bei acht sichtbaren Zeilen**. Jede Zeile ist 36 Pixel hoch; weitere Charaktere scrollen. Auch Suche und Realm-Filter passen die Höhe an. Name und Level stehen zusammen, der Realm darunter.
+
+Soundstones Rahmen mit kleinen Ecken, rote Schaltflächen und das kleine linke Zahnrad bilden die gemeinsame Gestaltung. Der vollständige Titel und die drei Statistiküberschriften erhalten feste Textbereiche mit WoWs Standardschrift. Das Einstellungsmenü enthält Minimap-Checkbox, Größenregler und Positionsrücksetzung. Das rosa Herz bleibt erhalten. Test 5 ersetzt die Minimap-Checkbox durch WoWs native Vorlage wie bei Soundstone. Der Minimap-Button wird von 36 auf 28 UI-Einheiten verkleinert, das vollständige Motiv auf 18; der Abstand zum inneren Rahmen bleibt größer als zwei Einheiten.
+
+Charakterdaten, Zeitformat, Fenstergröße und Position bleiben erhalten; die Datenversion bleibt 1. Alte Zeilenabstand-Einstellungen werden ignoriert. Nur bei Platzmangel wird das Fenster mit zehn Pixeln Reserve je Seite eingepasst. Der Header bleibt beim Filtern an derselben Stelle, solange ausreichend Bildschirmplatz vorhanden ist.
+
+Die Test3-Spielaufnahme bestätigt Titel, Statistiküberschriften und das kompakte Fenster. Test 4 gibt dem bisher gekürzten „Tage + Std.“-Button 40 Pixel mehr Breite, indem das Suchfeld kürzer wird. Charakterspalte und linker Statistikbereich sind ebenfalls schmaler.
+
+**100 % bleibt der Standard.** Deine gespeicherte Größe, beispielsweise 110 oder 120 %, bleibt beim Update erhalten. Bei einem Charakter entsprechen 110 % etwa 792 × 273 und 120 % etwa 864 × 298 Bildschirmpixeln, auch bei 1440p mit 80 % globaler UI-Skalierung. Die zusätzlichen Aufnahmen zeigten eine ungewöhnlich flache Checkbox und einen zu großen Minimap-Kreis. Beide Korrekturen wurden anschließend vom Nutzer für die Veröffentlichung akzeptiert.
+
+Für weitere Funktionsprüfungen kann die [kurze Testanleitung](TESTING-0.1.1-DE.md) verwendet werden.
+
 ## Vorschau und Rückmeldungen
 
-Das [freigegebene Mockup](mockup/index.html) zeigt Beispieldaten im Browser. Es ist keine Spielaufnahme. Echte Screenshots und Ergebnisse je Client folgen nach den [Ingame-Prüfungen](VALIDATION.md).
+Das [freigegebene Mockup](mockup-05/index.html) zeigt Beispieldaten im Browser. Es ist keine Spielaufnahme. Echte Screenshots und Ergebnisse je Client folgen nach den [Ingame-Prüfungen](VALIDATION.md).
 
 Bitte melde Fehler über [GitHub Issues](https://github.com/krebs3r/hourstone-azeroth-hours/issues) mit Client-Version, Sprache, Schritten zum Nachstellen und gegebenenfalls der Lua-Fehlermeldung.

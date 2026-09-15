@@ -1,0 +1,14 @@
+[
+  {
+    "file": "Gelasio-Regular.ttf",
+    "bytes": 147572,
+    "sha256": "48c797fbe0e07c48a18cb962e7bdfa23f19618327dddf54093265328dc9eb39d",
+    "source": "https://github.com/SorkinType/Gelasio/blob/main/fonts/ttf/Gelasio-Regular.ttf"
+  },
+  {
+    "file": "Selawik-Regular.ttf",
+    "bytes": 44224,
+    "sha256": "e9d98518d8ac2817782a9a382430463a2e0793ea68350b695bb727d9a830ee1c",
+    "source": "https://github.com/microsoft/Selawik/releases/tag/1.01"
+  }
+]

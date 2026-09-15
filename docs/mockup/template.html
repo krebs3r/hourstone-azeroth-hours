@@ -1,0 +1,319 @@
+<div id="hourstone-preview" data-skin="retail">
+  <section class="hs-family" aria-label="Soundstone und Hourstone im Vergleich">
+    <div class="hs-brand">
+      <img class="hs-brand-art" data-asset="Logo" alt="Soundstone: Portstein mit blauer Rune und goldenen Schallwellen">
+      <div><h2>Soundstone</h2><p>Azeroth Audio</p><div class="hs-miniatures"><span class="hs-minimap"><img data-asset="Logo" alt="Soundstone als Minimap-Symbol"></span><span class="hs-size-label">32 px</span><img class="hs-small-icon" data-asset="Logo" alt="Soundstone mit 20 Pixeln"></div></div>
+    </div>
+    <div class="hs-brand">
+      <img class="hs-brand-art" data-asset="HourstoneLogo" alt="Hourstone: blauer Runenstein mit einer goldenen Sanduhr">
+      <div><h2>Hourstone</h2><p>Azeroth Hours</p><div class="hs-miniatures"><span class="hs-minimap hs-hourstone-minimap"><img data-asset="HourstoneLogo" alt="Hourstone als Minimap-Symbol"></span><span class="hs-size-label">36 px</span><img class="hs-small-icon" data-asset="HourstoneLogo" alt="Hourstone mit 20 Pixeln"></div></div>
+    </div>
+  </section>
+  <div class="hs-preview-bar">
+    <span class="hs-preview-label" data-i18n="preview">Designvorschau · Beispieldaten</span>
+    <div class="hs-environment" role="group" aria-label="WoW-Version">
+      <button type="button" data-skin-choice="retail" aria-pressed="true">Retail</button>
+      <button type="button" data-skin-choice="classic" aria-pressed="false">Classic</button>
+    </div>
+    <label class="hs-language-label"><span class="hs-sr-only">Sprache / Language</span><select class="hs-language" aria-label="Sprache / Language"><option value="de">DE</option><option value="en">EN</option></select></label>
+  </div>
+  <div class="hs-window-wrap">
+    <section class="hs-window" aria-label="Hourstone – Azeroth Hours">
+      <div class="hs-frame" aria-hidden="true"></div>
+      <header class="hs-header">
+        <span class="hs-grip" aria-hidden="true">⠿</span>
+        <img class="hs-title-logo" data-asset="HourstoneLogo" alt="">
+        <div class="hs-title"><h1>Hourstone <span>– Azeroth Hours</span></h1><p data-i18n="tagline">Deine Charaktere. Deine Spielzeit.</p></div>
+        <div class="hs-header-actions">
+          <button type="button" class="hs-gear" aria-label="Einstellungen" aria-expanded="false">⚙</button>
+          <button type="button" class="hs-art-button hs-close" aria-label="Fenster schließen"><img data-asset="HeaderClose" alt=""></button>
+        </div>
+      </header>
+      <section class="hs-summary" aria-label="Spielzeit-Übersicht">
+        <div class="hs-stat hs-total-stat"><span class="hs-stat-label" data-i18n="total">Gesamte Spielzeit</span><strong class="hs-total">—</strong><small data-i18n="allTracked">Alle erfassten Charaktere</small></div>
+        <div class="hs-stat"><span class="hs-stat-label" data-i18n="characters">Charaktere</span><strong class="hs-count">8</strong><small class="hs-realms">3 Realms</small></div>
+        <div class="hs-stat"><span class="hs-stat-label" data-i18n="session">Aktuelle Sitzung</span><strong class="hs-session">2 Std. 14 Min.</strong><small class="hs-current-name">Elarion · Blackhand</small></div>
+      </section>
+      <div class="hs-toolbar">
+        <label class="hs-search-label"><span class="hs-sr-only" data-i18n="search">Charakter suchen</span><input type="search" class="hs-search" placeholder="Charakter suchen …" autocomplete="off"></label>
+        <label class="hs-realm-label"><span class="hs-sr-only" data-i18n="realm">Realm</span><select class="hs-realm" aria-label="Realm"><option value="all">Alle Realms</option><option>Blackhand</option><option>Antonidas</option><option>Die Aldor</option></select></label>
+        <div class="hs-format" role="group" aria-label="Zeitformat"><button type="button" data-format="combined" aria-pressed="true" data-i18n="combined">Tage + Std.</button><button type="button" data-format="hours" aria-pressed="false" data-i18n="hours">Stunden</button></div>
+      </div>
+      <div class="hs-table-wrap">
+        <table class="hs-table">
+          <thead><tr>
+            <th scope="col" aria-sort="none"><button type="button" data-sort="name"><span data-i18n="character">Charakter</span><span class="hs-sort-mark"></span></button></th>
+            <th scope="col" class="hs-level-cell" aria-sort="none"><button type="button" data-sort="level"><span data-i18n="level">Level</span><span class="hs-sort-mark"></span></button></th>
+            <th scope="col" aria-sort="none"><button type="button" data-sort="realm"><span data-i18n="realm">Realm</span><span class="hs-sort-mark"></span></button></th>
+            <th scope="col" class="hs-time-cell" aria-sort="descending"><button type="button" data-sort="seconds"><span data-i18n="played">Spielzeit</span><span class="hs-sort-mark">▾</span></button></th>
+            <th scope="col" class="hs-updated-cell" aria-sort="none"><button type="button" data-sort="age"><span data-i18n="updated">Aktualisiert</span><span class="hs-sort-mark"></span></button></th>
+          </tr></thead>
+          <tbody class="hs-rows"></tbody>
+        </table>
+      </div>
+      <footer class="hs-footer"><span class="hs-filter-summary" aria-live="polite"></span><span class="hs-credit"><span>v0.1.1</span><img class="hs-heart" data-asset="Heart" alt="♥"><span>by krebs3r</span></span></footer>
+      <section class="hs-settings" aria-label="Einstellungen" hidden>
+        <h2 data-i18n="settings">Einstellungen</h2>
+        <label><input class="hs-show-minimap" type="checkbox" checked><span data-i18n="minimap">Minimap-Button anzeigen</span></label>
+        <span class="hs-scale-label"></span>
+        <button type="button" class="hs-scale-down" aria-label="−5%">−</button>
+        <button type="button" class="hs-scale-up" aria-label="+5%">+</button>
+        <button type="button" class="hs-reset" data-i18n="reset">Position zurücksetzen</button>
+        <button type="button" class="hs-settings-close" data-i18n="done">Fertig</button>
+      </section>
+    </section>
+    <div class="hs-reopen" hidden><img data-asset="HourstoneLogo" alt=""><button type="button" data-i18n="open">Hourstone öffnen</button><code>/hourstone</code></div>
+  </div>
+  <div class="hs-bottom-bar"><span class="hs-demo-minimap hs-minimap hs-hourstone-minimap"><button type="button" aria-label="Hourstone über die Minimap öffnen"><img data-asset="HourstoneLogo" alt=""></button></span><span data-i18n="hint">Weitere Charaktere erscheinen nach dem ersten Login mit Hourstone.</span><span class="hs-preview-version">MOCKUP 04 · TEST 2</span></div>
+</div>
+<style>
+__HOURSTONE_FONTS__
+
+#hourstone-preview{--hs-gold:#e9c46e;--hs-gold-muted:#a99973;--hs-text:#eee7d6;--hs-muted:#a3a9a7;--hs-line:#5d5c51;--hs-blue:#56caf3;--hs-row-height:36px;color:var(--hs-text);font:14px/1.4 Gelasio,'Times New Roman',serif;width:100%;max-width:980px;margin:0 auto;padding:0 0 8px;box-sizing:border-box;background:transparent;color-scheme:dark}
+#hourstone-preview *,#hourstone-preview *:before,#hourstone-preview *:after{box-sizing:border-box}
+#hourstone-preview [hidden]{display:none!important}
+#hourstone-preview button,#hourstone-preview input,#hourstone-preview select{font:inherit}
+#hourstone-preview button{cursor:pointer;color:var(--hs-text)}
+#hourstone-preview button:focus-visible,#hourstone-preview input:focus-visible,#hourstone-preview select:focus-visible{outline:2px solid var(--hs-blue);outline-offset:3px}
+#hourstone-preview .hs-family{display:grid;grid-template-columns:1fr 1fr;gap:32px;padding:10px 26px 20px;background:transparent}
+#hourstone-preview .hs-brand{display:flex;align-items:center;justify-content:center;gap:14px;min-width:0}
+#hourstone-preview .hs-brand-art{width:110px;height:110px;object-fit:contain}
+#hourstone-preview .hs-brand h2{margin:0;color:var(--hs-gold);font-size:24px;font-weight:400;line-height:1.2}
+#hourstone-preview .hs-brand p{margin:3px 0 12px;color:var(--hs-muted);font:12px/1.3 Selawik,sans-serif;letter-spacing:1.6px;text-transform:uppercase}
+#hourstone-preview .hs-miniatures{display:flex;gap:10px;align-items:center}
+#hourstone-preview .hs-size-label{font:11px Selawik,sans-serif;color:var(--hs-muted)}
+#hourstone-preview .hs-minimap{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;flex-shrink:0;border:2px solid #ad9460;border-radius:50%;background:#10161a;box-shadow:inset 0 0 0 1px #030404,0 0 0 1px #343332}
+#hourstone-preview .hs-minimap img{display:block;width:32px;height:32px;object-fit:contain}
+#hourstone-preview .hs-small-icon{width:20px;height:20px;object-fit:contain}
+#hourstone-preview .hs-preview-bar{display:flex;align-items:center;gap:12px;padding:0 6px 12px;font:12px/1.4 Selawik,sans-serif;color:var(--hs-muted);flex-wrap:wrap}
+#hourstone-preview .hs-preview-label{flex:1;min-width:150px}
+#hourstone-preview .hs-environment{display:flex;border:1px solid #555247;border-radius:4px;overflow:hidden}
+#hourstone-preview .hs-environment button{background:#171c1e;border:0;padding:5px 13px;color:#a9afaf;font:12px Selawik,sans-serif}
+#hourstone-preview .hs-environment button[aria-pressed=true]{color:var(--hs-gold);background:#343026}
+#hourstone-preview .hs-language{background:#171c1e;color:var(--hs-text);border:1px solid #555247;border-radius:4px;padding:4px 5px;font:12px Selawik,sans-serif}
+#hourstone-preview .hs-window-wrap{position:relative}
+#hourstone-preview .hs-window{position:relative;isolation:isolate;padding:12px 15px 9px;min-width:0;filter:drop-shadow(0 10px 16px #0005)}
+#hourstone-preview .hs-frame{position:absolute;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+#hourstone-preview .hs-slice{position:absolute;overflow:hidden}
+#hourstone-preview .hs-slice img{position:absolute;max-width:none;max-height:none;display:block}
+#hourstone-preview .hs-header{display:flex;gap:10px;align-items:center;min-height:66px;padding:2px 0 10px;border-bottom:1px solid #8b8b7c}
+#hourstone-preview .hs-grip{color:#a8aba9;opacity:.7;font:26px/1 Gelasio;cursor:move;user-select:none}
+#hourstone-preview .hs-title-logo{width:42px;height:42px;object-fit:contain}
+#hourstone-preview .hs-title{flex:1;min-width:0}
+#hourstone-preview .hs-title h1{margin:0;color:var(--hs-gold);font-size:22px;font-weight:400;line-height:1.25;text-shadow:0 1px 1px #000}
+#hourstone-preview .hs-title h1 span{font-size:18px}
+#hourstone-preview .hs-title p{margin:3px 0 0;font-size:12px;color:#b4b1a6}
+#hourstone-preview .hs-header-actions{display:flex;align-items:center;gap:4px}
+#hourstone-preview .hs-art-button{background:none;border:0;padding:0;width:27px;height:27px;display:grid;place-items:center}
+#hourstone-preview .hs-art-button img{width:100%;height:100%}
+#hourstone-preview .hs-art-button:hover{filter:brightness(1.2)}
+#hourstone-preview .hs-art-button:active{transform:translateY(1px);filter:brightness(.85)}
+#hourstone-preview .hs-gear{font:29px/1 Gelasio;color:#bead7c;background:transparent;border:0;padding:0 5px 0 0}
+#hourstone-preview .hs-summary{display:grid;grid-template-columns:1.65fr .7fr 1.15fr;padding:21px 6px 19px;gap:20px;border-bottom:1px solid var(--hs-line)}
+#hourstone-preview .hs-stat{min-width:0}
+#hourstone-preview .hs-stat:not(:first-child){border-left:1px solid #6f716044;padding-left:20px}
+#hourstone-preview .hs-stat-label{display:block;color:#aba99b;font:11px/1.3 Selawik,sans-serif;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+#hourstone-preview .hs-stat strong{display:block;color:var(--hs-gold);font-size:25px;font-weight:400;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap}
+#hourstone-preview .hs-stat:not(:first-child) strong{font-size:22px}
+#hourstone-preview .hs-stat small{display:block;color:var(--hs-muted);font-size:11px;margin-top:6px}
+#hourstone-preview .hs-current-name{color:#8acbf5!important}
+#hourstone-preview .hs-toolbar{display:flex;gap:10px;align-items:center;padding:16px 1px 14px;flex-wrap:wrap}
+#hourstone-preview .hs-search-label{flex:1;min-width:155px}
+#hourstone-preview .hs-toolbar input,#hourstone-preview .hs-toolbar select{background:#0d1114;color:#e3decc;border:1px solid #757262;border-radius:3px;box-shadow:inset 0 1px 3px #0008;padding:7px 10px;min-height:32px;font-size:13px}
+#hourstone-preview .hs-toolbar input{width:100%}
+#hourstone-preview .hs-toolbar input::placeholder{color:#979e9c}
+#hourstone-preview .hs-toolbar select{min-width:138px}
+#hourstone-preview .hs-format{display:flex;border:1px solid #72664c;border-radius:3px;overflow:hidden;flex-shrink:0}
+#hourstone-preview .hs-format button{border:0;background:#181b1b;padding:7px 12px;font-size:12px;min-height:32px;color:#b7b5aa}
+#hourstone-preview .hs-format button+button{border-left:1px solid #72664c}
+#hourstone-preview .hs-format button[aria-pressed=true]{color:#ffe3a1;background:linear-gradient(#71332c,#421a18);box-shadow:inset 0 0 0 1px #b38f5355}
+#hourstone-preview .hs-table-wrap{overflow-x:auto;scrollbar-color:#8c7d59 #171a1b;min-height:calc(var(--hs-row-height)*8 + 32px)}
+#hourstone-preview .hs-table{border-collapse:collapse;width:100%;font-size:13px;table-layout:fixed;min-width:600px}
+#hourstone-preview .hs-table th{padding:0;text-align:left;border-bottom:1px solid #6d6c5f;font-weight:400;height:30px;color:#b7b3a5}
+#hourstone-preview .hs-table th:first-child{width:27%}
+#hourstone-preview .hs-table th:nth-child(2){width:8%}
+#hourstone-preview .hs-table th:nth-child(3){width:19%}
+#hourstone-preview .hs-table th:nth-child(4){width:27%}
+#hourstone-preview .hs-table th:nth-child(5){width:19%}
+#hourstone-preview .hs-table th button{display:flex;gap:5px;align-items:center;width:100%;padding:0 9px;text-align:inherit;background:none;border:0;font:12px Selawik,sans-serif;color:inherit;height:30px}
+#hourstone-preview .hs-table th button:hover{color:var(--hs-gold)}
+#hourstone-preview .hs-table th[aria-sort=descending],#hourstone-preview .hs-table th[aria-sort=ascending]{color:var(--hs-gold)}
+#hourstone-preview .hs-level-cell{text-align:center!important}
+#hourstone-preview .hs-level-cell button{justify-content:center}
+#hourstone-preview .hs-time-cell{text-align:right!important}
+#hourstone-preview .hs-time-cell button{justify-content:flex-end}
+#hourstone-preview .hs-table td{height:var(--hs-row-height);padding:0 9px;border-bottom:1px solid #8a8e791f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hourstone-preview .hs-table tbody tr:nth-child(even){background:#ffffff03}
+#hourstone-preview .hs-table tbody tr:hover{background:#eedeb30b}
+#hourstone-preview .hs-table tbody tr.hs-active{background:#6bb5d010;box-shadow:inset 2px 0 0 #66bfe5}
+#hourstone-preview .hs-character-name{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom;font-size:14px}
+#hourstone-preview .hs-live-dot{display:inline-block;width:5px;height:5px;background:#6ce1b3;border-radius:50%;vertical-align:middle;margin-right:6px;box-shadow:0 0 5px #77ddb533}
+#hourstone-preview .hs-level{color:#d3c3a1;font-variant-numeric:tabular-nums;text-align:center}
+#hourstone-preview .hs-realm-value{color:#acaeab}
+#hourstone-preview .hs-played{font-variant-numeric:tabular-nums;text-align:right;color:#eee1be}
+#hourstone-preview .hs-updated{color:#969e9c;font:11px Selawik,sans-serif}
+#hourstone-preview .hs-active .hs-updated{color:#8cc8b5}
+#hourstone-preview .hs-empty{height:160px!important;text-align:center;color:#a8ada7;white-space:normal!important}
+#hourstone-preview .hs-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;min-height:40px;padding:7px 7px 2px;color:#aaa99b;font-size:11px}
+#hourstone-preview .hs-credit{white-space:nowrap;color:#838784;display:flex;align-items:center;gap:5px}
+#hourstone-preview .hs-heart{width:9px;height:9px;display:block}
+#hourstone-preview .hs-filter-summary{font-variant-numeric:tabular-nums}
+#hourstone-preview .hs-bottom-bar{display:flex;align-items:center;gap:12px;padding:14px 7px 2px;font:11px/1.45 Selawik,sans-serif;color:#9ea5a3}
+#hourstone-preview .hs-bottom-bar>span:nth-child(2){flex:1}
+#hourstone-preview .hs-demo-minimap button{border:0;padding:0;background:transparent;display:grid;place-items:center}
+#hourstone-preview .hs-preview-version{white-space:nowrap;letter-spacing:1px;font-size:10px;color:#8c8f86}
+#hourstone-preview .hs-settings{position:absolute;right:16px;top:68px;z-index:5;width:265px;max-width:calc(100% - 32px);padding:18px;background:#171b1c;border:2px solid #9d8959;box-shadow:0 8px 30px #000b;color:var(--hs-text)}
+#hourstone-preview .hs-settings h2{margin:0 0 16px;color:var(--hs-gold);font-size:17px;font-weight:400}
+#hourstone-preview .hs-settings label{display:flex;gap:10px;align-items:center;margin:12px 0;font-size:13px}
+#hourstone-preview .hs-settings input{accent-color:#d6b362;width:16px;height:16px}
+#hourstone-preview .hs-settings-close,#hourstone-preview .hs-reopen button{padding:5px 18px;border:1px solid #a28b5d;border-radius:3px;background:linear-gradient(#693028,#341412);color:#f4d997}
+#hourstone-preview .hs-reopen{min-height:340px;display:flex;align-items:center;justify-content:center;gap:15px;flex-direction:column;background:#141a1d;border:1px solid #81704d;border-radius:5px}
+#hourstone-preview .hs-reopen img{width:90px;height:90px;object-fit:contain}
+#hourstone-preview .hs-reopen code{color:#9a9d94;font-size:12px}
+#hourstone-preview .hs-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+#hourstone-preview[data-skin=classic]{--hs-line:#59594f}
+#hourstone-preview[data-skin=classic] .hs-toolbar input,#hourstone-preview[data-skin=classic] .hs-toolbar select{background:#121311;border-color:#777568}
+#hourstone-preview[data-skin=classic] .hs-settings{background:#1a1b18;border-color:#8b8a7e}
+
+#hourstone-preview .hs-header{height:66px}
+#hourstone-preview .hs-summary{height:114.6875px}
+#hourstone-preview .hs-toolbar{height:64.1875px;flex-wrap:nowrap}
+#hourstone-preview .hs-table-wrap{height:calc(var(--hs-row-height)*8 + 32px);overflow-y:auto}
+#hourstone-preview .hs-format{width:155.546875px;flex-shrink:0;display:flex}
+#hourstone-preview .hs-format button:first-child{width:84.6875px}
+#hourstone-preview .hs-format button:last-child{flex:1}
+#hourstone-preview[data-language=en] .hs-format{width:161px}
+#hourstone-preview[data-language=en] .hs-format button:first-child{width:98px}
+#hourstone-preview .hs-search{height:34.1875px}
+#hourstone-preview .hs-realm{height:33px}
+#hourstone-preview .hs-grip{width:19.59375px;flex-shrink:0;font-size:0;position:relative;height:42px}
+#hourstone-preview .hs-grip::before{content:"";position:absolute;left:3px;top:15.5px;width:2px;height:2px;background:#a8aba9;border-radius:50%;box-shadow:5px 0 #a8aba9,0 5px #a8aba9,5px 5px #a8aba9,0 10px #a8aba9,5px 10px #a8aba9}
+#hourstone-preview .hs-minimap{width:32px;height:32px;overflow:hidden}
+#hourstone-preview .hs-minimap img{width:19px;height:19px}
+#hourstone-preview .hs-footer{height:40px;flex-wrap:nowrap}
+
+
+#hourstone-preview .hs-window{width:980px;height:626px;left:50%;margin-left:-490px;transform-origin:top center}
+#hourstone-preview .hs-settings{height:234px;padding:0}
+#hourstone-preview .hs-settings h2{position:absolute;left:18px;top:18px;line-height:23.8px;margin:0}
+#hourstone-preview .hs-settings label{position:absolute;left:18px;top:59px;height:18px;margin:0;gap:8px}
+#hourstone-preview .hs-settings input{margin:0}
+#hourstone-preview .hs-scale-label{position:absolute;left:18px;top:94px;width:166px;height:28px;font:12px/28px Selawik,sans-serif}
+#hourstone-preview .hs-scale-down,#hourstone-preview .hs-scale-up,#hourstone-preview .hs-reset{position:absolute;height:28px;background:#0d1114;border:1px solid #757262;border-radius:3px;font-size:13px}
+#hourstone-preview .hs-scale-down{left:185px;top:94px;width:27px}
+#hourstone-preview .hs-scale-up{left:216px;top:94px;width:27px}
+#hourstone-preview .hs-reset{left:18px;top:133px;width:225px;height:30px;text-align:left;padding:0 10px}
+#hourstone-preview .hs-settings-close{position:absolute;left:159px;top:182px;width:84px;height:30px;padding:0;font-size:13px}
+#hourstone-preview[data-skin=classic] .hs-scale-down,#hourstone-preview[data-skin=classic] .hs-scale-up,#hourstone-preview[data-skin=classic] .hs-reset{background:#121311;border-color:#777568}
+#hourstone-preview .hs-hourstone-minimap{position:relative;width:36px;height:36px;border:0;box-shadow:none;background:transparent;isolation:isolate}
+#hourstone-preview .hs-hourstone-minimap::before,#hourstone-preview .hs-hourstone-minimap::after{content:"";position:absolute;inset:0;background-size:100% 100%;pointer-events:none}
+#hourstone-preview .hs-hourstone-minimap::before{background-image:var(--hs-minimap-background);z-index:-1}
+#hourstone-preview .hs-hourstone-minimap::after{background-image:var(--hs-minimap-border);z-index:2}
+#hourstone-preview .hs-hourstone-minimap:hover::after{background-image:var(--hs-minimap-hover),var(--hs-minimap-border)}
+#hourstone-preview .hs-hourstone-minimap img{width:22px;height:22px;clip-path:circle(16px at center)}
+
+</style>
+<script>
+(() => {
+  const root = document.getElementById('hourstone-preview');
+  const assets = __HOURSTONE_ASSETS__;
+  const q = s => root.querySelector(s);
+  const qa = s => [...root.querySelectorAll(s)];
+  const state = { skin:'retail', language:'de', format:'combined', query:'', realm:'all', sort:'seconds', descending:true, scale:1, x:0, y:0, gold:'#e9c46e' };
+  const chars = [
+    {name:'Elarion',realm:'Blackhand',level:90,seconds:7633560,age:0,color:'#69ccf0',active:true},
+    {name:'Thalindra',realm:'Antonidas',level:90,seconds:3042900,age:2,color:'#ff7d0a'},
+    {name:'Morgath',realm:'Blackhand',level:90,seconds:1923600,age:1,color:'#c79c6e'},
+    {name:'Lunara',realm:'Die Aldor',level:86,seconds:976620,age:7,color:'#ffffff'},
+    {name:'Elarion',realm:'Die Aldor',level:80,seconds:532080,age:12,color:'#abd473'},
+    {name:'Schattenwind',realm:'Blackhand',level:74,seconds:261240,age:3,color:'#c5a4ff'},
+    {name:'Bronzebart',realm:'Antonidas',level:42,seconds:78180,age:24,color:'#fff27a'},
+    {name:'Funkenflug',realm:'Antonidas',level:16,seconds:12900,age:5,color:'#f58cba'}
+  ];
+  const words = {
+    de:{preview:'Designvorschau · Beispieldaten',tagline:'Deine Charaktere. Deine Spielzeit.',total:'Gesamte Spielzeit',allTracked:'Alle erfassten Charaktere',characters:'Charaktere',session:'Aktuelle Sitzung',search:'Charakter suchen',realm:'Realm',combined:'Tage + Std.',hours:'Stunden',character:'Charakter',level:'Level',played:'Spielzeit',updated:'Aktualisiert',settings:'Einstellungen',minimap:'Minimap-Button anzeigen',scale:'Fensterskalierung',reset:'Position zurücksetzen',done:'Fertig',open:'Hourstone öffnen',hint:'Weitere Charaktere erscheinen nach dem ersten Login mit Hourstone.',allRealms:'Alle Realms',now:'Gerade eben',yesterday:'Gestern',noResults:'Keine passenden Charaktere gefunden.',visible:'Charaktere angezeigt',close:'Fenster schließen'},
+    en:{preview:'Design preview · Sample data',tagline:'Your characters. Your time.',total:'Total time played',allTracked:'All tracked characters',characters:'Characters',session:'Current session',search:'Search characters',realm:'Realm',combined:'Days + hours',hours:'Hours',character:'Character',level:'Level',played:'Time played',updated:'Updated',settings:'Settings',minimap:'Show minimap button',scale:'Window scale',reset:'Reset position',done:'Done',open:'Open Hourstone',hint:'More characters appear after their first login with Hourstone.',allRealms:'All realms',now:'Just now',yesterday:'Yesterday',noResults:'No matching characters found.',visible:'characters shown',close:'Close window'}
+  };
+  function time(seconds){
+    if(state.format==='hours')return (seconds/3600).toLocaleString(state.language==='de'?'de-DE':'en-US',{minimumFractionDigits:1,maximumFractionDigits:1})+(state.language==='de'?' Std.':' hrs');
+    const m=Math.floor(seconds/60),d=Math.floor(m/1440),h=Math.floor(m%1440/60),min=m%60;
+    return state.language==='de'?`${d} T. ${h} Std. ${min} Min.`:`${d}d ${h}h ${min}m`;
+  }
+  function age(days){const w=words[state.language];return days===0?w.now:days===1?w.yesterday:state.language==='de'?`Vor ${days} Tagen`:`${days} days ago`;}
+  function paintFrame(){
+    const frame=q('.hs-frame'),w=frame.clientWidth,h=frame.clientHeight;
+    if(!w||!h)return;
+    const classic=state.skin==='classic',x0=2,x1=510,y0=classic?118:120,y1=classic?393:391;
+    const sourceCorner=classic?52:23,edge=classic?14:10,cutX=(x1-x0)*sourceCorner/(classic?710:711),cutY=(y1-y0)*sourceCorner/(classic?384:379);
+    const srcX=[x0,x0+cutX,x1-cutX,x1],srcY=[y0,y0+cutY,y1-cutY,y1],dstX=[0,edge,w-edge,w],dstY=[0,edge,h-edge,h];
+    const img=assets[classic?'ClassicPanel':'RetailPanel'];
+    if(frame.childElementCount!==9){frame.replaceChildren();for(let k=0;k<9;k++){const d=document.createElement('div');d.className='hs-slice';d.append(document.createElement('img'));frame.append(d);}}
+    for(let y=0;y<3;y++)for(let x=0;x<3;x++){
+      const tile=frame.children[y*3+x],child=tile.firstChild,dw=dstX[x+1]-dstX[x],dh=dstY[y+1]-dstY[y],sx=dw/(srcX[x+1]-srcX[x]),sy=dh/(srcY[y+1]-srcY[y]);
+      Object.assign(tile.style,{left:dstX[x]+'px',top:dstY[y]+'px',width:dw+'px',height:dh+'px'});
+      if(child.getAttribute('src')!==img)child.src=img;
+      Object.assign(child.style,{width:(512*sx)+'px',height:(512*sy)+'px',left:(-srcX[x]*sx)+'px',top:(-srcY[y]*sy)+'px'});
+      child.alt='';
+    }
+  }
+  function render(){
+    root.dataset.language=state.language;
+    const w=words[state.language];
+    root.dataset.skin=state.skin;root.lang=state.language;root.style.setProperty('--hs-gold',state.gold);
+    qa('[data-i18n]').forEach(el=>el.textContent=w[el.dataset.i18n]);
+    qa('[data-skin-choice]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.skinChoice===state.skin)));
+    qa('[data-format]').forEach(el=>el.setAttribute('aria-pressed',String(el.dataset.format===state.format)));
+    q('.hs-search').placeholder=w.search+' …';q('.hs-realm').options[0].textContent=w.allRealms;
+    q('.hs-close').setAttribute('aria-label',w.close);q('.hs-gear').setAttribute('aria-label',w.settings);
+    q('.hs-total').textContent=time(chars.reduce((s,c)=>s+c.seconds,0));
+    q('.hs-count').textContent=chars.length;q('.hs-session').textContent=state.language==='de'?'2 Std. 14 Min.':'2h 14m';
+    const filtered=chars.filter(c=>(state.realm==='all'||c.realm===state.realm)&&c.name.toLocaleLowerCase().includes(state.query.toLocaleLowerCase()));
+    filtered.sort((a,b)=>{const av=a[state.sort],bv=b[state.sort];let r=typeof av==='number'?av-bv:String(av).localeCompare(String(bv),state.language);if(state.descending)r=-r;return r||a.realm.localeCompare(b.realm);});
+    const body=q('.hs-rows');body.replaceChildren();
+    for(const c of filtered){
+      const tr=document.createElement('tr');if(c.active)tr.className='hs-active';
+      const name=document.createElement('td'),span=document.createElement('span');span.className='hs-character-name';span.style.color=c.color;
+      if(c.active){const dot=document.createElement('span');dot.className='hs-live-dot';dot.setAttribute('aria-hidden','true');span.append(dot);}
+      span.append(document.createTextNode(c.name));name.append(span);name.setAttribute('aria-label',c.name+' – '+c.realm);tr.append(name);
+      const values=[['hs-level',state.skin==='classic'?Math.max(1,Math.round(c.level*60/90)):c.level],['hs-realm-value',c.realm],['hs-played',time(c.seconds)],['hs-updated',age(c.age)]];
+      for(const [cls,value] of values){const td=document.createElement('td');td.className=cls;td.textContent=value;tr.append(td);}body.append(tr);
+    }
+    if(!filtered.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=5;td.className='hs-empty';td.textContent=w.noResults;tr.append(td);body.append(tr);}
+    q('.hs-filter-summary').textContent=`${filtered.length} / ${chars.length} ${w.visible}`+((state.realm!=='all'||state.query)?' · '+time(filtered.reduce((s,c)=>s+c.seconds,0)):'');
+    qa('[data-sort]').forEach(el=>{const active=el.dataset.sort===state.sort;el.parentElement.setAttribute('aria-sort',active?(state.descending?'descending':'ascending'):'none');el.querySelector('.hs-sort-mark').textContent=active?(state.descending?'▾':'▴'):'';});
+    scaleWindow();paintFrame();
+  }
+  qa('[data-asset]').forEach(el=>el.src=assets[el.dataset.asset]);
+  for(const name of ['Background','Border','Hover'])root.style.setProperty('--hs-minimap-'+name.toLowerCase(),`url(${assets['Minimap'+name]})`);
+  qa('[data-skin-choice]').forEach(el=>el.addEventListener('click',()=>{state.skin=el.dataset.skinChoice;render();}));
+  qa('[data-format]').forEach(el=>el.addEventListener('click',()=>{state.format=el.dataset.format;render();}));
+  qa('[data-sort]').forEach(el=>el.addEventListener('click',()=>{if(state.sort===el.dataset.sort)state.descending=!state.descending;else{state.sort=el.dataset.sort;state.descending=state.sort==='seconds'||state.sort==='level';}render();}));
+  q('.hs-search').addEventListener('input',e=>{state.query=e.target.value.trim();render();});
+  q('.hs-realm').addEventListener('change',e=>{state.realm=e.target.value;render();});
+  q('.hs-language').addEventListener('change',e=>{state.language=e.target.value;render();});
+  const settings=q('.hs-settings'),gear=q('.hs-gear');
+  function setSettings(open){settings.hidden=!open;gear.setAttribute('aria-expanded',String(open));}
+  gear.addEventListener('click',()=>setSettings(settings.hidden));q('.hs-settings-close').addEventListener('click',()=>setSettings(false));
+  function scaleWindow(){
+    const factor=Math.min(state.scale,(innerWidth-20)/980,(innerHeight-20)/626);
+    q('.hs-window').style.transform=`translate(${state.x}px,${state.y}px) scale(${factor})`;
+    q('.hs-window-wrap').style.height=626*factor+'px';
+    q('.hs-scale-label').textContent=words[state.language].scale+': '+Math.round(state.scale*100)+'%';
+  }
+  q('.hs-scale-down').addEventListener('click',()=>{state.scale=Math.max(.65,state.scale-.05);scaleWindow();});
+  q('.hs-scale-up').addEventListener('click',()=>{state.scale=Math.min(1.3,state.scale+.05);scaleWindow();});
+  q('.hs-reset').addEventListener('click',()=>{state.x=state.y=0;scaleWindow();});
+  let drag=null;
+  const header=q('.hs-header');
+  header.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;drag={x:e.clientX-state.x,y:e.clientY-state.y};header.setPointerCapture(e.pointerId);});
+  header.addEventListener('pointermove',e=>{if(drag){state.x=e.clientX-drag.x;state.y=e.clientY-drag.y;scaleWindow();}});
+  header.addEventListener('pointerup',()=>{drag=null;});
+  addEventListener('resize',scaleWindow);
+  q('.hs-show-minimap').addEventListener('change',e=>q('.hs-demo-minimap').hidden=!e.target.checked);
+  function setWindow(open){q('.hs-window').hidden=!open;q('.hs-reopen').hidden=open;setSettings(false);if(open){requestAnimationFrame(paintFrame);}}
+  q('.hs-close').addEventListener('click',()=>setWindow(false));q('.hs-reopen button').addEventListener('click',()=>setWindow(true));q('.hs-demo-minimap button').addEventListener('click',()=>setWindow(q('.hs-window').hidden));
+  root.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!settings.hidden){setSettings(false);gear.focus();}else setWindow(false);}});
+  render();new ResizeObserver(paintFrame).observe(q('.hs-window'));
+  if(globalThis.Tweak){const tweak=new Tweak({container:root,onChange:render});tweak.addSelect(state,'skin',{label:'WoW-Gestaltung',options:[{label:'Retail',value:'retail'},{label:'Classic',value:'classic'}]});tweak.addColorPicker(state,'gold',{label:'Goldton der Überschriften',reference:'--hs-gold'});}
+})();
+</script>

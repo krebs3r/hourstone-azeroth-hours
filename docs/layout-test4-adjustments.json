@@ -1,0 +1,13 @@
+{
+  "source": "User feedback on the native test3 capture: narrow the left areas and give the combined-format button more room. Design-unit adjustments at 100%, applied to the preserved Mockup 05 DOM baseline; not a new in-game measurement.",
+  "summaryColumns": [38,22,40],
+  "search": [10,120,362,26],
+  "realm": [379,120,139,26],
+  "format": [525,120.5,185,25],
+  "combinedButton": [525,120.5,111,25],
+  "hoursButton": [639,120.5,71,25],
+  "statLabels": [[15,61.5,250.2,15],[290.2,61.5,126.8,15],[442,61.5,251,15]],
+  "statTotal": [15,76.5,250.2,25],
+  "statSession": [442,76.5,251,25],
+  "columnWidths": [280,245,175]
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Hourstone – Azeroth Hours",
+  "summary": "Track character playtime, total hours and your current session in a compact window with search, realm filters and sorting.",
+  "game": "World of Warcraft",
+  "category": "Miscellaneous",
+  "license": "MIT License",
+  "source": "https://github.com/krebs3r/hourstone-azeroth-hours",
+  "issues": "https://github.com/krebs3r/hourstone-azeroth-hours/issues",
+  "confirmed_clients": [
+    "Retail 12.1.0",
+    "TBC Anniversary 2.5.6"
+  ]
+}

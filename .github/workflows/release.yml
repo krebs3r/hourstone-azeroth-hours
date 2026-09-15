@@ -1,4 +1,4 @@
-name: Prerelease
+name: Release
 on:
   push:
     tags: ['v*']
@@ -32,7 +32,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
         run: python tools/package.py --tag "$RELEASE_TAG"
-      - name: Publish prerelease after successful checks
+      - name: Publish release after successful checks
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -53,4 +53,4 @@ jobs:
             exit 1
           fi
           gh release create "$RELEASE_TAG" "dist/Hourstone-$version.zip" "dist/Hourstone-$version.zip.sha256" \
-            --verify-tag --prerelease --title "Hourstone $version – Azeroth Hours" --notes-file docs/RELEASE-NOTES.md
+            --verify-tag --title "Hourstone $version â€“ Azeroth Hours" --notes-file docs/RELEASE-NOTES.md

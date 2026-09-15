@@ -1,0 +1,40 @@
+name: Import verified source
+on:
+  push:
+    paths: ['.github/workflows/import-source.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify and unpack reviewed source
+        run: |
+          python - <<'PY'
+          import hashlib, pathlib, zipfile
+          source = pathlib.Path('Hourstone-source-upload.zip')
+          assert hashlib.sha256(source.read_bytes()).hexdigest() == 'f5edbeadeb0b04ad6fe5927a7928dc1f17e8003c70f968cf3beda275dce28055'
+          with zipfile.ZipFile(source) as archive:
+              for name in archive.namelist():
+                  path = pathlib.PurePosixPath(name)
+                  assert not path.is_absolute() and '..' not in path.parts and '.git' not in path.parts
+                  if not name.startswith('.github/'):
+                      archive.extract(name)
+          PY
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python tests/run.py
+      - run: python -m unittest discover -s tests -p 'test_*.py'
+      - run: python tools/package.py --tag v0.1.0
+      - name: Commit checked source
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm Hourstone-source-upload.zip
+          git add .
+          git commit -m 'Import checked Hourstone 0.1.0 addon, assets and documentation'
+          git push origin HEAD:main

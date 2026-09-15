@@ -6,7 +6,7 @@
 
 A standalone World of Warcraft addon that keeps a list of your characters and their total playtime. A sibling to [Soundstone – Azeroth Audio](https://github.com/krebs3r/soundstone-azeroth-audio), with the same blue rune stone, warm gold details and Retail / Classic frames.
 
-[Download Hourstone 0.1.1](https://github.com/krebs3r/hourstone-azeroth-hours/releases/download/v0.1.1/Hourstone-0.1.1.zip) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
+[Download Hourstone 0.1.1](https://github.com/krebs3r/hourstone-azeroth-hours/releases/download/v0.1.1/Hourstone-0.1.1.zip) · [CurseForge](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
 ## Features
 

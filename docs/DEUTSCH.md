@@ -50,6 +50,6 @@ Für weitere Funktionsprüfungen kann die [kurze Testanleitung](TESTING-0.1.1-DE
 
 ## Vorschau und Rückmeldungen
 
-Das [freigegebene Mockup](mockup-05/index.html) zeigt Beispieldaten im Browser. Es ist keine Spielaufnahme. Echte Screenshots und Ergebnisse je Client folgen nach den [Ingame-Prüfungen](VALIDATION.md).
+Das [freigegebene Mockup](mockup-05/index.html) zeigt Beispieldaten im Browser. Es ist keine Spielaufnahme. Die [vorhandene Spielaufnahme](curseforge/screenshots/compact-ingame.png) stammt aus Test 3; die nachfolgenden Korrekturen und die Nutzerbestätigung für Retail und TBC Anniversary sind in den [Prüfergebnissen](VALIDATION.md) dokumentiert.
 
 Bitte melde Fehler über [GitHub Issues](https://github.com/krebs3r/hourstone-azeroth-hours/issues) mit Client-Version, Sprache, Schritten zum Nachstellen und gegebenenfalls der Lua-Fehlermeldung.

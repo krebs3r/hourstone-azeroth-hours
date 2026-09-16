@@ -5,11 +5,22 @@ function T:Init(db)
     self.db, self.started, self.wantSync = db, false, false
 end
 function T:UpdateIdentity(level)
-    local identity = C.Identity()
+    local identity = C.Identity(self.db.sourceId)
     if not identity then return false end
     self.key = identity.key
     local record = self.db.characters[self.key]
-    if type(record) ~= "table" then record = {}; self.db.characters[self.key] = record end
+    -- Adopt only an existing local observation when its previously unknown region
+    -- becomes available. Imported observations are never in db.characters.
+    if type(record) ~= "table" then record = nil end
+    for key, candidate in pairs(self.db.characters) do
+        if key ~= self.key and type(candidate) == "table" and candidate.guid == identity.guid and candidate.flavor == identity.flavor
+            and (candidate.region == nil or candidate.region == "unknown" or candidate.region == identity.region) then
+            record = H.S.Choose(record, candidate); self.db.characters[key] = nil
+            if type(self.db.runtime) == "table" and self.db.runtime.key == key then self.db.runtime.key = self.key end
+        end
+    end
+    if type(record) ~= "table" then record = {} end
+    self.db.characters[self.key] = record
     for k, v in pairs(identity) do if k ~= "key" then record[k] = v end end
     if M.Number(level) then record.level = level end
     self.record = record
@@ -59,7 +70,11 @@ function T:Receive(total)
     if not self.started or not M.Number(total) then return false end
     -- A server answer is a replacement baseline, including answers to manual /played.
     self.base, self.baseAt, self.wantSync = total, C.Now(), false
-    self.record.seconds, self.record.updatedAt, self.record.syncedAt = total, C.Epoch(), C.Epoch()
+    local serverAt = C.ServerEpoch()
+    if not M.Number(serverAt) then serverAt = nil end
+    self.record.seconds, self.record.updatedAt = total, C.Epoch()
+    self.record.serverSeconds, self.record.serverAt = M.Number(serverAt) and total or nil, serverAt
+    self.record.syncedAt = nil
     return true
 end
 function T:Save()

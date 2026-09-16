@@ -1,4 +1,4 @@
-"""Build approved artwork and code-defined UI primitives (uncompressed BGRA TGA)."""
+"""Build artwork and code-defined UI primitives (uncompressed BGRA TGA)."""
 from pathlib import Path
 import math
 import struct
@@ -55,7 +55,7 @@ def build():
     for name,size in SIZES.items():
         im=Image.open(ROOT/"docs/assets"/f"{name}.png").convert("RGBA")
         save(name,im.resize((size,size),Image.Resampling.LANCZOS))
-    manifest=json.loads((ROOT/"docs/mockup-05/soundstone-assets.json").read_text(encoding="utf-8"))
+    manifest=json.loads((ROOT/"docs/assets/soundstone-manifest.json").read_text(encoding="utf-8"))
     for name,entry in manifest["assets"].items():
         data=base64.b64decode(entry["base64"],validate=True)
         blob=b"blob "+str(len(data)).encode()+b"\0"+data
@@ -94,6 +94,6 @@ def build():
         d.ellipse((15*s,15*s,49*s,49*s),fill=(0,0,0,0))
         d.ellipse((21*s,21*s,43*s,43*s),outline="#bead7c",width=4*s)
     primitive("Gear",gear)
-    print("Built approved artwork and UI primitives.")
+    print("Built artwork and UI primitives.")
 
 if __name__=="__main__": build()

@@ -3,6 +3,26 @@ local C = {}
 H.C = C
 function C.Now() return GetTime() end
 function C.Epoch() return GetServerTime and GetServerTime() or time() end
+-- Server timestamps alone may establish an authoritative /played baseline.
+function C.ServerEpoch() return GetServerTime and GetServerTime() or nil end
+function C.Region()
+    local regions = {"us", "kr", "eu", "tw", "cn"}
+    local guid = UnitGUID("player")
+    local info = guid and C_BattleNet and C_BattleNet.GetGameAccountInfoByGUID and C_BattleNet.GetGameAccountInfoByGUID(guid)
+    local id = type(info) == "table" and info.regionID or nil
+    if not regions[id] then id = GetCurrentRegion and GetCurrentRegion() or 0 end
+    -- Live Classic families have their own Cfg_Regions IDs. Test/arena regions
+    -- deliberately remain unknown instead of being mistaken for a live region.
+    if type(id) == "number" and id >= 41 and id <= 45 then id = id - 40 end
+    if type(id) == "number" and id >= 81 and id <= 85 then id = id - 80 end
+    return regions[id] or "unknown"
+end
+function C.SourceId()
+    local parts = {}
+    for i = 1, 8 do parts[i] = string.format("%04x", math.random(0, 65535)) end
+    -- Include the server epoch without changing WoW's shared random seed.
+    return "hs-" .. tostring(C.Epoch()) .. "-" .. table.concat(parts)
+end
 function C.Retail() return WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1) end
 function C.Flavor()
     local id = WOW_PROJECT_ID
@@ -14,18 +34,21 @@ function C.Flavor()
 end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.1.1"
+    return getter and getter("Hourstone", "Version") or "0.2.0"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)
 end
 function C.Lower(s) return (strlower or string.lower)(s) end
-function C.Identity()
+function C.Identity(sourceId)
     local guid = UnitGUID("player")
     if not guid then return nil end
     local name, realm = UnitFullName("player")
     local _, class = UnitClass("player")
-    return { key = C.Flavor() .. ":" .. guid, guid = guid, flavor = C.Flavor(), name = name or "?",
+    local region, flavor = C.Region(), C.Flavor()
+    local scope = region == "unknown" and (region .. ":" .. (sourceId or "local")) or region
+    return { key = scope .. ":" .. flavor .. ":" .. guid, guid = guid, flavor = flavor, region = region,
+        sourceId = sourceId, name = name or "?",
         realm = realm and realm ~= "" and realm or GetRealmName(), class = class or "",
         level = UnitLevel("player") }
 end

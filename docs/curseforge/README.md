@@ -1,32 +1,22 @@
 # Publishing Hourstone on CurseForge
 
-Project: [Hourstone – Azeroth Hours](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours), ID **1697059**. Current status is recorded in [STATUS.md](STATUS.md).
+Project: [Hourstone – Azeroth Hours](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours), ID **1697059**. [project.json](project.json) contains the configured game versions and public project metadata.
 
-For 0.1.1 the user requested a GitHub release and CurseForge upload, and confirmed Retail and TBC Anniversary. On 2026-09-16, the user also confirmed Classic and Classic Era and requested enabling both for the existing release. [Acceptance](acceptance/v0.1.1.md) records the confirmation, exact commit and package hash.
+## Setup and release
 
-## One-time setup
+1. Create a dedicated token in the [CurseForge token settings](https://authors-old.curseforge.com/account/api-tokens) and save it as the repository Actions secret `CF_API_TOKEN`. Run **Check CurseForge connection** to verify authentication and configured versions without uploading.
+2. Update the TOC version, release notes, changelog and confirmed game-version configuration. Complete automated and native-client validation.
+3. Push the matching `vX.Y.Z` tag or run **Release** with that tag. The workflow checks repository privacy, runs tests, builds the ZIP and SHA-256, and publishes the GitHub release.
+4. The dependent CurseForge job downloads that exact ZIP, verifies its checksum and GitHub asset digest, checks the embedded TOC version, then uploads the release notes and configured game versions through the [CurseForge Upload API](https://support.curseforge.com/support/solutions/articles/9000197321).
 
-Create a dedicated **Hourstone GitHub Releases** token in the [CurseForge token settings](https://authors-old.curseforge.com/account/api-tokens), then save it as the repository Actions secret **CF_API_TOKEN** in [GitHub settings](https://github.com/krebs3r/hourstone-azeroth-hours/settings/secrets/actions). Do not commit tokens or reuse Soundstone credentials. Run the **Check CurseForge connection** workflow: it checks authentication and the configured game versions without uploading a file. Project upload permissions and moderation can only be fully verified by an actual release upload.
+The resulting `curseforge-upload.json` release asset records the file ID and ZIP hash. Check moderation and public availability separately. A workflow triggered by a manually created GitHub release is not configured; use the tag or workflow above.
 
-## Normal releases
+## Interrupted uploads and retries
 
-1. Update `Hourstone/Hourstone.toc`, `docs/RELEASE-NOTES.md`, and the changelog. Keep `project.json`'s `game_versions` list limited to confirmed clients (currently Retail **12.1.0**, Mists Classic **5.5.4**, TBC Anniversary **2.5.6** and Classic Era **1.15.9**); update this list when support changes. The other TOC interfaces do not automatically opt clients into distribution.
-2. Push the matching `vX.Y.Z` tag, or manually run **Release** with that tag. CI tests and builds the ZIP and SHA-256, then publishes the GitHub release.
-3. The dependent **Upload release to CurseForge** job downloads that published ZIP, verifies both its checksum file and GitHub asset digest, and checks the embedded TOC version. It sends the GitHub release notes and the configured game versions through the [official CurseForge Upload API](https://support.curseforge.com/support/solutions/articles/9000197321). CurseForge publishes the file after approval.
-4. The release asset `curseforge-upload.json` records the actual CurseForge file ID and ZIP hash. The Actions summary links to the file. Verify moderation and CurseForge-app availability separately.
+The job creates `curseforge-upload-pending.json` on the GitHub release without overwriting it before sending an upload. A completed receipt makes retries a no-op. The minimal [historical receipt](releases/v0.1.1.json) protects the first published upload from duplication.
 
-## Failures and retries
+If a token or other pre-upload check fails, correct it and re-run failed jobs. Re-running the whole release job stops at an existing GitHub release to preserve published assets.
 
-The GitHub release remains published if CurseForge fails. After correcting a missing token or a pre-upload error, choose **Re-run failed jobs** on the original Release run. Re-running all jobs stops at the existing GitHub release to preserve its assets. Creating a GitHub release through the website alone does not trigger this workflow; use the tag push or Release workflow above.
+An interrupted upload with a pending marker requires inspection of the [authors dashboard](https://authors.curseforge.com/#/projects/1697059/files), including processing files. If upload succeeded, restore the verified receipt from the Actions artifact or reconstruct its file ID from the confirmed matching upload. Only remove a pending marker when the earlier job has stopped and absence of an upload has been established. Never treat a timeout as proof that no upload occurred.
 
-Before the upload, the job attaches `curseforge-upload-pending.json` to the GitHub release **without overwrite**. This prevents parallel or repeated attempts from uploading twice. A valid completed receipt makes a retry a no-op; the historical `releases/v0.1.1.json` also protects the first manual upload. The pending marker remains as an audit record after success.
-
-If a request times out or the runner stops after the marker was saved, the next attempt stops for inspection:
-
-- Check the [authors dashboard](https://authors.curseforge.com/#/projects/1697059/files), including processing files. Never assume a timeout means the upload failed.
-- If upload succeeded but attaching the receipt failed, download the `curseforge-upload-…` Actions artifact and attach its `curseforge-upload.json` to the matching GitHub release. If the response was lost, copy the pending record, add the verified `file_id` and `status: uploaded-awaiting-approval`, and attach it as `curseforge-upload.json` after confirming the uploaded file matches the ZIP.
-- Only when the previous job has stopped **and absence of an upload is confirmed**, remove the pending marker from that release and choose **Re-run failed jobs**. Do not overwrite a published ZIP or retry an ambiguous upload.
-
-Version 0.1.1 was uploaded manually; installing this automation does not upload it again. The source link and English/German description refer to GitHub; bugs go to GitHub Issues.
-
-`logo-400.png` is a proportional export of the approved logo, with the motif unchanged. `screenshots/compact-ingame.png` is the actual user-supplied **test3** capture, captioned in the gallery as predating the final label, checkbox and minimap corrections. Browser mockups are not presented as native screenshots.
+Published ZIPs and historical release tags remain immutable. `logo-400.png` is a proportional export of the Hourstone logo. [description.md](description.md) contains public product copy; real character databases, capture logs and local publishing credentials are not repository assets.

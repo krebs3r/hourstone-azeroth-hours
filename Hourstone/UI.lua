@@ -125,6 +125,7 @@ function U:SavePosition()
 end
 function U:CloseMenus()
     self.menu:Hide(); self.sortMenu:Hide(); self.settings:Hide()
+    if self.clientMenu then self.clientMenu:Hide() end
 end
 function U:ToggleSettings()
     self:Create(); local shown=self.settings:IsShown(); self:CloseMenus()
@@ -262,7 +263,22 @@ function U:Create()
         if not self.refreshing then self.offset=math.floor(v+.5); self:Refresh() end
     end)
     self.footerFrame=rect("Frame",f,10,212,700,26)
-    self.footer=text(self.footerFrame,"",10,5,2,580,{166/255,166/255,155/255},24)
+    self.footer=text(self.footerFrame,"",10,5,2,424,{166/255,166/255,155/255},24)
+    self.clientButton=control(self.footerFrame,L.allClients,435,3,139,22,function() self:ToggleClients() end,"Toggle")
+    self.clientButton.label:SetJustifyH("LEFT"); self.clientButton.label:SetWidth(107)
+    arrow(self.clientButton,124,9,6,4)
+    self.clientMenu=rect("Frame",self.footerFrame,435,-138,168,141)
+    self.clientMenu:SetFrameLevel(f:GetFrameLevel()+30); skin(self.clientMenu,self.panelName)
+    self.clientMenu:EnableMouse(true); self.clientMenu:Hide(); self.clientRows={}
+    for i,flavor in ipairs({"all","retail","mists","tbc","era"}) do
+        local b=rect("Button",self.clientMenu,8,8+(i-1)*25,152,25)
+        b.label=text(b,flavor=="all" and L.allClients or L[flavor],11,7,0,140,nil,25)
+        local glow=solid(b,"HIGHLIGHT",187/255,161/255,102/255,37/255); glow:SetAllPoints()
+        b:SetScript("OnClick",function()
+            self.flavor,self.offset=flavor~="all" and flavor or nil,0; self:CloseMenus(); self:Refresh()
+        end)
+        self.clientRows[flavor]=b
+    end
     local creditColor={156/255,158/255,146/255,.85}
     self.creditVersion=text(self.footerFrame,"v"..C.Version(),10,584,2,36,creditColor,24,"RIGHT")
     self.creditHeart=artwork(self.footerFrame,"Heart",9,9,625,9.5)
@@ -337,6 +353,10 @@ function U:ToggleRealms()
     for _,name in ipairs(self.stats.realms) do self.realmChoices[#self.realmChoices+1]={label=name,realm=name} end
     self.realmOffset=0; self:RenderRealms(); self.menu:Show()
 end
+function U:ToggleClients()
+    local shown=self.clientMenu:IsShown(); self:CloseMenus()
+    self.clientMenu:SetShown(not shown)
+end
 function U:RenderRealms()
     for i,b in ipairs(self.realmRows) do
         local entry=self.realmChoices[i+self.realmOffset]; b:SetShown(entry~=nil)
@@ -354,7 +374,8 @@ function U:Refresh()
     if not self.frame then return end
     self.refreshing=true
     local mode=self.db.settings.format
-    local entries,stats=M.List(self.db,self.searchText,self.realm,self.sort,self.descending,function(key,char) return T:Value(key,char) end)
+    local display=H.S.Display(self.db,function(key,char) return T:Value(key,char) end)
+    local entries,stats=M.List(display,self.searchText,self.realm,self.sort,self.descending,nil,self.flavor)
     self.stats,self.visibleCount=stats,#entries; self:LayoutRows(#entries)
     self.total:SetText(stats.count>0 and stats.missing==stats.count and L.unavailable or M.Format(stats.total,mode))
     self.count:SetText(tostring(stats.count))
@@ -363,6 +384,7 @@ function U:Refresh()
     self.realms:SetWidth(126.8-occupied(self.count)-8)
     self.session:SetText(M.SessionFormat(T:Session()))
     self.realmButton.label:SetText(self.realm or L.allRealms)
+    self.clientButton.label:SetText(self.flavor and L[self.flavor] or L.allClients)
     selected(self.combined,mode=="combined"); selected(self.hours,mode=="hours")
     for field,header in pairs(self.headers) do
         local b=header.button
@@ -380,7 +402,7 @@ function U:Refresh()
     for i,row in ipairs(self.rows) do
         local entry=entries[i+self.offset]; row.entry=entry; row:SetShown(entry~=nil)
         if entry then
-            local char,active=entry.char,entry.key==T.key
+            local char,active=entry.char,entry.key==T.key and entry.char._local
             row.active:SetShown(active); row.dot:SetShown(active)
             if active then row.bg:SetColorTexture(104/255,184/255,208/255,18/255)
             else row.bg:SetColorTexture(1,1,1,(i+self.offset)%2==0 and 3/255 or 0) end
@@ -390,14 +412,15 @@ function U:Refresh()
             row.level:SetText(L.level.." "..(M.Number(char.level) and tostring(char.level) or "?"))
             row.level:ClearAllPoints(); row.level:SetPoint("TOPLEFT",x+occupied(row.name)+7,-5)
             row.realm:ClearAllPoints(); row.realm:SetPoint("TOPLEFT",x,-19); row.realm:SetWidth(NAME_WIDTH-8-x)
-            row.realm:SetText(char.realm); row.played:SetText(M.Format(entry.seconds,mode))
+            row.realm:SetText(char.realm..(self.flavor and "" or (char.flavor and " · "..(L[char.flavor] or char.flavor) or "")))
+            row.played:SetText(M.Format(entry.seconds,mode))
             row.updated:SetText(active and entry.seconds and L.now or M.Age(char.updatedAt))
             row.updated:SetTextColor(unpack(active and {156/255,194/255,176/255} or {167/255,171/255,165/255}))
         end
     end
     self.empty:SetShown(#entries==0); self.empty:SetText(stats.count==0 and L.noCharacters or L.empty)
     local count=string.format(L.shown,#entries,stats.count)
-    if self.realm or (self.searchText and self.searchText~="") then
+    if self.realm or self.flavor or (self.searchText and self.searchText~="") then
         count=count.." · "..string.format(L.filteredTime,M.SumText(stats.visible,stats.visibleMissing,#entries,mode))
     end
     self.footer:SetText(count)
@@ -414,12 +437,13 @@ function U:RowTooltip(row)
     if not entry then return end
     local char = entry.char
     local lines = {char.name.." · "..char.realm, L.level.." "..tostring(char.level or "?"),
-        string.format(L.fullTime,M.Format(T:Value(entry.key,char),self.db.settings.format))}
-    if entry.key == T.key then
+        string.format(L.fullTime,M.Format(entry.seconds,self.db.settings.format))}
+    if char.flavor then lines[#lines+1] = L.client..": "..(L[char.flavor] or char.flavor) end
+    if entry.key == T.key and char._local then
         lines[#lines+1] = L.active
         lines[#lines+1] = T.base and L.estimate or L.noSync
     else lines[#lines+1] = L.known end
-    if M.Number(char.syncedAt) then lines[#lines+1] = string.format(L.sync,date("%Y-%m-%d %H:%M",char.syncedAt)) end
+    if M.Number(char.serverAt) then lines[#lines+1] = string.format(L.sync,date("%Y-%m-%d %H:%M",char.serverAt)) end
     tooltip(row,lines)
 end
 function U:UpdateMinimap()

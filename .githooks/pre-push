@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+cd "$(git rev-parse --show-toplevel)"
+if [ -x .venv312/Scripts/python.exe ]; then
+    exec .venv312/Scripts/python.exe tools/privacy_guard.py --pre-push
+elif [ -x .venv/Scripts/python.exe ]; then
+    exec .venv/Scripts/python.exe tools/privacy_guard.py --pre-push
+elif [ -x .venv/bin/python ]; then
+    exec .venv/bin/python tools/privacy_guard.py --pre-push
+else
+    exec python3 tools/privacy_guard.py --pre-push
+fi

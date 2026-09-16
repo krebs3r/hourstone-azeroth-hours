@@ -1,30 +1,19 @@
-# Hourstone 0.1.1 – Azeroth Hours
+# Hourstone 0.2.0 — development
 
-A compact playtime tracker in the Soundstone addon family. This release contains the approved test5 addon files without further runtime changes.
+- Add optional integration with [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) protocol 1 for a combined character overview across selected local WoW installations.
+- Separate confirmed `/played` measurements from local estimates and migrate saved data to schema 2.
+- Merge repeated observations of the same character without adding cumulative totals. Keep UI preferences, session state and request timing local.
+- Add a client-family filter for the combined character list.
+- Retain reproducible assets and regression fixtures while simplifying repository documentation and adding commit-aware privacy checks.
 
-## Changes
-
-- Compact 720px window with height following the visible character list (248–500px at 100%). Up to eight rows are visible; additional characters scroll.
-- Soundstone-style Retail and Classic frames, native WoW fonts, red buttons and a small settings gear.
-- Complete title and statistics labels, wider German time-format button and better balanced columns.
-- Character name and level together, realm beneath; sortable name, level, realm, playtime and last update.
-- Native minimap checkbox and a smaller, centered minimap button with the complete hourglass motif.
-- Footer totals and pink heart; preserved character data, time format, position and scale. Default scale remains 100%.
+The addon works independently. For synchronization, use Hourstone 0.2.x with Companion 0.1.x (protocol 1) and close all WoW clients before syncing; the imported view appears after the next start. Native-client acceptance of this new flow is still required. Historical release assets remain unchanged.
 
 ## Installation
 
-Download **Hourstone-0.1.1.zip** and extract the contained **Hourstone** folder into your client's **Interface/AddOns** directory. Replace the existing Hourstone folder when updating. Keep **WTF** to preserve your saved characters and settings.
-
-## Validation and supported clients
-
-The final package was approved by the user in **Retail 12.1.0**, **Mists of Pandaria Classic 5.5.4**, **TBC Anniversary 2.5.6** and **Classic Era 1.15.9**. Classic and Classic Era testing was confirmed on **2026-09-16**; both have been added to the existing CurseForge release. The addon files and release ZIP are unchanged. Release validation passed: 30 Lua scenario suites and 8 Python tests, including tracking, reloads, offline exclusion, 40 layout states, 360 scaling cases, minimap containment and deterministic packaging.
-
-Hardcore and Season of Discovery share the Classic Era interface and are implemented and simulated, but have not been separately tested in game. Combat/taint behavior and the full manual per-client checklist have not been separately reported.
-
-SHA-256: `8b38daa8a75abc48b043c4eb7bcca7790d799c7dc7d821b63dc2d7581c8c446b`
+Download the `Hourstone-X.Y.Z.zip` asset from [GitHub Releases](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest) and extract `Hourstone` into the client's `Interface/AddOns` folder while WoW is closed. Keep existing SavedVariables to migrate tracked characters and preferences. Use the companion's backup and setup guidance before synchronizing.
 
 ## Deutsch
 
-Kompakte Oberfläche im Soundstone-Stil, vollständiger Titel, breiterer Zeitformat-Button, native Checkbox und kleinerer Minimap-Button. Charakterdaten und Einstellungen bleiben erhalten; 100 % bleibt der Standard.
+Version 0.2.0 ergänzt die optionale Anbindung an den Hourstone Companion mit Protokoll 1, eine gemeinsame Charakterübersicht und einen Clientfilter. Bestätigte Serverzeiten und lokale Schätzungen werden getrennt gespeichert; vorhandene Daten wechseln zu Schema 2. Mehrfach vorliegende Gesamtzeiten desselben Charakters werden nicht addiert. Einstellungen und Sitzungen bleiben lokal.
 
-Der freigegebene Test-5-Stand wurde unverändert übernommen. Der Nutzer hat Retail, Mists of Pandaria Classic, TBC Anniversary und Classic Era bestätigt. Classic und Classic Era wurden am **16.09.2026** ergänzt und für die bestehende CurseForge-Datei freigegeben. Hardcore, Season of Discovery und die vollständige manuelle Prüfliste wurden nicht separat bestätigt. Zum Installieren den enthaltenen Ordner **Hourstone** in **Interface/AddOns** ersetzen und **WTF** beibehalten.
+Der Companion gleicht Daten bei vollständig beendetem WoW ab. Die neue Übersicht erscheint beim nächsten Start. Der Ablauf benötigt noch Tests in den echten Clients; das Addon funktioniert weiterhin eigenständig.

@@ -1,6 +1,16 @@
 __pycache__/
 *.pyc
-.venv/
+.venv*/
 dist/
 .DS_Store
 .local-history/
+.env
+.env.*
+*.log
+*.dmp
+*.bak
+*.tmp
+WTF/
+SavedVariables/
+private/
+local-data/

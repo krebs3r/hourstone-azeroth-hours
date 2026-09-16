@@ -11,6 +11,12 @@ for i=1,140 do
     db.characters["other:"..i]={name=string.rep("Long",8)..i,realm="Realm "..(i%15),level=i%91,seconds=i*1000,class="WARRIOR",updatedAt=EPOCH-i}
 end
 U:Refresh(); assert(U.maxOffset==133)
+U:ToggleClients(); assert(U.clientMenu:IsShown())
+U.clientRows.era.scripts.OnClick()
+assert(U.flavor=="era" and not U.clientMenu:IsShown() and U.offset==0)
+assert(U.visibleCount==0 or H.C.Flavor()=="era")
+U:ToggleClients(); U.clientRows.all.scripts.OnClick()
+assert(U.flavor==nil and U.visibleCount==141 and U.maxOffset==133)
 U:Scroll(999); assert(U.offset==133 and U.rows[8].entry)
 U:ToggleRealms(); assert(#U.realmChoices==17 and U.menu:IsShown())
 U.menu.scripts.OnMouseWheel(U.menu,-8); assert(U.realmOffset==11)

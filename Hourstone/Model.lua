@@ -1,15 +1,30 @@
 local _, H = ...
 local M, L = {}, H.L
 H.M = M
-M.SCHEMA = 1
+M.SCHEMA = 2
 function M.Number(value)
     return type(value) == "number" and value == value and value >= 0 and value < math.huge
 end
 function M.Init(db)
     if type(db) ~= "table" then db = {} end
     if M.Number(db.version) and db.version > M.SCHEMA then return nil, "future" end
+    local previous = M.Number(db.version) and db.version or 1
     db.version = M.SCHEMA
+    if type(db.sourceId) ~= "string" or not db.sourceId:match("^[A-Za-z0-9_-]+$") or #db.sourceId > 128 then
+        db.sourceId = H.C.SourceId()
+    end
     if type(db.characters) ~= "table" then db.characters = {} end
+    for _, char in pairs(db.characters) do
+        if type(char) == "table" then
+            char.sourceId = db.sourceId
+            if type(char.region) ~= "string" then char.region = "unknown" end
+            if previous < 2 then
+                -- Schema 1 seconds may include a saved local estimate. syncedAt
+                -- cannot recover its original server value, so never invent one.
+                char.serverSeconds, char.serverAt, char.syncedAt = nil, nil, nil
+            end
+        end
+    end
     if type(db.settings) ~= "table" then db.settings = {} end
     local s = db.settings
     if s.format ~= "hours" then s.format = "combined" end
@@ -51,7 +66,7 @@ function M.Age(epoch, now)
     if age < 172800 then return L.yesterday end
     return string.format(L.dayAgo, math.floor(age / 86400))
 end
-function M.List(db, search, realm, sort, descending, valueFor)
+function M.List(db, search, realm, sort, descending, valueFor, flavor)
     local rows, total, visible, missing, visibleMissing, count, realms = {}, 0, 0, 0, 0, 0, {}
     search, sort = H.C.Lower(search or ""), sort or "seconds"
     if descending == nil then descending = true end
@@ -61,7 +76,8 @@ function M.List(db, search, realm, sort, descending, valueFor)
             realms[char.realm] = true
             local seconds = valueFor and valueFor(key, char) or char.seconds
             if not M.Number(seconds) then seconds = nil; missing = missing + 1 else total = total + seconds end
-            if (not realm or char.realm == realm) and H.C.Lower(char.name):find(search, 1, true) then
+            if (not realm or char.realm == realm) and (not flavor or char.flavor == flavor)
+                and H.C.Lower(char.name):find(search, 1, true) then
                 rows[#rows + 1] = { key = key, char = char, seconds = seconds }
                 if seconds then visible = visible + seconds else visibleMissing = visibleMissing + 1 end
             end

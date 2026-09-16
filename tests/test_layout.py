@@ -13,9 +13,9 @@ sys.path.insert(0,str(ROOT/"tests"))
 from run import runtime
 
 class Layout(unittest.TestCase):
-    def test_mockup_geometry_and_states(self):
-        reference=json.loads((ROOT/"docs/mockup-05-measurements.json").read_text())
-        reference.update(json.loads((ROOT/"docs/layout-test4-adjustments.json").read_text()))
+    def test_baseline_geometry_and_states(self):
+        reference=json.loads((ROOT/"tests/fixtures/layout/baseline.json").read_text())
+        reference.update(json.loads((ROOT/"tests/fixtures/layout/adjustments.json").read_text()))
         for project in (1,2):
             for locale in ("deDE","enUS"):
                 for mode in ("combined","hours"):
@@ -65,8 +65,8 @@ class Layout(unittest.TestCase):
                             self.assertEqual(u.rows[1].name.font,"Fonts\\FRIZQT__.TTF")
                             self.assertEqual(u.rows[1].updated.font,"Fonts\\FRIZQT__.TTF")
                             self.assertEqual(u.combined.label.text,lua.globals().H.L.combined)
-                            # Browser metrics underestimate the native font in the supplied
-                            # capture. Leave explicit headroom; this is not a native-font test.
+                            # Approximate metrics need headroom for native fonts.
+                            # This is a layout check, not a native-font measurement.
                             self.assertGreaterEqual(u.combined.label.width,u.combined.label.GetUnboundedStringWidth(u.combined.label)*1.35+8)
                             # Native 9-slice corners stay the same size at every list height.
                             corner=next(f for f in lua.globals().ALL_FRAMES.values() if f.parent is not None and f.parent.id==u.frame.id and f.kind=="Texture")
@@ -123,7 +123,7 @@ class Layout(unittest.TestCase):
         self.assertEqual(u.frame.height,500)
         u.Scroll(u,999); offset=u.offset
         lua.execute('tick(2)'); self.assertEqual(u.offset,offset)
-        self.assertEqual(u.db.version,1)
+        self.assertEqual(u.db.version,2)
         self.assertFalse(u.db.settings.compact)
         self.assertEqual(dict(u.db.settings.position.items()),{"x":17,"y":43})
         self.assertEqual(u.db.characters["test:20"].seconds,20000)

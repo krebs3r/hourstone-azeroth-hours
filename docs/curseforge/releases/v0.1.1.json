@@ -1,32 +1,6 @@
 {
   "tag": "v0.1.1",
-  "commit": "dbe7c7871f26124e78d23a309456d083da888cc3",
-  "sha256": "8b38daa8a75abc48b043c4eb7bcca7790d799c7dc7d821b63dc2d7581c8c446b",
-  "file_name": "Hourstone-0.1.1.zip",
-  "file_size": 708840,
   "project_id": 1697059,
-  "file_id": 8886212,
-  "release_type": "release",
-  "game_versions": [
-    "12.1.0",
-    "2.5.6"
-  ],
-  "upload_method": "CurseForge authors dashboard",
-  "status": "uploaded-processing",
-  "auto_publish_after_approval": true,
-  "checked_at": "2026-09-15T13:02:29.173768+00:00",
-  "github_release": "https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.1.1",
-  "authors_file": "https://authors.curseforge.com/#/projects/1697059/files/8886212",
-  "cdn_url": "https://edge.forgecdn.net/files/8886/212/Hourstone-0.1.1.zip",
-  "github_digest_verified": true,
-  "cdn_download_verified": false,
-  "verification_note": "Local uploaded ZIP matches the accepted test5 package and GitHub asset digest. CDN readback attempts were reset by the remote host. Project approval and CurseForge-app installation remained pending at the initial upload; see the later compatibility update below.",
-  "compatibility_update": {
-    "checked_on": "2026-09-16",
-    "status": "approved-public",
-    "game_versions": ["12.1.0", "2.5.6", "5.5.4", "1.15.9"],
-    "public_file": "https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/8886212",
-    "package_unchanged": true,
-    "verification_note": "Authors dashboard shows Approved and Release with all four versions. Public file page shows the four flavors and versions, updated English/German changelog, Download and Install Via App. Actual app installation was not tested."
-  }
+  "sha256": "8b38daa8a75abc48b043c4eb7bcca7790d799c7dc7d821b63dc2d7581c8c446b",
+  "file_id": 8886212
 }

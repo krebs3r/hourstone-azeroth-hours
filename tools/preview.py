@@ -18,12 +18,12 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     lua=runtime(project,locale)
     lua.globals().PREVIEW_COUNT=population
     lua.execute('''fire("ADDON_LOADED","Hourstone"); fire("PLAYER_ENTERING_WORLD",true,false)
-        local chars={{"Thalindra","Antonidas",90,3042900,"DRUID",2},{"Morgath","Blackhand",90,1923600,"WARRIOR",1},
-        {"Lunara","Die Aldor",86,976620,"PRIEST",7},{"Elarion","Die Aldor",80,532080,"HUNTER",12},
-        {"Schattenwind","Blackhand",74,261240,"DEMONHUNTER",3},{"Bronzebart","Antonidas",42,78180,"ROGUE",24},
-        {"Funkenflug","Antonidas",16,12900,"PALADIN",5}}
+        local chars={{"ExampleDruid","Example Realm A",90,3042900,"DRUID",2},{"ExampleWarrior","Example Realm B",90,1923600,"WARRIOR",1},
+        {"ExamplePriest","Example Realm C",86,976620,"PRIEST",7},{"ExampleHunter","Example Realm C",80,532080,"HUNTER",12},
+        {"ExampleHero","Example Realm B",74,261240,"DEMONHUNTER",3},{"ExamplePaladin","Example Realm A",42,78180,"ROGUE",24},
+        {"ExampleMage","Example Realm A",16,12900,"PALADIN",5}}
         advance(300)
-        IDENTITY.name="Fluchmatrose"; IDENTITY.level=11; IDENTITY.realm="Thunderstrike"; IDENTITY.class="DEMONHUNTER"
+        IDENTITY.name="ExamplePlayer"; IDENTITY.level=11; IDENTITY.realm="Example Realm D"; IDENTITY.class="DEMONHUNTER"
         H.T:UpdateIdentity(); fire("TIME_PLAYED_MSG",39720,200)
         for i,c in ipairs(chars) do if i<PREVIEW_COUNT then HourstoneDB.characters["test:"..i]={name=c[1],realm=c[2],
             level=WOW_PROJECT_ID==1 and c[3] or math.floor(c[3]*60/90+.5),seconds=c[4],class=c[5],updatedAt=EPOCH-c[6]*86400} end
@@ -120,7 +120,7 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     return f'<div class="window" data-physical-width="{width:g}" data-physical-height="{height:g}" style="width:{width}px;height:{height}px"><div class="canvas" style="transform:scale({factor});width:{target.width}px;height:{target.height}px">'+''.join(pieces)+'</div></div>'
 
 def main():
-    page='<!doctype html><html lang="de"><meta charset="utf-8"><title>Hourstone test5 · Lua-Vorschau</title><style>body{background:#171c22;color:#eee;font-family:Segoe UI,sans-serif;padding:24px;max-width:900px;margin:auto}h1{font-size:22px}h2{font-size:16px;color:#aaa}p{font-size:13px;color:#aaa;line-height:1.6}.window{position:relative;margin-bottom:32px}.canvas{position:relative;transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}</style><h1>Hourstone v0.1.1 test5 · Lua-Vorschau</h1><p>Native WoW-Checkbox und kleinerer Minimap-Button. 100 % bleibt der Standard. Größenvergleich aus dem Lua-Simulator bei 1440p und 80 % globaler UI-Skalierung. Fiktive Daten; Georgia, Zahnrad und Checkbox sind Browser-Näherungen an WoW-eigene Ressourcen. Keine Ingame-Aufnahmen.</p>'
+    page='<!doctype html><html lang="de"><meta charset="utf-8"><title>Hourstone · Lua-Vorschau</title><style>body{background:#171c22;color:#eee;font-family:Segoe UI,sans-serif;padding:24px;max-width:900px;margin:auto}h1{font-size:22px}h2{font-size:16px;color:#aaa}p{font-size:13px;color:#aaa;line-height:1.6}.window{position:relative;margin-bottom:32px}.canvas{position:relative;transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}</style><h1>Hourstone · Lua-Vorschau</h1><p>Layoutvorschau mit synthetischen Charakterdaten. 100 % ist die Standardgröße. Größenvergleich aus dem Lua-Simulator bei 1440p und 80 % globaler UI-Skalierung. Fiktive Daten; Georgia, Zahnrad und Checkbox sind Browser-Näherungen an WoW-eigene Ressourcen. Keine Ingame-Aufnahmen.</p>'
     for project,locale,settings,mode,population,scale in [(2,"deDE",False,"combined",1,1),(2,"deDE",False,"combined",1,1.1),(2,"deDE",False,"combined",1,1.2),(2,"deDE",True,"combined",1,1.1),(1,"deDE",False,"combined",8,1),(2,"enUS",False,"hours",20,1),(1,"enUS",True,"hours",0,1)]:
         page+=f'<h2>{"Retail" if project==1 else "Classic"} · {locale} · {population} Charaktere · {scale*100:g} %'+(' · Einstellungen' if settings else '')+'</h2>'+render(project,locale,settings,mode,population,scale)
     page+='<h2>Minimap · 28 UI-Einheiten · 1440p / 80 % globale UI-Skalierung</h2>'+render(2,'deDE',minimap=True)

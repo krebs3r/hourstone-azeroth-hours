@@ -8,6 +8,7 @@ frame:SetScript("OnEvent",function(_,event,...)
         local db = H.M.Init(HourstoneDB)
         if not db then print(H.L.futureDB); frame:UnregisterAllEvents(); return end
         HourstoneDB = db
+        H.S.Import(db, HourstoneSync)
         H.T:Init(db); H.UI:Init(db)
         frame:UnregisterEvent("ADDON_LOADED")
         for _, e in ipairs({"PLAYER_ENTERING_WORLD","TIME_PLAYED_MSG","PLAYER_LEVEL_UP","PLAYER_LOGOUT","PLAYER_UPDATE_RESTING","UI_SCALE_CHANGED","DISPLAY_SIZE_CHANGED"}) do frame:RegisterEvent(e) end

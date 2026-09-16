@@ -13,7 +13,8 @@ local en = {
     hint = "Other characters appear after their first login with Hourstone.",
     name = "Name", noCharacters = "No characters tracked yet.", empty = "No matching characters.", settings = "Settings", minimap = "Show minimap button",
     on = "On", off = "Off", scale = "Hourstone size", reset = "Reset position", done = "Done",
-    realms = "%d realms",
+    realms = "%d realms", allClients = "All clients", client = "Client",
+    retail = "Retail", mists = "Mists Classic", tbc = "TBC Anniversary", era = "Classic Era",
     open = "Left click: open / close", move = "Drag: move minimap button", commands = "/hourstone or /azerothhours",
     active = "Current character", estimate = "Counted locally since the last known value.",
     sync = "Last server sync: %s", noSync = "Waiting for the server's /played value.",
@@ -33,7 +34,8 @@ local german = {
     hint = "Weitere Charaktere erscheinen nach dem ersten Login mit Hourstone.",
     name = "Name", noCharacters = "Noch keine Charaktere erfasst.", empty = "Keine passenden Charaktere.", settings = "Einstellungen", minimap = "Minimap-Button anzeigen",
     on = "An", off = "Aus", scale = "Hourstone-Größe", reset = "Position zurücksetzen", done = "Fertig",
-    realms = "%d Realms",
+    realms = "%d Realms", allClients = "Alle Clients", client = "Client",
+    retail = "Retail", mists = "Mists Classic", tbc = "TBC Anniversary", era = "Classic Era",
     open = "Linksklick: öffnen / schließen", move = "Ziehen: Minimap-Button verschieben", commands = "/hourstone oder /azerothhours",
     active = "Aktueller Charakter", estimate = "Seit dem letzten bekannten Wert lokal weitergezählt.",
     sync = "Letzter Serverabgleich: %s", noSync = "Warte auf den /played-Wert des Servers.",
@@ -41,4 +43,4 @@ local german = {
     request = "Abgleich angefragt", requestWait = "Abgleich vorgemerkt (60 Sekunden Anfrageabstand)",
     futureDB = "Hourstone: Die gespeicherten Daten stammen aus einer neueren Addon-Version. Bitte Hourstone aktualisieren.",
 }
-H.L = setmetatable(de and german or en, { __index = en })
+H.L = de and setmetatable(german, { __index = en }) or en

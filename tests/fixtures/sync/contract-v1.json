@@ -1,0 +1,404 @@
+{
+  "formatVersion": 1,
+  "cases": [
+    {
+      "name": "new-server-corrects-estimate-downward",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 2000,
+          "updatedAt": 1800001000,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ]
+    },
+    {
+      "name": "estimate-stays-with-baseline",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1080,
+          "updatedAt": 1800000080,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1070,
+          "updatedAt": 1800000070,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1080
+      ]
+    },
+    {
+      "name": "confirmed-beats-unconfirmed-fallback",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 999999,
+          "updatedAt": 1900000000,
+          "serverSeconds": null,
+          "serverAt": null
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1050
+      ]
+    },
+    {
+      "name": "unknown-regions-isolated-by-source",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1050,
+        1100
+      ]
+    },
+    {
+      "name": "known-regions-deduplicate-devices",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1050
+      ]
+    },
+    {
+      "name": "regions-stay-distinct",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "us",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1200,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1050,
+        1200
+      ]
+    },
+    {
+      "name": "client-families-stay-distinct",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "era",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1200,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1050,
+        1200
+      ]
+    },
+    {
+      "name": "same-second-server-answer-tie",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1060,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1010,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1060
+      ]
+    },
+    {
+      "name": "unconfirmed-latest-snapshot",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": null,
+          "serverAt": null
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1040,
+          "updatedAt": 1800000060,
+          "serverSeconds": null,
+          "serverAt": null
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1040
+      ]
+    },
+    {
+      "name": "deterministic-utf8-display-tie",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "😀",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1050
+      ],
+      "expectedNames": [
+        "😀"
+      ]
+    },
+    {
+      "name": "zero-is-known",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 0,
+          "updatedAt": 1800000050,
+          "serverSeconds": 0,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        0
+      ]
+    }
+  ]
+}

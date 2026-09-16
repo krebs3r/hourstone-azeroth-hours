@@ -7,7 +7,6 @@ import zipfile
 import hashlib
 import json
 import base64
-import re
 import io
 from PIL import Image
 
@@ -18,7 +17,7 @@ spec.loader.exec_module(package)
 
 class Packaging(unittest.TestCase):
     def test_soundstone_asset_pixels_and_provenance(self):
-        manifest=json.loads((ROOT/"docs/mockup-05/soundstone-assets.json").read_text(encoding="utf-8"))
+        manifest=json.loads((ROOT/"docs/assets/soundstone-manifest.json").read_text(encoding="utf-8"))
         for name,entry in manifest["assets"].items():
             data=base64.b64decode(entry["base64"],validate=True)
             self.assertEqual(hashlib.sha1(b"blob "+str(len(data)).encode()+b"\0"+data).hexdigest(),entry["sha"])
@@ -37,9 +36,10 @@ class Packaging(unittest.TestCase):
         root.mkdir(parents=True)
         try:
             shutil.copytree(ROOT/"Hourstone",root/"Hourstone")
-            archive=package.package(root,tag="v0.1.1")
+            version=package.validate(root)
+            archive=package.package(root,tag=f"v{version}")
             first=archive.read_bytes()
-            package.package(root,tag="v0.1.1")
+            package.package(root,tag=f"v{version}")
             self.assertEqual(first,archive.read_bytes())
             with zipfile.ZipFile(archive) as z:
                 self.assertIn("Hourstone/Media/Logo.tga",z.namelist())
@@ -54,12 +54,15 @@ class Packaging(unittest.TestCase):
                     self.assertEqual(z.read(member),(ROOT/member).read_bytes())
                     self.assertIn(f"Hourstone/Media/Fonts/{name}-OFL.txt",z.namelist())
                 manifest=json.loads((ROOT/"docs/font-manifest.json").read_text())
-                embedded=re.findall(r"data:font/ttf;base64,([A-Za-z0-9+/=]+)",(ROOT/"docs/mockup/index.html").read_text(encoding="utf-8"))
-                self.assertEqual(len(embedded),2)
-                for source,entry in zip(embedded,manifest):
+                self.assertEqual({entry["file"] for entry in manifest}, {"Gelasio-Regular.ttf", "Selawik-Regular.ttf"})
+                for entry in manifest:
                     member="Hourstone/Media/Fonts/"+entry["file"]
-                    self.assertEqual(hashlib.sha256(z.read(member)).hexdigest(),entry["sha256"])
-                    self.assertEqual(base64.b64decode(source),z.read(member))
+                    font=z.read(member)
+                    self.assertEqual(len(font),entry["bytes"])
+                    self.assertEqual(hashlib.sha256(font).hexdigest(),entry["sha256"])
+                    self.assertTrue(entry["source"].startswith("https://github.com/"))
+                    license_name=entry["file"].replace("-Regular.ttf", "-OFL.txt")
+                    self.assertIn(b"SIL OPEN FONT LICENSE", z.read("Hourstone/Media/Fonts/"+license_name))
                 self.assertTrue(all(i.create_system==3 for i in z.infolist()))
                 self.assertFalse(any("docs/" in n or "tests/" in n for n in z.namelist()))
             (root/"Hourstone/Model.lua").unlink()

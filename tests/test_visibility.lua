@@ -105,6 +105,7 @@ if T.record.flavor ~= "project-999" then
     assert(hidden(db,data) and ui.count.text=="0" and next(S.Display(db).characters)==nil)
     ui:ToggleSettings(); ui.removedToggle:Click()
     assert(ui.removedOnly and ui.rows[1].entry and ui.count.text=="0")
+    assert(ui.realms.text=="· "..string.format(H.L.realms,0) and ui.overviewStats.total==0)
     assert(ui.headers.name.button.label.text:find(H.L.removedCharacters,1,true))
     ui.rows[1]:Click("RightButton")
     assert(not hidden(db,data) and ui.count.text=="1" and not ui.rows[1]:IsShown())

@@ -194,7 +194,8 @@ function U:Create()
     self.session=text(self.summary,"",20,432,26.5,251,GOLD,25)
     self.summary:EnableMouse(true)
     self.summary:SetScript("OnEnter",function(owner)
-        if self.stats then tooltip(owner,{L.total,M.SumText(self.stats.total,self.stats.missing,self.stats.count,self.db.settings.format)}) end
+        local stats=self.overviewStats
+        if stats then tooltip(owner,{L.total,M.SumText(stats.total,stats.missing,stats.count,self.db.settings.format)}) end
     end)
     self.summary:SetScript("OnLeave",function() GameTooltip:Hide() end)
     line(self.summary,0,63,700,1,150/255,144/255,128/255,66/255)
@@ -415,12 +416,13 @@ function U:Refresh()
     local mode=self.db.settings.format
     local display=H.S.Display(self.db,function(key,char) return T:Value(key,char) end)
     local _,overview=M.List(display)
+    self.overviewStats=overview
     if self.removedOnly then display=H.S.Display(self.db,function(key,char) return T:Value(key,char) end,true) end
     local entries,stats=M.List(display,self.searchText,self.realm,self.sort,self.descending,nil,self.flavor)
     self.stats,self.visibleCount=stats,#entries; self:LayoutRows(#entries)
     self.total:SetText(overview.count>0 and overview.missing==overview.count and L.unavailable or M.Format(overview.total,mode))
     self.count:SetText(tostring(overview.count))
-    self.realms:SetText("· "..(#stats.realms==1 and L.oneRealm or string.format(L.realms,#stats.realms)))
+    self.realms:SetText("· "..(#overview.realms==1 and L.oneRealm or string.format(L.realms,#overview.realms)))
     self.realms:ClearAllPoints(); self.realms:SetPoint("TOPLEFT",280.2+occupied(self.count)+8,-35.5)
     self.realms:SetWidth(126.8-occupied(self.count)-8)
     self.session:SetText(M.SessionFormat(T:Session()))

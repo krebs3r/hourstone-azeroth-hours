@@ -2,7 +2,7 @@
 
 **Your characters. Your time.** See your World of Warcraft characters' total `/played` time and your current session in one compact window. Hourstone works on its own: no other addon, desktop app or external account is required.
 
-![Hourstone overview with character, guild and client information](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/addon-overview-en.png)
+![Hourstone overview with character, guild and client information](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/74bf5b7dad16ca31c1a889ef7ea9040a5d3bff33/docs/assets/addon-overview-en.png)
 
 The Hourstone character overview with realm and client filters.
 
@@ -49,7 +49,7 @@ Also from krebs3r: [Soundstone – Azeroth Audio](https://www.curseforge.com/wow
 
 **Deine Charaktere. Deine Spielzeit.** Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten Charaktere und die aktuelle Sitzung in einem kompakten Fenster. Das Addon funktioniert eigenständig; eine zusätzliche App oder ein externes Konto ist nicht erforderlich.
 
-![Hourstone-Übersicht mit Charakteren, Gilden und eigener Clientspalte](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/addon-overview-de.png)
+![Hourstone-Übersicht mit Charakteren, Gilden und eigener Clientspalte](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/74bf5b7dad16ca31c1a889ef7ea9040a5d3bff33/docs/assets/addon-overview-de.png)
 
 Die Hourstone-Charakterübersicht mit Realm- und Clientfiltern.
 

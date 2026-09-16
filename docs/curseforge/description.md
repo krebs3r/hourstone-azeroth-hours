@@ -2,9 +2,9 @@
 
 **Your characters. Your time.** See your World of Warcraft characters' total `/played` time and your current session in one compact window. Hourstone works on its own: no other addon, desktop app or external account is required.
 
-![Hourstone overview with character, guild and client information](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/c7d39d43373e2ce5e4a5388cbb92e7c067a9ed5b/docs/assets/addon-overview-en.png)
+![Hourstone overview with character, guild and client information](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/addon-overview-en.png)
 
-Synthetic sample data; browser approximation of the layout, not an in-game screenshot.
+The Hourstone character overview with realm and client filters.
 
 ## Your character overview
 
@@ -25,11 +25,17 @@ Right-click a character and confirm **Delete** to exclude the entry from the ove
 
 **Playing several WoW versions or using more than one PC? We recommend the optional [Hourstone Companion](https://github.com/krebs3r/hourstone-companion).** It brings the saved Hourstone data from your selected installations and accounts into one overview, including characters, guilds and playtime. The same character is counted once even if it is played on several devices.
 
+![Hourstone Companion overview for Windows](https://raw.githubusercontent.com/krebs3r/hourstone-companion/a97844e76462aa7cf3900e4554c9efa524dc3941/docs/assets/overview.png)
+
+Hourstone Companion: your characters and playtime across WoW clients.
+
 For multiple PCs, choose a shared folder that Dropbox, OneDrive or another folder-sync service keeps synchronized and available locally on every device. The Companion exchanges its data through that folder; no Hourstone server or separate Companion account is needed. Without a shared folder, it can still combine data from local installations.
 
 The exchange is automatic but not live: WoW must first save by logging out or using `/reload`, the Companion processes the saved data, and the folder service transfers changes between PCs. Hourstone reads the combined overview at the next login or `/reload`; after the first setup of the Companion data addon, fully close and restart WoW once. A deletion made while another PC was offline must reach that PC before a new character login can restore the entry.
 
-Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Older Hourstone 0.1.x versions do not support the Companion. The Windows Companion is currently a source/development preview; its signed public installer is still pending. Setup information, source code and release status are in the [Companion repository](https://github.com/krebs3r/hourstone-companion). The addon remains fully usable without it.
+Download **[Companion 0.1.5 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5)** as an installer or portable package. This is an unsigned preview release. Setup instructions and source code are in the [Companion repository](https://github.com/krebs3r/hourstone-companion).
+
+Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Older Hourstone 0.1.x versions do not support the Companion. The addon remains fully usable without it and continues to update separately through CurseForge.
 
 ## Supported clients
 
@@ -43,9 +49,9 @@ Also from krebs3r: [Soundstone – Azeroth Audio](https://www.curseforge.com/wow
 
 **Deine Charaktere. Deine Spielzeit.** Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten Charaktere und die aktuelle Sitzung in einem kompakten Fenster. Das Addon funktioniert eigenständig; eine zusätzliche App oder ein externes Konto ist nicht erforderlich.
 
-![Hourstone-Übersicht mit Charakteren, Gilden und eigener Clientspalte](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/c7d39d43373e2ce5e4a5388cbb92e7c067a9ed5b/docs/assets/addon-overview-de.png)
+![Hourstone-Übersicht mit Charakteren, Gilden und eigener Clientspalte](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/addon-overview-de.png)
 
-Synthetische Beispieldaten; Layout als Browser-Näherung, keine Ingame-Aufnahme.
+Die Hourstone-Charakterübersicht mit Realm- und Clientfiltern.
 
 Die Übersicht zeigt Name, Klassenfarbe, Level, Realm, zuletzt erfasste Gilde, Client, Spielzeit und letzte Aktualisierung. Suche nach Charakter oder Gilde, kombiniere Realm- und Clientfilter und sortiere die Spalten. Wähle zwischen Dezimalstunden und Tagen, Stunden und Minuten. Fensterposition, Größe und Minimap-Einstellung bleiben gespeichert.
 
@@ -61,4 +67,6 @@ Für den Austausch zwischen PCs wählst du einen gemeinsamen Ordner, den beispie
 
 Der Austausch erfolgt automatisch und zeitversetzt: WoW speichert beim Ausloggen oder mit `/reload`, der Companion liest den gespeicherten Stand ein und der Ordnerdienst überträgt die Änderungen. Das Addon übernimmt die gemeinsame Übersicht beim nächsten Login oder `/reload`. Nach der ersten Einrichtung des Companion-Datenaddons WoW einmal vollständig schließen und neu starten. Nach einer Löschung während des Offline-Betriebs zuerst synchronisieren, danach erneut mit dem Charakter einloggen, um den Eintrag wiederherzustellen.
 
-Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Der Windows-Companion ist derzeit eine Quellcode-/Entwicklungsvorschau; ein signierter öffentlicher Installer steht noch aus. Anleitung, Quellcode und Veröffentlichungsstand stehen im [Companion-Repository](https://github.com/krebs3r/hourstone-companion). Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.
+**[Companion 0.1.5 für Windows 11 x64 herunterladen](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5)** – als Installer oder portables Paket. Dies ist eine unsignierte Vorschauversion. Anleitung und Quellcode stehen im [Companion-Repository](https://github.com/krebs3r/hourstone-companion).
+
+Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.

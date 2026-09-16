@@ -2,9 +2,9 @@
 
 Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten World-of-Warcraft-Charaktere, die Gesamtspielzeit und die aktuelle Sitzung in einem kompakten Fenster. Suche, Filter, Sortierung und zwei Zeitformate erleichtern die Übersicht.
 
-![Synthetische Layoutvorschau von Hourstone 0.2.3 mit oberen Realm- und Clientfiltern und eigener Clientspalte](assets/addon-overview-de.png)
+![Hourstone 0.2.3 mit oberen Realm- und Clientfiltern und eigener Clientspalte](assets/addon-overview-de.png)
 
-Layoutvorschau mit fiktiven Charakteren. Schrift und WoW-eigene Bedienelemente sind Browser-Näherungen; dies ist keine Ingame-Aufnahme.
+Die Charakterübersicht vereint Suche, Realm- und Clientfilter und zeigt Gilde und Spielzeit jedes Charakters.
 
 ## Installation und Bedienung
 
@@ -41,7 +41,7 @@ Hourstone 0.2.3 unterstützt [Protokoll 3](sync-protocol-v3.md) des separaten [H
 
 WoW speichert zunächst beim Ausloggen oder mit `/reload`. Der Companion liest die gespeicherten Stände deiner ausgewählten Installationen und Accounts ein, führt sie zusammen und stellt die gemeinsame Übersicht für das Addon bereit. Hourstone übernimmt sie beim nächsten Login oder `/reload`. Nach der ersten Installation des Companion-Datenaddons WoW einmal vollständig schließen und neu starten. Für mehrere PCs einen Ordner wählen, den Dropbox, OneDrive oder ein anderer Dienst auf allen Geräten synchronisiert und dauerhaft lokal verfügbar hält. Darüber tauscht der Companion die Gerätestände aus.
 
-Der Windows-Companion ist derzeit als Quellcode-/Entwicklungsvorschau verfügbar; ein signierter öffentlicher Installer steht noch aus. Einrichtung und Veröffentlichungsstand stehen im Companion-Repository. Das Addon bleibt eigenständig nutzbar.
+[Hourstone Companion 0.1.5 für Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5) ist als Installer und portables Paket verfügbar. Dies ist eine unsignierte Vorschauversion. Einrichtung und Quellcode stehen im Companion-Repository. Das Addon bleibt eigenständig nutzbar.
 
 Doppelte Stände desselben Charakters werden zusammengeführt und niemals addiert. Bestätigte Serverwerte bleiben von lokalen Schätzungen getrennt. Fensterposition, Einstellungen, Anfragen und die laufende Sitzung bleiben lokal. Der Abgleich überträgt keine `/played`-Zeit zwischen unterschiedlichen Charakteren und ist kein Live-Abgleich während des Spiels. Einrichtung, Sicherungen und Grenzen stehen in der Companion-Anleitung.
 

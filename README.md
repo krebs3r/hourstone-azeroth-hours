@@ -8,9 +8,9 @@ Track your World of Warcraft characters and their total `/played` time in one co
 
 [Download](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest) · [CurseForge](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
-![Hourstone 0.2.3 synthetic layout preview showing realm and client filters and a separate client column](docs/assets/addon-overview-en.png)
+![Hourstone 0.2.3 overview with realm and client filters and a separate client column](docs/assets/addon-overview-en.png)
 
-Synthetic layout preview with fictional characters. Browser fonts and WoW-owned controls approximate the native UI; this is not an in-game screenshot.
+The character overview puts realm and client filters beside the search and shows each character's guild and playtime.
 
 ## Installation
 
@@ -51,7 +51,7 @@ Hourstone 0.2.3 supports [protocol 3](docs/sync-protocol-v3.md) with the separat
 
 WoW first saves by logging out or using `/reload`. The Companion reads the saved observations from your selected installations and accounts, combines them and makes the shared overview available to the addon. Hourstone reads that overview on the next login or `/reload`. After the initial installation of the Companion data addon, fully close and restart WoW once. Between PCs, choose a folder that Dropbox, OneDrive or another service synchronizes and keeps available locally on each device; the Companion exchanges device snapshots through that folder.
 
-The Windows Companion is currently a source/development preview; a signed public installer is not yet available. Its repository contains setup information and release status. Hourstone remains fully usable on its own.
+[Hourstone Companion 0.1.5 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5) is available as an installer or portable package. This is an unsigned preview release. Its repository contains setup information and source code. Hourstone remains fully usable on its own.
 
 Repeated observations of the same character are merged, never added. Confirmed server measurements are stored separately from local estimates. UI settings, request timing and the current session remain local. Synchronization cannot transfer `/played` between distinct characters, fetch unvisited characters or update a running client in real time. The companion's documentation explains setup, backups and limitations.
 
@@ -81,7 +81,7 @@ python tools/package.py
 
 The local pre-push hook and CI check the current tree and every new commit for private material. Keep local exports, logs and credentials outside Git. [Repository checks](docs/REPOSITORY.md) explains the historical baseline and checks.
 
-`tools/assets.py` regenerates shipping TGA textures from retained PNG masters and source manifests. Packaging validates metadata, files, textures, licenses and deterministic ZIP output. `tools/preview.py` renders the current Lua layout with synthetic data and approximate browser fonts; native checks remain necessary. Add `--product-pages` to generate explicitly labeled German and English layouts for documentation images in `dist`.
+`tools/assets.py` regenerates shipping TGA textures from retained PNG masters and source manifests. Packaging validates metadata, files, textures, licenses and deterministic ZIP output. `tools/preview.py` renders the current Lua layout with synthetic data and approximate browser fonts; native checks remain necessary. Add `--product-pages` to generate German and English product layouts for documentation images in `dist`.
 
 See the [changelog](CHANGELOG.md), [validation guide](docs/VALIDATION.md) and [publishing guide](docs/curseforge/README.md).
 

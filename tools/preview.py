@@ -135,13 +135,12 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     return f'<div class="window" data-physical-width="{width:g}" data-physical-height="{height:g}" style="width:{width}px;height:{height}px"><div class="canvas" style="transform:scale({factor});width:{target.width}px;height:{target.height}px">'+''.join(pieces)+'</div></div>'
 
 def product_pages():
-    """Write synthetic, explicitly labeled layouts for documentation captures."""
+    """Write synthetic product layouts for documentation captures."""
     css='body{margin:0;background:#171c22;color:#eee;font-family:Segoe UI,sans-serif}.product{width:720px;padding:28px 32px 24px}h1{font-size:20px;font-weight:600;margin:0 0 20px}.window,.canvas{position:relative}.canvas{transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}p{font-size:12px;color:#a9aaa2;margin:18px 0 0;line-height:1.6}'
     destination=ROOT/"dist"; destination.mkdir(exist_ok=True)
     for locale,language in (("deDE","de"),("enUS","en")):
-        caption=("Synthetische Layoutvorschau · Schrift und WoW-eigene Bedienelemente sind Näherungen. Keine Ingame-Aufnahme."
-            if language=="de" else "Synthetic layout preview · Fonts and WoW-owned controls are approximations. Not an in-game screenshot.")
-        page=f'<!doctype html><html lang="{language}"><meta charset="utf-8"><title>Hourstone · {language.upper()} layout preview</title><style>{css}</style><main class="product"><h1>Hourstone – Azeroth Hours</h1>'+render(1,locale,population=8)+f'<p>{caption}</p></main></html>'
+        overview=render(1,locale,population=8).replace("A very long synthetic guild name for layout review","Silver Dawn Expedition")
+        page=f'<!doctype html><html lang="{language}"><meta charset="utf-8"><title>Hourstone · {language.upper()} layout preview</title><style>{css}</style><main class="product"><h1>Hourstone – Azeroth Hours</h1>'+overview+'</main></html>'
         path=destination/f"addon-product-{language}.html"; path.write_text(page,encoding="utf-8"); print(path)
 
 

@@ -40,9 +40,9 @@ The physical conversion remains `pixels = UI units × effectiveScale × physical
 | Client | Declared interface | Load / UI | `/played` | Logout / reload | Combat / minimap |
 | --- | ---: | --- | --- | --- | --- |
 | Retail | 120100 | User confirmed | Not separately reported | Not separately reported | Visual acceptance; combat not separately reported |
-| Mists Classic | 50504 | Pending | Pending | Pending | Pending |
+| Mists Classic | 50504 | User confirmed (2026-09-16) | Not separately reported | Not separately reported | Not separately reported |
 | TBC Anniversary | 20506 | User confirmed | Not separately reported | Not separately reported | Visual acceptance; combat not separately reported |
-| Era | 11509 | Pending | Pending | Pending | Pending |
+| Era | 11509 | User confirmed (2026-09-16) | Not separately reported | Not separately reported | Not separately reported |
 | Hardcore | 11509 | Pending | Pending | Pending | Pending |
 | Season of Discovery | 11509 | Pending | Pending | Pending | Pending |
 
@@ -50,7 +50,9 @@ The physical conversion remains `pixels = UI units × effectiveScale × physical
 
 The user approved the final test5 appearance, requested GitHub and CurseForge publication, and confirmed testing in **Retail and TBC Anniversary** on 2026-09-15. The release ZIP is byte-identical to the accepted test5 ZIP: SHA-256 `8b38daa8a75abc48b043c4eb7bcca7790d799c7dc7d821b63dc2d7581c8c446b`.
 
-Installed Battle.net metadata on the confirmation date identifies Retail **12.1.0.69814** and Anniversary **2.5.6.69795**. These build numbers are installation metadata, not separately transcribed by the tester. No per-action claim is inferred for the remaining manual checklist. Mists, Era, Hardcore and SoD remain pending and are not selected for this CurseForge upload.
+Installed Battle.net metadata on the confirmation date identifies Retail **12.1.0.69814** and Anniversary **2.5.6.69795**. These build numbers are installation metadata, not separately transcribed by the tester. No per-action claim is inferred for the remaining manual checklist.
+
+On **2026-09-16**, the user additionally reported successful testing in **Classic and Classic Era** and requested publication for both. Classic is recorded as Mists of Pandaria Classic, matching the existing supported-client matrix. The configured versions are **5.5.4 / 50504** and **1.15.9 / 11509**; the user did not separately supply build numbers. Both client families are enabled on the existing CurseForge file. The release ZIP remains unchanged. Hardcore and Season of Discovery have not been separately tested.
 
 ## In-game acceptance checklist
 

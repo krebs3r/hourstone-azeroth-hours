@@ -52,11 +52,12 @@ The window shrinks to fit the list. This example also shows the German interface
 | Client family | Addon interface version | In-game testing |
 | --- | ---: | --- |
 | Retail (12.1.0) | 120100 | Confirmed (2026-09-15) |
-| Mists of Pandaria Classic (5.5.4) | 50504 | Pending |
+| Mists of Pandaria Classic (5.5.4) | 50504 | Confirmed (2026-09-16) |
 | Burning Crusade Classic Anniversary (2.5.6) | 20506 | Confirmed (2026-09-15) |
-| Classic Era, Hardcore and Season of Discovery (1.15.9) | 11509 | Pending |
+| Classic Era (1.15.9) | 11509 | Confirmed (2026-09-16) |
+| Hardcore and Season of Discovery (1.15.9) | 11509 | Not separately tested |
 
-Version **0.1.1** has been tested in Retail and Burning Crusade Classic Anniversary. Support for the other listed clients is implemented but still awaits in-game testing. See the [validation report](docs/VALIDATION.md) for test coverage and outstanding checks. Historical private-server clients are not supported.
+Version **0.1.1** has been tested in Retail, Mists of Pandaria Classic, Burning Crusade Classic Anniversary and Classic Era. All four client families are enabled for the CurseForge release. Hardcore and Season of Discovery share the Era interface but have not been separately tested. See the [validation report](docs/VALIDATION.md) for test coverage and outstanding checks. Historical private-server clients are not supported.
 
 ## Installation
 

@@ -17,9 +17,9 @@ Download **Hourstone-0.1.1.zip** and extract the contained **Hourstone** folder 
 
 ## Validation and supported clients
 
-The final package was approved by the user in **Retail 12.1.0** and **TBC Anniversary 2.5.6**. Local checks pass: 30 Lua scenario suites and 8 Python tests, including tracking, reloads, offline exclusion, 40 layout states, 360 scaling cases, minimap containment and deterministic packaging. GitHub Actions repeats these checks before publishing.
+The final package was approved by the user in **Retail 12.1.0**, **Mists of Pandaria Classic 5.5.4**, **TBC Anniversary 2.5.6** and **Classic Era 1.15.9**. Classic and Classic Era testing was confirmed on **2026-09-16**; both have been added to the existing CurseForge release. The addon files and release ZIP are unchanged. Release validation passed: 30 Lua scenario suites and 8 Python tests, including tracking, reloads, offline exclusion, 40 layout states, 360 scaling cases, minimap containment and deterministic packaging.
 
-Mists Classic, Classic Era, Hardcore and Season of Discovery are implemented and simulated, but remain unverified in game. They are not selected for this CurseForge file. Combat/taint behavior and the full manual per-client checklist have not been separately reported.
+Hardcore and Season of Discovery share the Classic Era interface and are implemented and simulated, but have not been separately tested in game. Combat/taint behavior and the full manual per-client checklist have not been separately reported.
 
 SHA-256: `8b38daa8a75abc48b043c4eb7bcca7790d799c7dc7d821b63dc2d7581c8c446b`
 
@@ -27,4 +27,4 @@ SHA-256: `8b38daa8a75abc48b043c4eb7bcca7790d799c7dc7d821b63dc2d7581c8c446b`
 
 Kompakte Oberfläche im Soundstone-Stil, vollständiger Titel, breiterer Zeitformat-Button, native Checkbox und kleinerer Minimap-Button. Charakterdaten und Einstellungen bleiben erhalten; 100 % bleibt der Standard.
 
-Der freigegebene Test-5-Stand wurde unverändert übernommen. Der Nutzer hat Retail und TBC Anniversary bestätigt; weitere Clientfamilien und die vollständige manuelle Prüfliste bleiben offen. Zum Installieren den enthaltenen Ordner **Hourstone** in **Interface/AddOns** ersetzen und **WTF** beibehalten.
+Der freigegebene Test-5-Stand wurde unverändert übernommen. Der Nutzer hat Retail, Mists of Pandaria Classic, TBC Anniversary und Classic Era bestätigt. Classic und Classic Era wurden am **16.09.2026** ergänzt und für die bestehende CurseForge-Datei freigegeben. Hardcore, Season of Discovery und die vollständige manuelle Prüfliste wurden nicht separat bestätigt. Zum Installieren den enthaltenen Ordner **Hourstone** in **Interface/AddOns** ersetzen und **WTF** beibehalten.

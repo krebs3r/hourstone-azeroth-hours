@@ -20,5 +20,13 @@
   "cdn_url": "https://edge.forgecdn.net/files/8886/212/Hourstone-0.1.1.zip",
   "github_digest_verified": true,
   "cdn_download_verified": false,
-  "verification_note": "Local uploaded ZIP matches the accepted test5 package and GitHub asset digest. CDN readback attempts were reset by the remote host. Project approval and CurseForge-app installation remain pending."
+  "verification_note": "Local uploaded ZIP matches the accepted test5 package and GitHub asset digest. CDN readback attempts were reset by the remote host. Project approval and CurseForge-app installation remained pending at the initial upload; see the later compatibility update below.",
+  "compatibility_update": {
+    "checked_on": "2026-09-16",
+    "status": "approved-public",
+    "game_versions": ["12.1.0", "2.5.6", "5.5.4", "1.15.9"],
+    "public_file": "https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/8886212",
+    "package_unchanged": true,
+    "verification_note": "Authors dashboard shows Approved and Release with all four versions. Public file page shows the four flavors and versions, updated English/German changelog, Download and Install Via App. Actual app installation was not tested."
+  }
 }

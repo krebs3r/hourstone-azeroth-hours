@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 compatibility update — 2026-09-16
+
+- In-game testing confirmed for Mists of Pandaria Classic and Classic Era, in addition to Retail and TBC Anniversary.
+- Enable Mists Classic 5.5.4 and Classic Era 1.15.9 for the existing CurseForge release and future uploads. Update GitHub and CurseForge compatibility documentation; addon files and the release ZIP are unchanged.
+- Hardcore and Season of Discovery have not been separately tested.
+
 ## 0.1.1 — 2026-09-15
 
 - Replace the flat custom minimap checkbox with the native UICheckButtonTemplate used by Soundstone. Keep checked state synchronized through checkbox, label and slash-command changes.

@@ -1,4 +1,14 @@
-# Veröffentlichungsstand — 15.09.2026
+# Veröffentlichungsstand — 16.09.2026
+
+## Freigabe für Classic und Classic Era
+
+- Der Nutzer hat zusätzlich erfolgreiche Ingame-Tests in Classic und Classic Era bestätigt. Mists of Pandaria Classic **5.5.4** und Classic Era **1.15.9** sind jetzt neben Retail **12.1.0** und TBC Anniversary **2.5.6** für Version **0.1.1** freigegeben.
+- Die bestehende CurseForge-Datei **8886212** wurde aktualisiert: Typ **Release**, Status **Approved**, alle vier Spielversionen. Die öffentliche [Dateiseite](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/8886212) zeigt alle vier Clientfamilien sowie Download und „Install Via App“.
+- Englische und deutsche CurseForge-Beschreibung, Datei-Changelog und GitHub-Release-Notizen sind aktualisiert. `project.json` enthält alle vier bestätigten Versionen für zukünftige automatische Uploads.
+- Addondateien, ZIP, Versionsnummer und SHA-256 bleiben unverändert. Es wurde keine zweite Datei hochgeladen.
+- Die 14 CurseForge-Publishing-Tests bestehen am 16.09.2026. Die vollständige lokale Python-Prüfung konnte in der vorhandenen Umgebung wegen fehlendem Pillow nicht ausgeführt werden; für diese Änderung sind nur Dokumentation und Veröffentlichungsmetadaten betroffen. Die CI führt die vollständigen Prüfungen nach dem Push erneut aus.
+
+## Historie des ersten Releases — 15.09.2026
 
 ## Erledigt
 
@@ -13,14 +23,13 @@
 - Datei **8886212**, **Hourstone 0.1.1**, Typ **Release**, für **Retail 12.1.0** und **TBC Anniversary 2.5.6** erfolgreich hochgeladen. Automatische Veröffentlichung nach Genehmigung ausgewählt.
 - Alle Projektdaten einschließlich Git-Historie, Mockups, Arbeitsdateien, früheren Testpaketen und Nutzeraufnahmen liegen jetzt unter `C:\Users\krebs3r\Documents\Codex\Hourstone – Azeroth Hours`. Alte Arbeits-/Vorschaupfade sind Verzeichnisverknüpfungen; die drei lokalen Vorschau-Server funktionieren wieder.
 
-## Aktueller CurseForge-Status
+## CurseForge-Status beim ersten Upload — 15.09.2026
 
-Im [Autoren-Dashboard](https://authors.curseforge.com/#/projects/1697059/files) steht die Datei auf **Processing**. Das neue Projekt wartet auf die Moderationsfreigabe und ist vorher nicht öffentlich verfügbar. Der [Upload-Beleg](releases/v0.1.1.json) enthält die tatsächliche Datei-ID und Versionszuordnung. Nicht erneut hochladen.
+Beim ersten Upload stand die Datei auf **Processing** und wartete auf Moderation. Am 16.09.2026 ist sie **Approved** und öffentlich verfügbar. Der [Upload-Beleg](releases/v0.1.1.json) enthält die tatsächliche Datei-ID und ursprüngliche Versionszuordnung; die spätere Freigabe ist dort separat ergänzt. Nicht erneut hochladen.
 
 ## Noch offen
 
-- Projekt-/Dateifreigabe durch CurseForge; danach [öffentliche Seite](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) und App-Verfügbarkeit prüfen.
 - GitHub- und CurseForge-CDN-Rückdownloads wurden vom Remotehost abgebrochen. Die GitHub-Asset-Prüfsumme und die tatsächlich für CurseForge ausgewählte lokale ZIP sind geprüft; ein vollständiger CDN-Rückdownload ist noch nicht belegt.
-- Installation über die CurseForge-App sowie zusätzliche Clientfamilien und separat dokumentierte manuelle Detailprüfungen.
+- Installation über die CurseForge-App, eigene Tests für Hardcore/Season of Discovery und separat dokumentierte manuelle Detailprüfungen.
 
 Der erste CurseForge-Upload erfolgte manuell über das Autoren-Dashboard. Der Release-Workflow enthält jetzt einen nachgelagerten CurseForge-Upload mit Prüfsummenprüfung und Schutz vor doppelten Uploads. Der eigene Token **Hourstone GitHub Releases** ist seit 15.09.2026 als GitHub-Actions-Secret `CF_API_TOKEN` hinterlegt. Der [Verbindungscheck](https://github.com/krebs3r/hourstone-azeroth-hours/actions/runs/34979326762) war erfolgreich: Token akzeptiert, Retail 12.1.0 und TBC Anniversary 2.5.6 aufgelöst, keine Datei hochgeladen. Die [vollständige CI-Prüfung](https://github.com/krebs3r/hourstone-azeroth-hours/actions/runs/34979015385) besteht einschließlich der 14 neuen Upload-Tests. Einrichtung und Wiederholungen sind in [README.md](README.md) beschrieben. Ein echter automatischer Release-Upload steht noch aus.

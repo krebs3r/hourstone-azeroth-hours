@@ -17,7 +17,7 @@ Ich hoffe weiterhin, dass Blizzard eine Spielzeiterfassung direkt in Battle.net 
 3. Die Datei muss anschließend unter `Interface/AddOns/Hourstone/Hourstone.toc` liegen.
 4. Aktiviere Hourstone in der Addon-Liste und logge dich ein.
 
-Die Vorabversion ist für Retail, Mists of Pandaria Classic, Burning Crusade Classic Anniversary sowie Classic Era inklusive Hardcore und Season of Discovery vorbereitet. **Der Nutzer hat Retail und TBC Anniversary bestätigt. Die übrigen Clientfamilien stehen für Ingame-Tests noch aus.** Die automatisierten Prüfungen verwenden simulierte WoW-Ereignisse und UI-APIs.
+Version **0.1.1** ist als reguläres Release für Retail, Mists of Pandaria Classic, Burning Crusade Classic Anniversary und Classic Era freigegeben. **Der Nutzer hat alle vier Clientfamilien im Spiel getestet; Classic und Classic Era wurden am 16.09.2026 bestätigt.** Hardcore und Season of Discovery nutzen dieselbe Schnittstelle wie Era, wurden aber nicht separat getestet. Die automatisierten Prüfungen verwenden simulierte WoW-Ereignisse und UI-APIs.
 
 ## Bedienung
 

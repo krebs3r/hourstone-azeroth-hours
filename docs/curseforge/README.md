@@ -2,7 +2,7 @@
 
 Project: [Hourstone – Azeroth Hours](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours), ID **1697059**. Current status is recorded in [STATUS.md](STATUS.md).
 
-For 0.1.1 the user requested a GitHub release and CurseForge upload, and confirmed Retail and TBC Anniversary. [Acceptance](acceptance/v0.1.1.md) records the exact commit and package hash.
+For 0.1.1 the user requested a GitHub release and CurseForge upload, and confirmed Retail and TBC Anniversary. On 2026-09-16, the user also confirmed Classic and Classic Era and requested enabling both for the existing release. [Acceptance](acceptance/v0.1.1.md) records the confirmation, exact commit and package hash.
 
 ## One-time setup
 
@@ -10,7 +10,7 @@ Create a dedicated **Hourstone GitHub Releases** token in the [CurseForge token 
 
 ## Normal releases
 
-1. Update `Hourstone/Hourstone.toc`, `docs/RELEASE-NOTES.md`, and the changelog. Keep `project.json`'s `game_versions` list limited to confirmed clients (currently Retail **12.1.0** and TBC Anniversary **2.5.6**); update this list when support changes. The other TOC interfaces do not automatically opt clients into distribution.
+1. Update `Hourstone/Hourstone.toc`, `docs/RELEASE-NOTES.md`, and the changelog. Keep `project.json`'s `game_versions` list limited to confirmed clients (currently Retail **12.1.0**, Mists Classic **5.5.4**, TBC Anniversary **2.5.6** and Classic Era **1.15.9**); update this list when support changes. The other TOC interfaces do not automatically opt clients into distribution.
 2. Push the matching `vX.Y.Z` tag, or manually run **Release** with that tag. CI tests and builds the ZIP and SHA-256, then publishes the GitHub release.
 3. The dependent **Upload release to CurseForge** job downloads that published ZIP, verifies both its checksum file and GitHub asset digest, and checks the embedded TOC version. It sends the GitHub release notes and the configured game versions through the [official CurseForge Upload API](https://support.curseforge.com/support/solutions/articles/9000197321). CurseForge publishes the file after approval.
 4. The release asset `curseforge-upload.json` records the actual CurseForge file ID and ZIP hash. The Actions summary links to the file. Verify moderation and CurseForge-app availability separately.

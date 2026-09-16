@@ -35,7 +35,7 @@ The exchange is automatic but not live: WoW must first save by logging out or us
 
 Download **[Companion 0.1.5 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5)** as an installer or portable package. This is an unsigned preview release. Setup instructions and source code are in the [Companion repository](https://github.com/krebs3r/hourstone-companion).
 
-Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Older Hourstone 0.1.x versions do not support the Companion. The addon remains fully usable without it and continues to update separately through CurseForge.
+Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Older Hourstone 0.1.x versions do not support the Companion. If the required addon version is still awaiting CurseForge approval, download [Hourstone 0.2.3 from GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.2.3). The addon remains fully usable without it and continues to update separately through CurseForge.
 
 ## Supported clients
 
@@ -69,4 +69,4 @@ Der Austausch erfolgt automatisch und zeitversetzt: WoW speichert beim Ausloggen
 
 **[Companion 0.1.5 für Windows 11 x64 herunterladen](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5)** – als Installer oder portables Paket. Dies ist eine unsignierte Vorschauversion. Anleitung und Quellcode stehen im [Companion-Repository](https://github.com/krebs3r/hourstone-companion).
 
-Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.
+Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Sollte die benötigte Addon-Version auf CurseForge noch auf Freigabe warten, lade [Hourstone 0.2.3 bei GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.2.3) herunter. Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.

@@ -1,26 +1,28 @@
 # Changelog
 
-## 0.2.3 — unreleased
+## 0.2.3 — 2026-09-16
+
+- First public 0.2.x release: includes the development milestones below, adding guild tracking, reversible overview deletion and optional Companion protocol 3 integration since public 0.1.1.
 
 - Put realm and client filters together above the table and show the client in a dedicated sortable column beside playtime.
 - Use Blizzard's native minimap tracking border, background and highlight with Retail/Classic geometry and the complete Hourstone logo.
 - Keep the server timestamp on one tooltip line, remove presence-status claims and clarify estimated or unconfirmed time.
 - Add "with" before the footer heart and consistently label deleted overview entries and their restore actions.
-- Preserve protocol 3, character/guild data, saved settings and minimap position without migration.
+- Preserve character/guild data, saved settings and minimap position. Public 0.1.1 data migrates to schema 3; the 0.2.2 development build already uses that schema and needs no further migration.
 
-## 0.2.2 — unreleased
+## 0.2.2 — development milestone included in 0.2.3
 
 - Remove a character from the overview and totals after confirmation, retaining its saved playtime. Restore it in the removed-character view or at a subsequent actual character login.
 - Synchronize removal and restoration across devices with protocol 3 and Companion 0.1.3. SavedVariables schema 3 preserves existing characters, guilds and settings.
 - Keep offline and concurrent removals hidden until observed and explicitly restored; reloads, zoning and server playtime updates never restore a character.
 
-## 0.2.1 — unreleased
+## 0.2.1 — development milestone included in 0.2.3
 
 - Record and display each character’s guild, including confirmed guildless and not-yet-recorded states.
 - Search character and guild names; keep full guild details in row tooltips.
 - Exchange guild changes independently of playtime through protocol 2 with Companion 0.1.2. Legacy protocol 1 input and existing saved data remain readable.
 
-## 0.2.0 — unreleased
+## 0.2.0 — development milestone included in 0.2.3
 
 - Optional Hourstone Companion protocol 1 integration for a combined overview across local client installations.
 - Schema 2 stores confirmed server measurements separately from local playtime estimates.

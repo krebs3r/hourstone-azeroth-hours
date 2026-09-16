@@ -27,6 +27,8 @@ Layout references are design specifications. The simulator's font metrics and th
 
 Version 0.1.1 has reported in-game coverage for Retail, Mists Classic, TBC Anniversary and Classic Era. Hardcore and Season of Discovery have not been separately tested. Those reports do not establish per-action coverage for every item below or validate the new 0.2.x companion protocol.
 
+Version 0.2.3's updated layout and minimap button were checked in TBC Anniversary. The new version still needs native checks in the other client families and practical two-PC synchronization checks. Automated coverage includes 60 Lua scenario suites and 33 Python tests; these do not replace the remaining in-game checks.
+
 ## In-game checklist
 
 1. Record addon version, client build and language. Enable Lua errors and install the package without other required addons.

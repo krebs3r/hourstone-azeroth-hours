@@ -11,6 +11,12 @@ Project: [Hourstone – Azeroth Hours](https://www.curseforge.com/wow/addons/hou
 
 The resulting `curseforge-upload.json` release asset records the file ID and ZIP hash. Check moderation and public availability separately. A workflow triggered by a manually created GitHub release is not configured; use the tag or workflow above.
 
+## Project description
+
+[description.md](description.md) is the English/German product description, including the optional Windows Companion, guilds and reversible overview deletion. Keep the project page consistent with this file when publishing. Copy it into the description editor in the [CurseForge authors dashboard](https://authors.curseforge.com/#/projects/1697059), save, and verify the resulting public page after any required moderation.
+
+The existing workflow and `tools/curseforge.py` upload the release ZIP and its release notes; they do **not** update the project description. Changing this Markdown file alone does not change CurseForge's project page. A description update is a separate publishing step and must not be reported as complete until it is visible on CurseForge.
+
 ## Interrupted uploads and retries
 
 The job creates `curseforge-upload-pending.json` on the GitHub release without overwriting it before sending an upload. A completed receipt makes retries a no-op. The minimal [historical receipt](releases/v0.1.1.json) protects the first published upload from duplication.

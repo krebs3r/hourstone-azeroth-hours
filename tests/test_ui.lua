@@ -42,9 +42,9 @@ SlashCmdList.HOURSTONE("minimap"); assert(U.minimap:IsShown() and U.minimapBox:G
 assert(U.densityToggle==nil and U.densityMenu==nil and #U.rows==8)
 for _,legacy in ipairs({false,true}) do
     db.settings.compact=legacy; U:LayoutRows()
-    assert(U.frame:GetHeight()==500 and U.rows[1]:GetHeight()==36 and db.settings.compact==legacy)
+    assert(U.frame:GetHeight()==612 and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
 end
-assert(U.frame:GetHeight()==500 and U.rows[1]:GetHeight()==36)
+assert(U.frame:GetHeight()==612 and U.rows[1]:GetHeight()==50)
 local before=db.characters
 U.scaleSlider:SetValue(90); assert(math.abs(db.settings.scale-.9)<.001)
 U.scaleSlider:SetValue(130); assert(db.settings.scale==1.3 and db.characters==before)

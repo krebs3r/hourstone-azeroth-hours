@@ -5,6 +5,17 @@ function C.Now() return GetTime() end
 function C.Epoch() return GetServerTime and GetServerTime() or time() end
 -- Server timestamps alone may establish an authoritative /played baseline.
 function C.ServerEpoch() return GetServerTime and GetServerTime() or nil end
+-- Guild data can lag behind login. Only an explicit membership result can
+-- establish absence; a missing name for a known member remains unknown.
+function C.Guild(allowAbsent)
+    if not IsInGuild or not GetGuildInfo then return nil end
+    local member, guild = IsInGuild(), GetGuildInfo("player")
+    if issecretvalue and (issecretvalue(member) or issecretvalue(guild)) then return nil end
+    if member == true and type(guild) == "string" and guild ~= "" then return guild end
+    if allowAbsent and member == false and (guild == nil or guild == "") then return "" end
+    return nil
+end
+function C.Escape(value) return (tostring(value):gsub("|", "||")) end
 function C.Region()
     local regions = {"us", "kr", "eu", "tw", "cn"}
     local guid = UnitGUID("player")
@@ -34,7 +45,7 @@ function C.Flavor()
 end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.2.0"
+    return getter and getter("Hourstone", "Version") or "0.2.1"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)

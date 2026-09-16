@@ -41,7 +41,19 @@ function T:Begin(isReload)
     self.base = M.Number(self.record.seconds) and (self.record.seconds + gap) or nil
     self.baseAt, self.started = now, true
     self.db.runtime = nil
+    self:UpdateGuild(false)
     self:Request()
+end
+function T:UpdateGuild(allowAbsent)
+    if not self.started or not self.record then return false end
+    local guild, stamp = C.Guild(allowAbsent), C.ServerEpoch()
+    if guild == nil or not H.S.ValidGuild(guild, stamp) then return false end
+    -- A fresh local API result can replace an earlier sample in the same server
+    -- second. Ordinal guild ties apply only when merging independent observations.
+    if H.S.KnownGuild(self.record) and stamp < self.record.guildUpdatedAt then return false end
+    local changed = self.record.guild ~= guild or self.record.guildUpdatedAt ~= stamp
+    self.record.guild, self.record.guildUpdatedAt = guild, stamp
+    return changed
 end
 function T:Value(key, record)
     if self.started and key == self.key then
@@ -80,6 +92,7 @@ end
 function T:Save()
     if not self.started then return end
     self:UpdateIdentity()
+    self:UpdateGuild(true)
     local total = self:Value(self.key, self.record)
     if total then self.record.seconds, self.record.updatedAt = total, C.Epoch() end
     self.db.runtime = { key = self.key, at = C.Now(), session = self:Session() }

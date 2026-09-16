@@ -1,5 +1,5 @@
 {
-  "source": "Layout specification adjustments for wider combined-format controls and balanced columns. Applied to the baseline; these are design targets, not native measurements.",
+  "source": "Layout targets for three-line character rows, wider combined-format controls and balanced columns. Applied to the baseline.",
   "summaryColumns": [
     38,
     22,
@@ -71,5 +71,30 @@
     280,
     245,
     175
-  ]
+  ],
+  "window": [
+    0,
+    0,
+    720,
+    612
+  ],
+  "table": [
+    10,
+    152,
+    700,
+    424
+  ],
+  "body": [
+    10,
+    176,
+    700,
+    400
+  ],
+  "footer": [
+    10,
+    576,
+    700,
+    26
+  ],
+  "rowHeight": 50
 }

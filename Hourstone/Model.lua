@@ -22,6 +22,7 @@ function M.Init(db)
                 -- Schema 1 seconds may include a saved local estimate. syncedAt
                 -- cannot recover its original server value, so never invent one.
                 char.serverSeconds, char.serverAt, char.syncedAt = nil, nil, nil
+                char.guild, char.guildUpdatedAt = nil, nil
             end
         end
     end
@@ -66,6 +67,10 @@ function M.Age(epoch, now)
     if age < 172800 then return L.yesterday end
     return string.format(L.dayAgo, math.floor(age / 86400))
 end
+function M.GuildText(char)
+    local value = not H.S.KnownGuild(char) and L.guildUnknown or (char.guild == "" and L.noGuild or char.guild)
+    return L.guild .. ": " .. H.C.Escape(value)
+end
 function M.List(db, search, realm, sort, descending, valueFor, flavor)
     local rows, total, visible, missing, visibleMissing, count, realms = {}, 0, 0, 0, 0, 0, {}
     search, sort = H.C.Lower(search or ""), sort or "seconds"
@@ -77,7 +82,8 @@ function M.List(db, search, realm, sort, descending, valueFor, flavor)
             local seconds = valueFor and valueFor(key, char) or char.seconds
             if not M.Number(seconds) then seconds = nil; missing = missing + 1 else total = total + seconds end
             if (not realm or char.realm == realm) and (not flavor or char.flavor == flavor)
-                and H.C.Lower(char.name):find(search, 1, true) then
+                and (H.C.Lower(char.name):find(search, 1, true)
+                    or (H.S.KnownGuild(char) and H.C.Lower(char.guild):find(search, 1, true))) then
                 rows[#rows + 1] = { key = key, char = char, seconds = seconds }
                 if seconds then visible = visible + seconds else visibleMissing = visibleMissing + 1 end
             end

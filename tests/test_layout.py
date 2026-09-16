@@ -1,4 +1,4 @@
-"""Compare actual Lua regions against an independent live DOM capture of Mockup 05.
+"""Verify actual Lua regions against the checked-in layout targets.
 
 Font rasterization and client-owned artwork still require in-game review.
 """
@@ -39,7 +39,7 @@ class Layout(unittest.TestCase):
                                 "statTotal":u.total,"statSession":u.session,"settings":u.settings,
                                 "minimapToggle":u.minimapToggle,"reset":u.reset,"done":u.done,
                                 "combinedButton":u.combined,"hoursButton":u.hours}
-                            delta=(8-max(1,min(8,population)))*36
+                            delta=(8-max(1,min(8,population)))*reference["rowHeight"]
                             for key,f in sections.items():
                                 expected=reference[key].copy()
                                 if key in ("window","table","body"): expected[3]-=delta
@@ -53,11 +53,14 @@ class Layout(unittest.TestCase):
                             self.assertEqual(u.maxOffset,max(0,population-8))
                             for i in range(1,9):
                                 row=u.rows[i]
-                                self.assertEqual(row.height,36)
+                                self.assertEqual(row.height,reference["rowHeight"])
                                 self.assertEqual(row.played.align,"RIGHT")
                                 self.assertEqual(row.shown,i<=population)
                                 if row.shown:
                                     self.assertGreaterEqual(row.name.width,190)
+                                    self.assertEqual(row.guild.points[1][5],-33)
+                                    self.assertLessEqual(33+row.guild.height,row.height-1)
+                                    self.assertGreaterEqual(row.guild.width,250)
                                     self.assertLessEqual(row.level.points[1][4]+row.level.width,272)
                             for field,width in zip(("name","seconds","updatedAt"),reference["columnWidths"]):
                                 self.assertEqual(u.headers[field].button.width,width)
@@ -80,7 +83,7 @@ class Layout(unittest.TestCase):
                 lua.globals().configure_display(screen_w,screen_h,parent_scale)
                 self.assertAlmostEqual(parent.height*parent_scale,768)
                 for addon_scale in (.65,1,1.1,1.15,1.2,1.3):
-                    for count,height in ((0,248),(1,248),(2,284),(8,500),(20,500)):
+                    for count,height in ((0,262),(1,262),(2,312),(8,612),(20,612)):
                         with self.subTest(resolution=(screen_w,screen_h),ui=parent_scale,addon=addon_scale,count=count):
                             u.db.settings.scale=addon_scale; u.LayoutRows(u,count)
                             lua.execute('fire("UI_SCALE_CHANGED"); fire("DISPLAY_SIZE_CHANGED")')
@@ -113,14 +116,14 @@ class Layout(unittest.TestCase):
         lua.execute('''local original=HourstoneDB.characters
             for i=1,20 do original["test:"..i]={name="Other"..i,realm="Other Realm",seconds=i*1000,level=i} end
             H.UI:Refresh(); assert(original==HourstoneDB.characters)''')
-        self.assertEqual(u.frame.height,500); self.assertAlmostEqual(top(),initial_top)
+        self.assertEqual(u.frame.height,612); self.assertAlmostEqual(top(),initial_top)
         u.search.SetText(u.search,"Elarion")
-        self.assertEqual(u.frame.height,248); self.assertAlmostEqual(top(),initial_top)
+        self.assertEqual(u.frame.height,262); self.assertAlmostEqual(top(),initial_top)
         self.assertIn(lua.globals().H.L.filteredTime.split(":")[0],u.footer.text)
         u.search.SetText(u.search,"missing")
-        self.assertTrue(u.empty.shown); self.assertEqual(u.frame.height,248)
+        self.assertTrue(u.empty.shown); self.assertEqual(u.frame.height,262)
         u.clearSearch.scripts.OnClick()
-        self.assertEqual(u.frame.height,500)
+        self.assertEqual(u.frame.height,612)
         u.Scroll(u,999); offset=u.offset
         lua.execute('tick(2)'); self.assertEqual(u.offset,offset)
         self.assertEqual(u.db.version,2)
@@ -168,7 +171,7 @@ class Layout(unittest.TestCase):
                         for key in ("characters","settings","version"):
                             self.assertEqual(restored[key],saved[key])
                         self.assertEqual(lua.globals().H.T.Session(lua.globals().H.T),42)
-                        self.assertEqual(lua.globals().H.UI.frame.height,248)
+                        self.assertEqual(lua.globals().H.UI.frame.height,262)
 
     def test_minimap_full_art_clearance(self):
         lua=runtime(); lua.execute('fire("ADDON_LOADED","Hourstone")')

@@ -3,7 +3,7 @@
 ## Notes: Your characters. Your time. Account-wide character playtime tracker.
 ## Notes-deDE: Deine Charaktere. Deine Spielzeit. Spielzeit aller erfassten Charaktere.
 ## Author: krebs3r
-## Version: 0.2.0
+## Version: 0.2.1
 ## SavedVariables: HourstoneDB
 ## OptionalDeps: Hourstone_Sync
 ## IconTexture: Interface\AddOns\Hourstone\Media\Logo.tga

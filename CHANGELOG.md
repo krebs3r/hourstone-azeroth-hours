@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.1 — unreleased
+
+- Record and display each character’s guild, including confirmed guildless and not-yet-recorded states.
+- Search character and guild names; keep full guild details in row tooltips.
+- Exchange guild changes independently of playtime through protocol 2 with Companion 0.1.2. Legacy protocol 1 input and existing saved data remain readable.
+
 ## 0.2.0 — unreleased
 
 - Optional Hourstone Companion protocol 1 integration for a combined overview across local client installations.

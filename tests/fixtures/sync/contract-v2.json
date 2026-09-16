@@ -1,0 +1,1082 @@
+{
+  "formatVersion": 2,
+  "cases": [
+    {
+      "name": "new-server-corrects-estimate-downward",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 2000,
+          "updatedAt": 1800001000,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ]
+    },
+    {
+      "name": "estimate-stays-with-baseline",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1080,
+          "updatedAt": 1800000080,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1070,
+          "updatedAt": 1800000070,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1080
+      ]
+    },
+    {
+      "name": "confirmed-beats-unconfirmed-fallback",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 999999,
+          "updatedAt": 1900000000,
+          "serverSeconds": null,
+          "serverAt": null
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1050
+      ]
+    },
+    {
+      "name": "unknown-regions-isolated-by-source",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1050,
+        1100
+      ]
+    },
+    {
+      "name": "known-regions-deduplicate-devices",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1050
+      ]
+    },
+    {
+      "name": "regions-stay-distinct",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "us",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1200,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1050,
+        1200
+      ]
+    },
+    {
+      "name": "client-families-stay-distinct",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "era",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1200,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1050,
+        1200
+      ]
+    },
+    {
+      "name": "same-second-server-answer-tie",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1060,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1010,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1060
+      ]
+    },
+    {
+      "name": "unconfirmed-latest-snapshot",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": null,
+          "serverAt": null
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1040,
+          "updatedAt": 1800000060,
+          "serverSeconds": null,
+          "serverAt": null
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1040
+      ]
+    },
+    {
+      "name": "deterministic-utf8-display-tie",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "😀",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1050,
+          "updatedAt": 1800000050,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1050
+      ],
+      "expectedNames": [
+        "😀"
+      ]
+    },
+    {
+      "name": "zero-is-known",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 0,
+          "updatedAt": 1800000050,
+          "serverSeconds": 0,
+          "serverAt": 1800000000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        0
+      ]
+    },
+    {
+      "name": "newer-guild-survives-newer-playtime-baseline",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 2000,
+          "updatedAt": 1800001000,
+          "serverSeconds": 1000,
+          "serverAt": 1800000000,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800002000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Old Watch",
+          "guildUpdatedAt": 1800001500
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "Dawnwatch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800002000
+      ]
+    },
+    {
+      "name": "unconfirmed-playtime-can-carry-newer-guild",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Old Watch",
+          "guildUpdatedAt": 1800001500
+        },
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 100,
+          "updatedAt": 1800003000,
+          "serverSeconds": null,
+          "serverAt": null,
+          "guild": "New Watch",
+          "guildUpdatedAt": 1800003000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "New Watch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800003000
+      ]
+    },
+    {
+      "name": "explicit-guild-leave-clears-older-name",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800001000
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "",
+          "guildUpdatedAt": 1800001001
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        ""
+      ],
+      "expectedGuildUpdatedAts": [
+        1800001001
+      ]
+    },
+    {
+      "name": "unknown-guild-never-clears-known",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800001000
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1200,
+          "updatedAt": 1800003000,
+          "serverSeconds": 1200,
+          "serverAt": 1800003000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1200
+      ],
+      "expectedGuilds": [
+        "Dawnwatch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800001000
+      ]
+    },
+    {
+      "name": "older-guild-leave-cannot-clear-newer-name",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800002000
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "",
+          "guildUpdatedAt": 1800001000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "Dawnwatch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800002000
+      ]
+    },
+    {
+      "name": "guild-ties-use-ordinal-utf8-bytes",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Zebra",
+          "guildUpdatedAt": 1800002000
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Äther",
+          "guildUpdatedAt": 1800002000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "Äther"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800002000
+      ]
+    },
+    {
+      "name": "guild-tie-name-wins-over-empty",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "",
+          "guildUpdatedAt": 1800002000
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800002000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "Dawnwatch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800002000
+      ]
+    },
+    {
+      "name": "guild-confirmation-refreshes-without-changing-name",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800001000
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800002000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "Dawnwatch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800002000
+      ]
+    },
+    {
+      "name": "legacy-and-null-guild-remain-unknown",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": null,
+          "guildUpdatedAt": null
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        null
+      ],
+      "expectedGuildUpdatedAts": [
+        null
+      ]
+    },
+    {
+      "name": "zero-guild-timestamp-is-known",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "",
+          "guildUpdatedAt": 0
+        },
+        {
+          "sourceId": "synthetic-source-c",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        ""
+      ],
+      "expectedGuildUpdatedAts": [
+        0
+      ]
+    },
+    {
+      "name": "guild-supports-128-utf8-bytes",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "ääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääää",
+          "guildUpdatedAt": 1800002000
+        }
+      ],
+      "expectedCount": 1,
+      "expectedSeconds": [
+        1100
+      ],
+      "expectedGuilds": [
+        "ääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääää"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800002000
+      ]
+    },
+    {
+      "name": "unknown-region-sources-keep-separate-guilds",
+      "observations": [
+        {
+          "sourceId": "synthetic-source-a",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Dawnwatch",
+          "guildUpdatedAt": 1800001000
+        },
+        {
+          "sourceId": "synthetic-source-b",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-SYNTHETIC",
+          "name": "Testmage",
+          "realm": "Test Realm",
+          "class": "MAGE",
+          "level": 80,
+          "seconds": 1100,
+          "updatedAt": 1800001001,
+          "serverSeconds": 1100,
+          "serverAt": 1800001001,
+          "guild": "Evening Watch",
+          "guildUpdatedAt": 1800002000
+        }
+      ],
+      "expectedCount": 2,
+      "expectedSeconds": [
+        1100,
+        1100
+      ],
+      "expectedGuilds": [
+        "Dawnwatch",
+        "Evening Watch"
+      ],
+      "expectedGuildUpdatedAts": [
+        1800001000,
+        1800002000
+      ]
+    }
+  ],
+  "invalidCases": [
+    {
+      "name": "guild-without-timestamp",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guild": "Dawnwatch"
+      }
+    },
+    {
+      "name": "timestamp-without-guild",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guildUpdatedAt": 1800001000
+      }
+    },
+    {
+      "name": "guild-not-string",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guild": false,
+        "guildUpdatedAt": 1800001000
+      }
+    },
+    {
+      "name": "guild-control-character",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guild": "Dawn\twatch",
+        "guildUpdatedAt": 1800001000
+      }
+    },
+    {
+      "name": "guild-too-many-bytes",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guild": "äääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääääää",
+        "guildUpdatedAt": 1800001000
+      }
+    },
+    {
+      "name": "guild-negative-timestamp",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guild": "Dawnwatch",
+        "guildUpdatedAt": -1
+      }
+    },
+    {
+      "name": "guild-timestamp-over-exact-number-limit",
+      "observation": {
+        "sourceId": "synthetic-source-b",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-SYNTHETIC",
+        "name": "Testmage",
+        "realm": "Test Realm",
+        "class": "MAGE",
+        "level": 80,
+        "seconds": 1100,
+        "updatedAt": 1800001001,
+        "serverSeconds": 1100,
+        "serverAt": 1800001001,
+        "guild": "Dawnwatch",
+        "guildUpdatedAt": 9007199254740992
+      }
+    }
+  ]
+}

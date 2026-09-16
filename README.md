@@ -18,8 +18,8 @@ Repeat for each installation. The addon runs independently without another addon
 
 ## Features and controls
 
-- Character name, class, level, realm, cumulative playtime and last update.
-- Search, realm and client filters, sortable columns, total and filtered playtime.
+- Character name, class, level, realm, guild, cumulative playtime and last update.
+- Search by character or guild, realm and client filters, sortable columns, total and filtered playtime.
 - Decimal hours or days / hours / minutes, plus the current login session.
 - Movable window, 65–130% size setting and optional draggable minimap button.
 - `/hourstone` or `/azerothhours`: open or close; `/hourstone minimap`: show or hide the minimap button; `/hourstone reset`: reset window position.
@@ -32,9 +32,11 @@ A character appears after its first login with Hourstone enabled. The server's `
 
 The session continues through a UI reload identified by WoW and resets at a new login. Data is saved as `HourstoneDB` per installation and WoW account at logout or reload. A crash can lose unsaved changes.
 
+Guild membership is recorded for each character when you play it. Guild changes and leaving a guild update independently of playtime. Characters without a recorded guild status show **Not yet recorded**; log in with Hourstone 0.2.1 or later and log out or `/reload` to make the guild available to the companion. **No guild** means the character was confirmed to be guildless. The last saved status is shown for offline characters.
+
 ## Optional synchronization
 
-The 0.2.x development line supports [protocol 1](docs/sync-protocol-v1.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.x. It combines saved character observations from selected local installations after all WoW clients have closed. On the next start, Hourstone can display the combined list and filter it by client family. The companion can also exchange device snapshots through a shared folder between PCs. Published Hourstone 0.1.x releases do not support this protocol.
+Hourstone 0.2.1 supports [protocol 2](docs/sync-protocol-v2.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.2 or later, including guild membership. Update the addon and companion on every computer together; legacy protocol 1 input remains readable. It combines saved character observations from selected local installations after all WoW clients have closed. On the next start, Hourstone can display the combined list and filter it by client family. The companion can also exchange device snapshots through a shared folder between PCs. Published Hourstone 0.1.x releases do not support this protocol.
 
 Repeated observations of the same character are merged, never added. Confirmed server measurements are stored separately from local estimates. UI settings, request timing and the current session remain local. Synchronization cannot transfer `/played` between distinct characters, fetch unvisited characters or update a running client in real time. The companion's documentation explains setup, backups and limitations.
 

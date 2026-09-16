@@ -24,9 +24,14 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
         {"ExampleMage","Example Realm A",16,12900,"PALADIN",5}}
         advance(300)
         IDENTITY.name="ExamplePlayer"; IDENTITY.level=11; IDENTITY.realm="Example Realm D"; IDENTITY.class="DEMONHUNTER"
-        H.T:UpdateIdentity(); fire("TIME_PLAYED_MSG",39720,200)
+        IN_GUILD=true; GUILD_NAME="Dawnwatch"; H.T:UpdateIdentity(); H.T:UpdateGuild(false); fire("TIME_PLAYED_MSG",39720,200)
         for i,c in ipairs(chars) do if i<PREVIEW_COUNT then HourstoneDB.characters["test:"..i]={name=c[1],realm=c[2],
             level=WOW_PROJECT_ID==1 and c[3] or math.floor(c[3]*60/90+.5),seconds=c[4],class=c[5],updatedAt=EPOCH-c[6]*86400} end
+        end
+        local sampleGuilds={"Dawnwatch","",false,"A very long synthetic guild name for layout review","Evening Watch","",false}
+        for i,guild in ipairs(sampleGuilds) do
+            local char=HourstoneDB.characters["test:"..i]
+            if char and guild~=false then char.guild=guild; char.guildUpdatedAt=EPOCH-i*60 end
         end
         for i=9,PREVIEW_COUNT do HourstoneDB.characters["test:"..i]={name="Longcharactername"..i,realm="Realm "..i,level=60,seconds=i*1000,class="MAGE",updatedAt=EPOCH-3000} end
         if PREVIEW_COUNT==0 then HourstoneDB.characters={} end

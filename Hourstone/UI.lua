@@ -4,7 +4,7 @@ H.UI = U
 local ROOT = "Interface\\AddOns\\Hourstone\\Media\\"
 local FONT = STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF"
 local GOLD, MUTED = {243/255,206/255,112/255}, {169/255,170/255,162/255}
-local WIDTH, ROW_HEIGHT, CAPACITY = 720, 36, 8
+local WIDTH, ROW_HEIGHT, CAPACITY = 720, 50, 8
 local NAME_WIDTH, PLAYED_WIDTH, UPDATED_WIDTH = 280, 245, 175
 local SEARCH_WIDTH, FORMAT_WIDTH, COMBINED_WIDTH = 362, 185, 111
 local MINIMAP_SIZE, MINIMAP_ICON, MINIMAP_MASK = 28, 18, 24
@@ -108,8 +108,8 @@ end
 function U:Position(reset)
     local f,p=self.frame,self.db.settings.position
     if reset then self.db.settings.position=nil; p=nil; self.anchorHeight=f:GetHeight() end
-    local height=p and tonumber(p.height) or self.anchorHeight or 248
-    if not M.Number(height) or height<248 or height>500 then height=248 end
+    local height=p and tonumber(p.height) or self.anchorHeight or 262
+    if not M.Number(height) or height<248 or height>612 then height=262 end
     -- Stored center offsets remain compatible. Remember the height at placement
     -- so filtering grows downward from the same header instead of making it jump.
     local x,y=p and p.x or 0,(p and p.y or 0)+(height-f:GetHeight())/2
@@ -155,7 +155,7 @@ end
 function U:Create()
     if self.frame then return end
     local f=C.Frame("Frame","HourstoneWindow",UIParent); self.frame=f
-    f:SetSize(WIDTH,248); f:SetFrameStrata("DIALOG"); f:SetClampedToScreen(true)
+    f:SetSize(WIDTH,262); f:SetFrameStrata("DIALOG"); f:SetClampedToScreen(true)
     f:SetMovable(true); f:EnableMouse(true); f:Hide()
     self.panelName=C.Retail() and "RetailPanel" or "ClassicPanel"
     self.panelLayout=skin(f,self.panelName)
@@ -220,7 +220,7 @@ function U:Create()
     self.hours=control(self.format,L.hours,COMBINED_WIDTH+3,0,FORMAT_WIDTH-COMBINED_WIDTH-3,25,function() self:SetFormat("hours") end)
 
     self.sort,self.descending,self.offset="seconds",true,0
-    self.table=rect("Frame",f,10,152,700,60); self.headers={}
+    self.table=rect("Frame",f,10,152,700,24+ROW_HEIGHT); self.headers={}
     for i,spec in ipairs({{"name","character",0,NAME_WIDTH},{"seconds","played",NAME_WIDTH,PLAYED_WIDTH},{"updatedAt","updated",NAME_WIDTH+PLAYED_WIDTH,UPDATED_WIDTH}}) do
         local field,title,x,w=spec[1],L[spec[2]],spec[3],spec[4]
         local b=rect("Button",self.table,x,0,w,24)
@@ -235,26 +235,27 @@ function U:Create()
         self.headers[field]={button=b,width=w,title=title}
     end
     line(self.table,0,23,700,1,169/255,160/255,139/255,101/255)
-    self.list=rect("Frame",self.table,0,24,700,36); self.list:EnableMouseWheel(true)
+    self.list=rect("Frame",self.table,0,24,700,ROW_HEIGHT); self.list:EnableMouseWheel(true)
     self.list:SetScript("OnMouseWheel",function(_,delta) self:Scroll(-delta*3) end)
     self.rows={}
     for i=1,CAPACITY do
         local row=rect("Button",self.list,0,(i-1)*ROW_HEIGHT,700,ROW_HEIGHT); self.rows[i]=row
         row.bg=solid(row,"BACKGROUND",1,1,1,0); row.bg:SetAllPoints()
-        row.active=line(row,0,0,2,35,104/255,202/255,232/255)
-        line(row,0,35,700,1,141/255,138/255,114/255,59/255)
+        row.active=line(row,0,0,2,ROW_HEIGHT-1,104/255,202/255,232/255)
+        line(row,0,ROW_HEIGHT-1,700,1,141/255,138/255,114/255,59/255)
         row.dot=artwork(row,"LiveDot",5,5,8,8.5)
         row.name=text(row,"",13,8,3,NAME_WIDTH-77,nil,16)
         row.level=text(row,"",10,NAME_WIDTH-62,5,54,{196/255,184/255,154/255},12)
         row.realm=text(row,"",11,8,19,NAME_WIDTH-16,{168/255,170/255,165/255},13)
-        row.played=text(row,"",12,NAME_WIDTH+5,0,PLAYED_WIDTH-19,{238/255,225/255,187/255},35,"RIGHT")
-        row.updated=text(row,"",11,NAME_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,{167/255,171/255,165/255},35)
+        row.guild=text(row,"",10,8,33,NAME_WIDTH-16,{150/255,165/255,156/255},13)
+        row.played=text(row,"",12,NAME_WIDTH+5,0,PLAYED_WIDTH-19,{238/255,225/255,187/255},ROW_HEIGHT-1,"RIGHT")
+        row.updated=text(row,"",11,NAME_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,{167/255,171/255,165/255},ROW_HEIGHT-1)
         local glow=solid(row,"HIGHLIGHT",203/255,184/255,130/255,12/255); glow:SetAllPoints()
         row:SetScript("OnEnter",function(owner) self:RowTooltip(owner) end)
         row:SetScript("OnLeave",function() GameTooltip:Hide() end)
     end
-    self.empty=text(self.list,L.empty,11,8,0,684,MUTED,36,"CENTER")
-    self.scroll=rect("Slider",self.list,695,2,5,32)
+    self.empty=text(self.list,L.empty,11,8,0,684,MUTED,ROW_HEIGHT,"CENTER")
+    self.scroll=rect("Slider",self.list,695,2,5,ROW_HEIGHT-4)
     self.scroll:SetOrientation("VERTICAL"); self.scroll:SetMinMaxValues(0,0); self.scroll:SetValueStep(1)
     if self.scroll.SetObeyStepOnDrag then self.scroll:SetObeyStepOnDrag(true) end
     self.scroll:SetThumbTexture("Interface\\Buttons\\WHITE8X8")
@@ -262,7 +263,7 @@ function U:Create()
     self.scroll:SetScript("OnValueChanged",function(_,v)
         if not self.refreshing then self.offset=math.floor(v+.5); self:Refresh() end
     end)
-    self.footerFrame=rect("Frame",f,10,212,700,26)
+    self.footerFrame=rect("Frame",f,10,176+ROW_HEIGHT,700,26)
     self.footer=text(self.footerFrame,"",10,5,2,424,{166/255,166/255,155/255},24)
     self.clientButton=control(self.footerFrame,L.allClients,435,3,139,22,function() self:ToggleClients() end,"Toggle")
     self.clientButton.label:SetJustifyH("LEFT"); self.clientButton.label:SetWidth(107)
@@ -408,11 +409,13 @@ function U:Refresh()
             else row.bg:SetColorTexture(1,1,1,(i+self.offset)%2==0 and 3/255 or 0) end
             local x=active and 20 or 8
             row.name:ClearAllPoints(); row.name:SetPoint("TOPLEFT",x,-3); row.name:SetWidth(NAME_WIDTH-69-x)
-            row.name:SetText(char.name); row.name:SetTextColor(C.ClassColor(char.class))
+            row.name:SetText(C.Escape(char.name)); row.name:SetTextColor(C.ClassColor(char.class))
             row.level:SetText(L.level.." "..(M.Number(char.level) and tostring(char.level) or "?"))
             row.level:ClearAllPoints(); row.level:SetPoint("TOPLEFT",x+occupied(row.name)+7,-5)
             row.realm:ClearAllPoints(); row.realm:SetPoint("TOPLEFT",x,-19); row.realm:SetWidth(NAME_WIDTH-8-x)
-            row.realm:SetText(char.realm..(self.flavor and "" or (char.flavor and " · "..(L[char.flavor] or char.flavor) or "")))
+            row.realm:SetText(C.Escape(char.realm)..(self.flavor and "" or (char.flavor and " · "..(L[char.flavor] or char.flavor) or "")))
+            row.guild:ClearAllPoints(); row.guild:SetPoint("TOPLEFT",x,-33); row.guild:SetWidth(NAME_WIDTH-8-x)
+            row.guild:SetText(M.GuildText(char))
             row.played:SetText(M.Format(entry.seconds,mode))
             row.updated:SetText(active and entry.seconds and L.now or M.Age(char.updatedAt))
             row.updated:SetTextColor(unpack(active and {156/255,194/255,176/255} or {167/255,171/255,165/255}))
@@ -436,7 +439,7 @@ function U:RowTooltip(row)
     local entry = row.entry
     if not entry then return end
     local char = entry.char
-    local lines = {char.name.." · "..char.realm, L.level.." "..tostring(char.level or "?"),
+    local lines = {C.Escape(char.name.." · "..char.realm), L.level.." "..tostring(char.level or "?"), M.GuildText(char),
         string.format(L.fullTime,M.Format(entry.seconds,self.db.settings.format))}
     if char.flavor then lines[#lines+1] = L.client..": "..(L[char.flavor] or char.flavor) end
     if entry.key == T.key and char._local then

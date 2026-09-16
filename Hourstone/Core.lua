@@ -11,7 +11,7 @@ frame:SetScript("OnEvent",function(_,event,...)
         H.S.Import(db, HourstoneSync)
         H.T:Init(db); H.UI:Init(db)
         frame:UnregisterEvent("ADDON_LOADED")
-        for _, e in ipairs({"PLAYER_ENTERING_WORLD","TIME_PLAYED_MSG","PLAYER_LEVEL_UP","PLAYER_LOGOUT","PLAYER_UPDATE_RESTING","UI_SCALE_CHANGED","DISPLAY_SIZE_CHANGED"}) do frame:RegisterEvent(e) end
+        for _, e in ipairs({"PLAYER_ENTERING_WORLD","TIME_PLAYED_MSG","PLAYER_LEVEL_UP","PLAYER_LOGOUT","PLAYER_UPDATE_RESTING","PLAYER_GUILD_UPDATE","GUILD_ROSTER_UPDATE","UI_SCALE_CHANGED","DISPLAY_SIZE_CHANGED"}) do frame:RegisterEvent(e) end
         SLASH_HOURSTONE1, SLASH_HOURSTONE2 = "/hourstone", "/azerothhours"
         SlashCmdList.HOURSTONE = function(message)
             message = H.C.Lower((message or ""):match("^%s*(.-)%s*$"))
@@ -29,10 +29,13 @@ frame:SetScript("OnEvent",function(_,event,...)
         end)
     elseif event == "PLAYER_ENTERING_WORLD" then
         local _, reload = ...
-        H.T:Begin(reload == true); H.T:UpdateIdentity()
+        H.T:Begin(reload == true); H.T:UpdateIdentity(); H.T:UpdateGuild(false)
     elseif event == "TIME_PLAYED_MSG" then H.T:Receive(...)
     elseif event == "PLAYER_LEVEL_UP" then H.T:UpdateIdentity(...)
     elseif event == "PLAYER_UPDATE_RESTING" then H.T:UpdateIdentity()
+    elseif event == "PLAYER_GUILD_UPDATE" then
+        if ... == "player" then H.T:UpdateGuild(true) end
+    elseif event == "GUILD_ROSTER_UPDATE" then H.T:UpdateGuild(false)
     elseif event == "PLAYER_LOGOUT" then H.T:Save()
     elseif H.UI.frame then H.UI:ApplyScale(); H.UI:UpdateMinimap() end
 end)

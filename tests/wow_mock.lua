@@ -11,6 +11,9 @@ function UnitGUID() return IDENTITY.guid end
 function UnitFullName() return IDENTITY.name, IDENTITY.realm end
 function UnitClass() return IDENTITY.class, IDENTITY.class end
 function UnitLevel() return IDENTITY.level end
+GUILD_READS = 0
+function IsInGuild() return IN_GUILD end
+function GetGuildInfo(unit) assert(unit == "player"); GUILD_READS=GUILD_READS+1; return GUILD_NAME end
 function RequestTimePlayed() REQUESTS=REQUESTS+1 end
 function GetAddOnMetadata() return TEST_VERSION end
 function GetPhysicalScreenSize() return SCREEN_WIDTH or 1920,SCREEN_HEIGHT or 1080 end

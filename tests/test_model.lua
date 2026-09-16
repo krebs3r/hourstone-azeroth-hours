@@ -34,3 +34,22 @@ assert(M.SessionFormat(8040)==(H.de and "2 Std. 14 Min." or "2h 14m"))
 assert(M.SessionFormat(0)==(H.de and "0 Std. 0 Min." or "0h 0m"))
 assert(M.SessionFormat(86460)==M.Format(86460,"combined"))
 assert(M.Format(7633560,"hours")== (H.de and "2.120,4 Std." or "2,120.4 hrs"))
+
+-- Sort displayed client names, with unknown families last in both directions.
+local flavors={"retail","era","tbc","mists","project-999"}
+local clients={characters={}}
+for i,flavor in ipairs(flavors) do
+    clients.characters[tostring(i)]={name="Character"..i,realm="One",flavor=flavor,seconds=100}
+end
+clients.characters.missing={name="Missing",realm="One",seconds=100}
+local ascending={"era","mists","retail","tbc"}
+for _,descending in ipairs({false,true}) do
+    rows=M.List(clients,nil,nil,"flavor",descending)
+    for i=1,4 do assert(rows[i].char.flavor==ascending[descending and 5-i or i]) end
+    assert(rows[5].char.flavor=="project-999" and rows[6].key=="missing")
+end
+assert(M.ClientText({})==L.unknownClient)
+local original=L.retail
+L.retail="A synthetic localized client"
+rows=M.List(clients,nil,nil,"flavor",false); assert(rows[1].char.flavor=="retail")
+L.retail=original

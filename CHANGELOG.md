@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3 — unreleased
+
+- Put realm and client filters together above the table and show the client in a dedicated sortable column beside playtime.
+- Use Blizzard's native minimap tracking border, background and highlight with Retail/Classic geometry and the complete Hourstone logo.
+- Keep the server timestamp on one tooltip line, remove presence-status claims and clarify estimated or unconfirmed time.
+- Add "with" before the footer heart and consistently label deleted overview entries and their restore actions.
+- Preserve protocol 3, character/guild data, saved settings and minimap position without migration.
+
 ## 0.2.2 — unreleased
 
 - Remove a character from the overview and totals after confirmation, retaining its saved playtime. Restore it in the removed-character view or at a subsequent actual character login.

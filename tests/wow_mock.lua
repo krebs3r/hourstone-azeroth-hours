@@ -154,8 +154,8 @@ function methods:GetValue() return self.value end
 function methods:SetJustifyH(v) self.align=v end
 function methods:SetJustifyV(v) self.valign=v end
 function methods:SetOwner() end
-function methods:ClearLines() self.lines={} end
-function methods:AddLine(line) self.lines[#self.lines+1]=line end
+function methods:ClearLines() self.lines={}; self.lineWrap={} end
+function methods:AddLine(line,_,_,_,wrap) self.lines[#self.lines+1]=line; self.lineWrap[#self.lines]=wrap end
 for _,key in ipairs({"SetFrameStrata","SetClampedToScreen","SetMovable","EnableMouse","RegisterForDrag","StartMoving","StopMovingOrSizing","SetAutoFocus","SetMaxLetters","SetTextInsets","ClearFocus","EnableMouseWheel","SetValueStep","SetObeyStepOnDrag","RegisterForClicks","SetWordWrap"}) do methods[key]=function() end end
 UIParent=new("Frame","UIParent"); UIParent:SetScale(1)
 function configure_display(w,h,scale)

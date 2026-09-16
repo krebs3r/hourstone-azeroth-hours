@@ -3,6 +3,7 @@
 This is a development preview with fictional data, never an in-game screenshot.
 """
 import base64
+import argparse
 import html
 from pathlib import Path
 import sys
@@ -25,15 +26,17 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
         advance(300)
         IDENTITY.name="ExamplePlayer"; IDENTITY.level=11; IDENTITY.realm="Example Realm D"; IDENTITY.class="DEMONHUNTER"
         IN_GUILD=true; GUILD_NAME="Dawnwatch"; H.T:UpdateIdentity(); H.T:UpdateGuild(false); fire("TIME_PLAYED_MSG",39720,200)
+        local clients={"retail","mists","tbc","era"}
         for i,c in ipairs(chars) do if i<PREVIEW_COUNT then HourstoneDB.characters["test:"..i]={name=c[1],realm=c[2],
-            level=WOW_PROJECT_ID==1 and c[3] or math.floor(c[3]*60/90+.5),seconds=c[4],class=c[5],updatedAt=EPOCH-c[6]*86400} end
+            level=WOW_PROJECT_ID==1 and c[3] or math.floor(c[3]*60/90+.5),seconds=c[4],class=c[5],
+            flavor=clients[(i-1)%4+1],updatedAt=EPOCH-c[6]*86400} end
         end
         local sampleGuilds={"Dawnwatch","",false,"A very long synthetic guild name for layout review","Evening Watch","",false}
         for i,guild in ipairs(sampleGuilds) do
             local char=HourstoneDB.characters["test:"..i]
             if char and guild~=false then char.guild=guild; char.guildUpdatedAt=EPOCH-i*60 end
         end
-        for i=9,PREVIEW_COUNT do HourstoneDB.characters["test:"..i]={name="Longcharactername"..i,realm="Realm "..i,level=60,seconds=i*1000,class="MAGE",updatedAt=EPOCH-3000} end
+        for i=9,PREVIEW_COUNT do HourstoneDB.characters["test:"..i]={name="Longcharactername"..i,realm="Realm "..i,level=60,seconds=i*1000,class="MAGE",flavor=clients[(i-1)%4+1],updatedAt=EPOCH-3000} end
         if PREVIEW_COUNT==0 then HourstoneDB.characters={} end
         configure_display(2560,1440,.8); H.UI:Toggle()''')
     if settings: lua.execute("H.UI:ToggleSettings()")
@@ -95,7 +98,8 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
             family="Georgia,serif"
             pieces.append(f'<span style="{style}color:{css};font-family:{family};line-height:{h}px;font-size:{f.get("fontSize",12)}px;text-align:{f.get("align","LEFT").lower()}">{value}</span>')
         elif f.get("texture"):
-            name=f["texture"].split("\\")[-1].replace(".tga",".png")
+            native={136430:"MiniMap-TrackingBorder",136467:"UI-Minimap-Background",136477:"UI-Minimap-ZoomButton-Highlight"}
+            name=native.get(f["texture"],str(f["texture"]).split("\\")[-1].replace(".tga",".png"))
             path=ROOT/"docs/assets"/name
             if path.exists():
                 image=base64.b64encode(path.read_bytes()).decode()
@@ -117,6 +121,12 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
             elif name=="UI-CheckBox-Check":
                 check=base64.b64encode((ROOT/"docs/assets/Check.png").read_bytes()).decode()
                 pieces.append(f'<div style="{style}"><img alt="" src="data:image/png;base64,{check}" style="position:absolute;inset:6px;width:12px;height:12px"></div>')
+            elif name=="UI-Minimap-Background":
+                pieces.append(f'<div style="{style}border-radius:50%;background:#10161a"></div>')
+            elif name=="MiniMap-TrackingBorder":
+                # Approximate only the visible rim. The native texture has
+                # transparent padding; compare its actual shape inside WoW.
+                pieces.append(f'<div style="{style}"><div style="width:31px;height:31px;box-sizing:border-box;border-radius:50%;border:3px solid #9b8b70;box-shadow:inset 0 0 1px #ede2c2,0 0 1px #000"></div></div>')
         elif color is not None: pieces.append(f'<div style="{style}background:{css}"></div>')
     # Project native UI coordinates into physical pixels; do not assume effectiveScale=1.
     screen_h=lua.globals().GetPhysicalScreenSize()[1]
@@ -124,13 +134,32 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     width,height=target.width*factor,target.height*factor
     return f'<div class="window" data-physical-width="{width:g}" data-physical-height="{height:g}" style="width:{width}px;height:{height}px"><div class="canvas" style="transform:scale({factor});width:{target.width}px;height:{target.height}px">'+''.join(pieces)+'</div></div>'
 
+def product_pages():
+    """Write synthetic, explicitly labeled layouts for documentation captures."""
+    css='body{margin:0;background:#171c22;color:#eee;font-family:Segoe UI,sans-serif}.product{width:720px;padding:28px 32px 24px}h1{font-size:20px;font-weight:600;margin:0 0 20px}.window,.canvas{position:relative}.canvas{transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}p{font-size:12px;color:#a9aaa2;margin:18px 0 0;line-height:1.6}'
+    destination=ROOT/"dist"; destination.mkdir(exist_ok=True)
+    for locale,language in (("deDE","de"),("enUS","en")):
+        caption=("Synthetische Layoutvorschau · Schrift und WoW-eigene Bedienelemente sind Näherungen. Keine Ingame-Aufnahme."
+            if language=="de" else "Synthetic layout preview · Fonts and WoW-owned controls are approximations. Not an in-game screenshot.")
+        page=f'<!doctype html><html lang="{language}"><meta charset="utf-8"><title>Hourstone · {language.upper()} layout preview</title><style>{css}</style><main class="product"><h1>Hourstone – Azeroth Hours</h1>'+render(1,locale,population=8)+f'<p>{caption}</p></main></html>'
+        path=destination/f"addon-product-{language}.html"; path.write_text(page,encoding="utf-8"); print(path)
+
+
 def main():
-    page='<!doctype html><html lang="de"><meta charset="utf-8"><title>Hourstone · Lua-Vorschau</title><style>body{background:#171c22;color:#eee;font-family:Segoe UI,sans-serif;padding:24px;max-width:900px;margin:auto}h1{font-size:22px}h2{font-size:16px;color:#aaa}p{font-size:13px;color:#aaa;line-height:1.6}.window{position:relative;margin-bottom:32px}.canvas{position:relative;transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}</style><h1>Hourstone · Lua-Vorschau</h1><p>Layoutvorschau mit synthetischen Charakterdaten. 100 % ist die Standardgröße. Größenvergleich aus dem Lua-Simulator bei 1440p und 80 % globaler UI-Skalierung. Fiktive Daten; Georgia, Zahnrad und Checkbox sind Browser-Näherungen an WoW-eigene Ressourcen. Keine Ingame-Aufnahmen.</p>'
-    for project,locale,settings,mode,population,scale in [(2,"deDE",False,"combined",1,1),(2,"deDE",False,"combined",1,1.1),(2,"deDE",False,"combined",1,1.2),(2,"deDE",True,"combined",1,1.1),(1,"deDE",False,"combined",8,1),(2,"enUS",False,"hours",20,1),(1,"enUS",True,"hours",0,1)]:
-        page+=f'<h2>{"Retail" if project==1 else "Classic"} · {locale} · {population} Charaktere · {scale*100:g} %'+(' · Einstellungen' if settings else '')+'</h2>'+render(project,locale,settings,mode,population,scale)
-    page+='<h2>Minimap · 28 UI-Einheiten · 1440p / 80 % globale UI-Skalierung</h2>'+render(2,'deDE',minimap=True)
+    page='<!doctype html><html lang="de"><meta charset="utf-8"><title>Hourstone · Lua-Vorschau</title><style>body{background:#171c22;color:#eee;font-family:Segoe UI,sans-serif;padding:24px;max-width:900px;margin:auto}h1{font-size:22px}h2{font-size:16px;color:#aaa}p{font-size:13px;color:#aaa;line-height:1.6}.window{position:relative;margin-bottom:32px}.canvas{position:relative;transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}</style><h1>Hourstone · Lua-Vorschau</h1><p>Layoutvorschau mit synthetischen Charakterdaten aller vier Clientfamilien. 100 % ist die Standardgröße. Größenvergleich aus dem Lua-Simulator bei 1440p und 80 % globaler UI-Skalierung. Fiktive Daten; Georgia, Zahnrad, Checkbox und Minimaprahmen sind Browser-Näherungen an WoW-eigene Ressourcen. Keine Ingame-Aufnahmen.</p>'
+    families={1:"Retail",19:"Mists Classic",5:"TBC Anniversary",2:"Classic Era"}
+    profiles=[(2,"deDE",False,"combined",1,1),(2,"deDE",False,"combined",1,1.1),(2,"deDE",False,"combined",1,1.2),(2,"deDE",True,"combined",1,1.1),
+        (1,"deDE",False,"combined",8,1),(19,"enUS",False,"hours",8,1),(5,"deDE",False,"combined",8,1),(2,"enUS",False,"hours",20,1),(1,"enUS",True,"hours",0,1)]
+    for project,locale,settings,mode,population,scale in profiles:
+        page+=f'<h2>{families[project]} · {locale} · {population} Charaktere · {scale*100:g} %'+(' · Einstellungen' if settings else '')+'</h2>'+render(project,locale,settings,mode,population,scale)
+    for project in families:
+        page+=f'<h2>Minimap · {families[project]} · 31 UI-Einheiten · Textur-Näherung</h2>'+render(project,'deDE',minimap=True)
     page+='</html>'
     dest=ROOT/"dist/lua-ui-preview.html"; dest.parent.mkdir(exist_ok=True); dest.write_text(page,encoding="utf-8")
     print(dest)
 
-if __name__=="__main__": main()
+if __name__=="__main__":
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--product-pages",action="store_true",help="Also write labeled synthetic layouts for documentation images")
+    args=parser.parse_args(); main()
+    if args.product_pages: product_pages()

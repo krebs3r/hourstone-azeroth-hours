@@ -8,6 +8,10 @@ Track your World of Warcraft characters and their total `/played` time in one co
 
 [Download](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest) · [CurseForge](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
+![Hourstone 0.2.3 synthetic layout preview showing realm and client filters and a separate client column](docs/assets/addon-overview-en.png)
+
+Synthetic layout preview with fictional characters. Browser fonts and WoW-owned controls approximate the native UI; this is not an in-game screenshot.
+
 ## Installation
 
 1. Download the `Hourstone-X.Y.Z.zip` asset from GitHub Releases or install through CurseForge.
@@ -18,20 +22,20 @@ Repeat for each installation. The addon runs independently without another addon
 
 ## Features and controls
 
-- Character name, class, level, realm, guild, cumulative playtime and last update.
-- Search by character or guild, realm and client filters, sortable columns, total and filtered playtime.
+- Character name, class, level, realm and guild, with a separate client column beside playtime and last update.
+- Search by character or guild, realm and client filters together above the table, sortable columns, total and filtered playtime.
 - Decimal hours or days / hours / minutes, plus the current login session.
-- Remove characters from the overview without losing their saved playtime; restore them from a separate list.
+- Delete entries from the overview without losing their saved playtime; restore them from a separate list.
 - Movable window, 65–130% size setting and optional draggable minimap button.
 - `/hourstone` or `/azerothhours`: open or close; `/hourstone minimap`: show or hide the minimap button; `/hourstone reset`: reset window position.
 
-Use the gear button for display settings. Click column headings to sort, scroll longer lists, and hover a character for full details.
+Use the gear button for display settings. Click column headings to sort, including client names, scroll longer lists, and hover a character for full details. Unknown client families sort last. Tooltips show the recorded data and the last server timestamp without claiming an online/offline status.
 
-## Removing and restoring characters
+## Deleting and restoring overview entries
 
-Right-click a character and confirm **Remove** to hide it from the overview and its totals. This never deletes a WoW character or its saved playtime. In the gear menu, choose **Removed characters**, then right-click an entry to restore it. Use the same menu to return to tracked characters. The summary cards always exclude removed characters, including while browsing the removed list.
+Right-click a character and confirm **Delete** to hide it from the overview and its totals. This never deletes a WoW character or its saved playtime. In the gear menu, choose **Deleted characters**, then right-click an entry to restore it. Use the same menu to return to tracked characters. The summary cards always exclude deleted entries, including while browsing that list.
 
-A new login with that character also restores removals already known to the addon. Removing your currently played character keeps it hidden until you restore it or log in again; its time continues to be recorded. `/reload`, zoning and `/played` do not restore it. If another PC removed it while this PC was offline, synchronize first and then make a new character login. Removal and restore changes are saved with the normal WoW logout/reload and exchanged by Companion.
+A new login with that character also restores deletions already known to the addon. Deleting your currently played character's entry keeps it hidden until you restore it or log in again; its time continues to be recorded. `/reload`, zoning and `/played` do not restore it. If another PC deleted the entry while this PC was offline, synchronize first and then make a new character login. These changes are saved with the normal WoW logout/reload and exchanged by Companion.
 
 ## Tracking and saved data
 
@@ -43,7 +47,7 @@ Guild membership is recorded for each character when you play it. Guild changes 
 
 ## Optional synchronization
 
-Hourstone 0.2.2 supports [protocol 3](docs/sync-protocol-v3.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.3 or later, including guild membership and shared removal/restore controls. Update the addon and companion on every computer together; legacy protocol 1 and 2 input remains readable. It combines saved character observations from selected local installations after all WoW clients have closed. On the next start, Hourstone can display the combined list and filter it by client family. The companion can also exchange device snapshots through a shared folder between PCs. Published Hourstone 0.1.x releases do not support this protocol.
+Hourstone 0.2.3 supports [protocol 3](docs/sync-protocol-v3.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.3 or later, including guild membership and shared delete/restore controls. Version 0.2.3 keeps the same protocol and saved-data schema as 0.2.2; existing data and settings need no migration. Update the addon and companion on every computer together; legacy protocol 1 and 2 input remains readable. It combines saved character observations from selected local installations after all WoW clients have closed. On the next start, Hourstone can display the combined list and filter it by client family. The companion can also exchange device snapshots through a shared folder between PCs. Published Hourstone 0.1.x releases do not support this protocol.
 
 Repeated observations of the same character are merged, never added. Confirmed server measurements are stored separately from local estimates. UI settings, request timing and the current session remain local. Synchronization cannot transfer `/played` between distinct characters, fetch unvisited characters or update a running client in real time. The companion's documentation explains setup, backups and limitations.
 
@@ -73,7 +77,7 @@ python tools/package.py
 
 The local pre-push hook and CI check the current tree and every new commit for private material. Keep local exports, logs and credentials outside Git. [Repository checks](docs/REPOSITORY.md) explains the historical baseline and checks.
 
-`tools/assets.py` regenerates shipping TGA textures from retained PNG masters and source manifests. Packaging validates metadata, files, textures, licenses and deterministic ZIP output. `tools/preview.py` renders the current Lua layout with synthetic data and approximate browser fonts; native checks remain necessary.
+`tools/assets.py` regenerates shipping TGA textures from retained PNG masters and source manifests. Packaging validates metadata, files, textures, licenses and deterministic ZIP output. `tools/preview.py` renders the current Lua layout with synthetic data and approximate browser fonts; native checks remain necessary. Add `--product-pages` to generate explicitly labeled German and English layouts for documentation images in `dist`.
 
 See the [changelog](CHANGELOG.md), [validation guide](docs/VALIDATION.md) and [publishing guide](docs/curseforge/README.md).
 

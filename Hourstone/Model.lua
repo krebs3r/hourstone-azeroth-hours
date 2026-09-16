@@ -78,6 +78,11 @@ function M.GuildText(char)
     local value = not H.S.KnownGuild(char) and L.guildUnknown or (char.guild == "" and L.noGuild or char.guild)
     return L.guild .. ": " .. H.C.Escape(value)
 end
+local CLIENTS={retail=true,mists=true,tbc=true,era=true}
+function M.ClientText(char)
+    if CLIENTS[char.flavor] then return L[char.flavor] end
+    return L.unknownClient
+end
 function M.List(db, search, realm, sort, descending, valueFor, flavor)
     local rows, total, visible, missing, visibleMissing, count, realms = {}, 0, 0, 0, 0, 0, {}
     search, sort = H.C.Lower(search or ""), sort or "seconds"
@@ -98,6 +103,7 @@ function M.List(db, search, realm, sort, descending, valueFor, flavor)
     end
     local function field(row)
         if sort == "seconds" then return row.seconds end
+        if sort == "flavor" then return CLIENTS[row.char.flavor] and H.C.Lower(M.ClientText(row.char)) or nil end
         if sort == "level" or sort == "updatedAt" then
             return M.Number(row.char[sort]) and row.char[sort] or nil
         end
@@ -105,7 +111,7 @@ function M.List(db, search, realm, sort, descending, valueFor, flavor)
     end
     table.sort(rows, function(a, b)
         local av, bv = field(a), field(b)
-        -- Unknown numeric values stay at the bottom in both sort directions.
+        -- Unknown values stay at the bottom in both sort directions.
         if av == nil and bv ~= nil then return false end
         if bv == nil and av ~= nil then return true end
         if av ~= bv then

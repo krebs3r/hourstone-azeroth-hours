@@ -16,7 +16,7 @@ class Layout(unittest.TestCase):
     def test_baseline_geometry_and_states(self):
         reference=json.loads((ROOT/"tests/fixtures/layout/baseline.json").read_text())
         reference.update(json.loads((ROOT/"tests/fixtures/layout/adjustments.json").read_text()))
-        for project in (1,2):
+        for project in (1,2,5,19):
             for locale in ("deDE","enUS"):
                 for mode in ("combined","hours"):
                     for population in (0,1,8,20,141):
@@ -35,7 +35,7 @@ class Layout(unittest.TestCase):
                                 return [parent[0]+p[4],parent[1]-p[5],f.width,f.height]
                             sections={"window":u.frame,"header":u.header,"summary":u.summary,"toolbar":u.toolbar,
                                 "table":u.table,"body":u.list,"footer":u.footerFrame,"gear":u.gear,"close":u.close,
-                                "search":u.search,"realm":u.realmButton,"format":u.format,"logo":u.logo,"title":u.title,
+                                "search":u.search,"realm":u.realmButton,"client":u.clientButton,"format":u.format,"logo":u.logo,"title":u.title,
                                 "statTotal":u.total,"statSession":u.session,"settings":u.settings,
                                 "minimapToggle":u.minimapToggle,"reset":u.reset,"done":u.done,
                                 "combinedButton":u.combined,"hoursButton":u.hours}
@@ -62,8 +62,17 @@ class Layout(unittest.TestCase):
                                     self.assertLessEqual(33+row.guild.height,row.height-1)
                                     self.assertGreaterEqual(row.guild.width,250)
                                     self.assertLessEqual(row.level.points[1][4]+row.level.width,272)
-                            for field,width in zip(("name","seconds","updatedAt"),reference["columnWidths"]):
+                            for field,width in zip(("name","flavor","seconds","updatedAt"),reference["columnWidths"]):
                                 self.assertEqual(u.headers[field].button.width,width)
+                            self.assertEqual(u.headers.seconds.button.label.align,"RIGHT")
+                            self.assertEqual(u.headers.flavor.button.label.align,"LEFT")
+                            self.assertLessEqual(bounds(u.rows[1].realm)[0]+u.rows[1].realm.width,bounds(u.rows[1].client)[0])
+                            self.assertLessEqual(bounds(u.rows[1].client)[0]+u.rows[1].client.width,bounds(u.rows[1].played)[0])
+                            self.assertLessEqual(bounds(u.rows[1].played)[0]+u.rows[1].played.width,bounds(u.rows[1].updated)[0])
+                            self.assertEqual(u.menu.parent.id,u.realmButton.id)
+                            self.assertEqual(u.clientMenu.parent.id,u.clientButton.id)
+                            self.assertGreater(bounds(u.menu)[1],bounds(u.realmButton)[1]+u.realmButton.height)
+                            self.assertGreater(bounds(u.clientMenu)[1],bounds(u.clientButton)[1]+u.clientButton.height)
                             self.assertTrue(u.footer.text.startswith(f"{population} / {population}"))
                             self.assertEqual(u.rows[1].name.font,"Fonts\\FRIZQT__.TTF")
                             self.assertEqual(u.rows[1].updated.font,"Fonts\\FRIZQT__.TTF")
@@ -148,11 +157,14 @@ class Layout(unittest.TestCase):
                             self.assertEqual(u.statLabels[i].text,lua.globals().H.L[key])
                             self.assertGreater(u.statLabels[i].width,120)
                         self.assertGreaterEqual(u.rows[1].name.width,190)
-                        version,heart,author=u.creditVersion,u.creditHeart,u.creditAuthor
+                        version,credit_with,heart,author=u.creditVersion,u.creditWith,u.creditHeart,u.creditAuthor
                         self.assertEqual((heart.width,heart.height),(9,9))
                         self.assertTrue(heart.texture.endswith("Heart.tga"))
-                        self.assertAlmostEqual(heart.points[1][4]-version.points[1][4]-version.width,5)
+                        self.assertEqual(credit_with.text,"with")
+                        self.assertAlmostEqual(credit_with.points[1][4]-version.points[1][4]-version.width,5)
+                        self.assertAlmostEqual(heart.points[1][4]-credit_with.points[1][4]-credit_with.width,5)
                         self.assertAlmostEqual(author.points[1][4]-heart.points[1][4]-heart.width,5)
+                        self.assertLess(u.footer.points[1][4]+u.footer.width,version.points[1][4])
                         self.assertEqual(u.settings.height,214)
                         self.assertIsNone(u.densityToggle)
                         lua.globals().ZERO_FONT_METRICS=False
@@ -174,29 +186,48 @@ class Layout(unittest.TestCase):
                         self.assertEqual(lua.globals().H.UI.frame.height,262)
 
     def test_minimap_full_art_clearance(self):
-        lua=runtime(); lua.execute('fire("ADDON_LOADED","Hourstone")')
-        button=lua.globals().H.UI.minimap; icon=button.icon
         im=Image.open(ROOT/"Hourstone/Media/Logo.tga").convert("RGBA")
-        radius=max(math.hypot((x+.5)/im.width-.5,(y+.5)/im.height-.5)
-            for y in range(im.height) for x in range(im.width) if im.getpixel((x,y))[3]>0)*icon.width
-        inner_radius=28/64*28 # inner edge of the shipped 64px border texture
-        self.assertLessEqual(radius,inner_radius-2)
-        self.assertEqual(button.width,28)
-        self.assertEqual(icon.width,18)
-        self.assertEqual(icon.width,icon.height)
-        self.assertEqual(icon.mask.width,24)
-        self.assertEqual(icon.points[1][4]+icon.width/2,14)
-        self.assertEqual(-icon.points[1][5]+icon.height/2,14)
-        self.assertEqual(button.highlight.allPoints.id,button.id)
-        self.assertTrue(button.highlight.texture.endswith("MinimapHover.tga"))
-        for frame in lua.globals().ALL_FRAMES.values():
-            if frame.parent is not None and frame.parent.id==button.id and frame.texture is not None:
-                if frame.texture.endswith(("MinimapBackground.tga","MinimapBorder.tga")):
-                    self.assertEqual((frame.width,frame.height),(28,28))
-        for scale in (.65,.8,1,1.3,1.5,2):
-            lua.globals().Minimap.SetScale(lua.globals().Minimap,scale)
-            self.assertAlmostEqual(button.GetEffectiveScale(button),scale)
-            self.assertLess(radius*scale,inner_radius*scale)
+        normalized_radius=max(math.hypot((x+.5)/im.width-.5,(y+.5)/im.height-.5)
+            for y in range(im.height) for x in range(im.width) if im.getpixel((x,y))[3]>0)
+        for project in (1,2,5,19,999):
+            with self.subTest(project=project):
+                lua=runtime(project); lua.execute('fire("ADDON_LOADED","Hourstone")')
+                u=lua.globals().H.UI; button=u.minimap; icon=button.icon
+                retail=project==1
+                radius=normalized_radius*icon.width
+                self.assertLess(radius,button.mask.width/2)
+                self.assertEqual((button.width,button.height),(31,31))
+                self.assertEqual((icon.width,icon.height),(18,18) if retail else (17,17))
+                self.assertIsNone(icon.uv) # use the complete Hourstone motif
+                self.assertEqual((icon.mask.width,icon.mask.height),(24,24))
+                self.assertEqual(icon.mask.points[1][2].id,icon.id)
+                self.assertEqual((icon.mask.points[1][1],icon.mask.points[1][3]),("CENTER","CENTER"))
+                self.assertEqual((button.border.width,button.border.height),(50,50) if retail else (53,53))
+                self.assertEqual(button.border.texture,136430)
+                self.assertEqual(button.border.points[1][1],"TOPLEFT")
+                self.assertEqual((button.border.points[1][4],button.border.points[1][5]),(0,0))
+                self.assertEqual(button.background.texture,136467)
+                self.assertEqual((button.background.width,button.background.height),(24,24) if retail else (20,20))
+                self.assertEqual(button.highlight.texture,136477)
+                self.assertEqual(button.highlight.allPoints.id,button.id)
+                if retail:
+                    self.assertEqual(icon.points[1][1],"CENTER")
+                    self.assertEqual(button.background.points[1][1],"CENTER")
+                else:
+                    self.assertEqual((icon.points[1][4],icon.points[1][5]),(7,-6))
+                    self.assertEqual((button.background.points[1][4],button.background.points[1][5]),(7,-5))
+                for frame in lua.globals().ALL_FRAMES.values():
+                    if frame.parent is not None and frame.parent.id==button.id and isinstance(frame.texture,str):
+                        self.assertFalse(frame.texture.endswith(("MinimapBackground.tga","MinimapBorder.tga","MinimapHover.tga")))
+                u.db.settings.minimapAngle=127.5
+                u.UpdateMinimap(u)
+                x,y=button.points[1][4],button.points[1][5]
+                self.assertAlmostEqual(math.hypot(x,y),lua.globals().Minimap.width/2+7)
+                for scale in (.65,.8,1,1.3,1.5,2):
+                    lua.globals().Minimap.SetScale(lua.globals().Minimap,scale)
+                    self.assertAlmostEqual(button.GetEffectiveScale(button),scale)
+                    self.assertEqual(u.db.settings.minimapAngle,127.5)
+                    self.assertLess(radius*scale,button.mask.width/2*scale)
 
 
 if __name__=="__main__": unittest.main()

@@ -1,5 +1,5 @@
 {
-  "source": "Layout targets for three-line character rows, wider combined-format controls and balanced columns. Applied to the baseline.",
+  "source": "Layout targets for three-line character rows, upper realm/client filters and a dedicated client column. Applied to the baseline.",
   "summaryColumns": [
     38,
     22,
@@ -8,11 +8,11 @@
   "search": [
     10,
     120,
-    362,
+    216,
     26
   ],
   "realm": [
-    379,
+    233,
     120,
     139,
     26
@@ -23,6 +23,7 @@
     185,
     25
   ],
+  "client": [379, 120, 139, 26],
   "combinedButton": [
     525,
     120.5,
@@ -69,8 +70,9 @@
   ],
   "columnWidths": [
     280,
-    245,
-    175
+    120,
+    185,
+    115
   ],
   "window": [
     0,

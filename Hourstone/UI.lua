@@ -5,9 +5,9 @@ local ROOT = "Interface\\AddOns\\Hourstone\\Media\\"
 local FONT = STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF"
 local GOLD, MUTED = {243/255,206/255,112/255}, {169/255,170/255,162/255}
 local WIDTH, ROW_HEIGHT, CAPACITY = 720, 50, 8
-local NAME_WIDTH, PLAYED_WIDTH, UPDATED_WIDTH = 280, 245, 175
-local SEARCH_WIDTH, FORMAT_WIDTH, COMBINED_WIDTH = 362, 185, 111
-local MINIMAP_SIZE, MINIMAP_ICON, MINIMAP_MASK = 28, 18, 24
+local NAME_WIDTH, CLIENT_WIDTH, PLAYED_WIDTH, UPDATED_WIDTH = 280, 120, 185, 115
+local SEARCH_WIDTH, FILTER_WIDTH, FORMAT_WIDTH, COMBINED_WIDTH = 216, 139, 185, 111
+local MINIMAP_SIZE, MINIMAP_MASK = 31, 24
 
 local function rect(kind,parent,x,y,w,h,name)
     local f=C.Frame(kind,name,parent)
@@ -90,7 +90,10 @@ local function closeButton(parent,x,y,size,action)
 end
 local function tooltip(owner,lines)
     GameTooltip:SetOwner(owner,"ANCHOR_RIGHT"); GameTooltip:ClearLines()
-    for _,value in ipairs(lines) do GameTooltip:AddLine(value,.94,.91,.84,true) end
+    for _,value in ipairs(lines) do
+        if type(value)=="table" then GameTooltip:AddLine(value.text,.94,.91,.84,value.wrap~=false)
+        else GameTooltip:AddLine(value,.94,.91,.84,true) end
+    end
     GameTooltip:Show()
 end
 -- Width measurements affect only spacing between adjacent labels. A zero result
@@ -215,21 +218,27 @@ function U:Create()
     end)
     search:SetScript("OnEscapePressed",function(edit) edit:ClearFocus(); f:Hide() end)
     search:SetScript("OnEnterPressed",function(edit) edit:ClearFocus() end)
-    self.realmButton=control(self.toolbar,L.allRealms,SEARCH_WIDTH+7,6,139,26,function() self:ToggleRealms() end,"Toggle")
+    search:SetScript("OnEnter",function(owner) tooltip(owner,{L.searchHelp}) end)
+    search:SetScript("OnLeave",function() GameTooltip:Hide() end)
+    self.realmButton=control(self.toolbar,L.allRealms,SEARCH_WIDTH+7,6,FILTER_WIDTH,26,function() self:ToggleRealms() end,"Toggle")
     self.realmButton.label:SetJustifyH("LEFT"); self.realmButton.label:SetWidth(107)
     arrow(self.realmButton,124,11,6,4)
+    self.clientButton=control(self.toolbar,L.allClients,SEARCH_WIDTH+FILTER_WIDTH+14,6,FILTER_WIDTH,26,function() self:ToggleClients() end,"Toggle")
+    self.clientButton.label:SetJustifyH("LEFT"); self.clientButton.label:SetWidth(107)
+    arrow(self.clientButton,124,11,6,4)
     self.format=rect("Frame",self.toolbar,700-FORMAT_WIDTH,6.5,FORMAT_WIDTH,25)
     self.combined=control(self.format,L.combined,0,0,COMBINED_WIDTH,25,function() self:SetFormat("combined") end)
     self.hours=control(self.format,L.hours,COMBINED_WIDTH+3,0,FORMAT_WIDTH-COMBINED_WIDTH-3,25,function() self:SetFormat("hours") end)
 
     self.sort,self.descending,self.offset="seconds",true,0
     self.table=rect("Frame",f,10,152,700,24+ROW_HEIGHT); self.headers={}
-    for i,spec in ipairs({{"name","character",0,NAME_WIDTH},{"seconds","played",NAME_WIDTH,PLAYED_WIDTH},{"updatedAt","updated",NAME_WIDTH+PLAYED_WIDTH,UPDATED_WIDTH}}) do
+    for _,spec in ipairs({{"name","character",0,NAME_WIDTH},{"flavor","client",NAME_WIDTH,CLIENT_WIDTH},
+        {"seconds","played",NAME_WIDTH+CLIENT_WIDTH,PLAYED_WIDTH},{"updatedAt","updated",NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH,UPDATED_WIDTH}}) do
         local field,title,x,w=spec[1],L[spec[2]],spec[3],spec[4]
         local b=rect("Button",self.table,x,0,w,24)
-        b.label=text(b,title,11,8,0,w-24,{197/255,191/255,171/255},24,i==2 and "RIGHT" or "LEFT")
-        if i==2 then b.label:SetWidth(w-32) end
-        b.arrow=arrow(b,i==2 and w-19 or 80,10.5)
+        b.label=text(b,title,11,8,0,w-24,{197/255,191/255,171/255},24,field=="seconds" and "RIGHT" or "LEFT")
+        if field=="seconds" then b.label:SetWidth(w-32) end
+        b.arrow=arrow(b,field=="seconds" and w-19 or 80,10.5)
         b:SetScript("OnClick",function()
             if field=="name" then
                 local shown=self.sortMenu:IsShown(); self:CloseMenus(); self.sortMenu:SetShown(not shown)
@@ -251,8 +260,9 @@ function U:Create()
         row.level=text(row,"",10,NAME_WIDTH-62,5,54,{196/255,184/255,154/255},12)
         row.realm=text(row,"",11,8,19,NAME_WIDTH-16,{168/255,170/255,165/255},13)
         row.guild=text(row,"",10,8,33,NAME_WIDTH-16,{150/255,165/255,156/255},13)
-        row.played=text(row,"",12,NAME_WIDTH+5,0,PLAYED_WIDTH-19,{238/255,225/255,187/255},ROW_HEIGHT-1,"RIGHT")
-        row.updated=text(row,"",11,NAME_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,{167/255,171/255,165/255},ROW_HEIGHT-1)
+        row.client=text(row,"",11,NAME_WIDTH+8,0,CLIENT_WIDTH-16,{168/255,170/255,165/255},ROW_HEIGHT-1)
+        row.played=text(row,"",12,NAME_WIDTH+CLIENT_WIDTH+5,0,PLAYED_WIDTH-19,{238/255,225/255,187/255},ROW_HEIGHT-1,"RIGHT")
+        row.updated=text(row,"",11,NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,{167/255,171/255,165/255},ROW_HEIGHT-1)
         local glow=solid(row,"HIGHLIGHT",203/255,184/255,130/255,12/255); glow:SetAllPoints()
         row:SetScript("OnEnter",function(owner) self:RowTooltip(owner) end)
         row:SetScript("OnLeave",function() GameTooltip:Hide() end)
@@ -275,11 +285,11 @@ function U:Create()
         if not self.refreshing then self.offset=math.floor(v+.5); self:Refresh() end
     end)
     self.footerFrame=rect("Frame",f,10,176+ROW_HEIGHT,700,26)
-    self.footer=text(self.footerFrame,"",10,5,2,424,{166/255,166/255,155/255},24)
-    self.clientButton=control(self.footerFrame,L.allClients,435,3,139,22,function() self:ToggleClients() end,"Toggle")
-    self.clientButton.label:SetJustifyH("LEFT"); self.clientButton.label:SetWidth(107)
-    arrow(self.clientButton,124,9,6,4)
-    self.clientMenu=rect("Frame",self.footerFrame,435,-138,168,141)
+    self.footer=text(self.footerFrame,"",10,5,2,540,{166/255,166/255,155/255},24)
+    self.footerFrame:EnableMouse(true)
+    self.footerFrame:SetScript("OnEnter",function(owner) tooltip(owner,{self.footer:GetText()}) end)
+    self.footerFrame:SetScript("OnLeave",function() GameTooltip:Hide() end)
+    self.clientMenu=rect("Frame",self.clientButton,0,29,168,141)
     self.clientMenu:SetFrameLevel(f:GetFrameLevel()+30); skin(self.clientMenu,self.panelName)
     self.clientMenu:EnableMouse(true); self.clientMenu:Hide(); self.clientRows={}
     for i,flavor in ipairs({"all","retail","mists","tbc","era"}) do
@@ -292,11 +302,12 @@ function U:Create()
         self.clientRows[flavor]=b
     end
     local creditColor={156/255,158/255,146/255,.85}
-    self.creditVersion=text(self.footerFrame,"v"..C.Version(),10,584,2,36,creditColor,24,"RIGHT")
+    self.creditVersion=text(self.footerFrame,"v"..C.Version(),10,555,2,36,creditColor,24,"RIGHT")
+    self.creditWith=text(self.footerFrame,"with",10,596,2,24,creditColor,24)
     self.creditHeart=artwork(self.footerFrame,"Heart",9,9,625,9.5)
     self.creditAuthor=text(self.footerFrame,"by krebs3r",10,639,2,56,creditColor,24)
 
-    self.menu=rect("Frame",f,SEARCH_WIDTH-62,149,218,41); self.menu:SetFrameLevel(f:GetFrameLevel()+30)
+    self.menu=rect("Frame",self.realmButton,0,29,218,41); self.menu:SetFrameLevel(f:GetFrameLevel()+30)
     self.menuLayout=skin(self.menu,self.panelName); self.menu:EnableMouse(true); self.menu:EnableMouseWheel(true); self.menu:Hide()
     self.realmRows={}; self.realmOffset=0
     for i=1,6 do
@@ -456,7 +467,8 @@ function U:Refresh()
             row.level:SetText(L.level.." "..(M.Number(char.level) and tostring(char.level) or "?"))
             row.level:ClearAllPoints(); row.level:SetPoint("TOPLEFT",x+occupied(row.name)+7,-5)
             row.realm:ClearAllPoints(); row.realm:SetPoint("TOPLEFT",x,-19); row.realm:SetWidth(NAME_WIDTH-8-x)
-            row.realm:SetText(C.Escape(char.realm)..(self.flavor and "" or (char.flavor and " · "..(L[char.flavor] or char.flavor) or "")))
+            row.realm:SetText(C.Escape(char.realm))
+            row.client:SetText(C.Escape(M.ClientText(char)))
             row.guild:ClearAllPoints(); row.guild:SetPoint("TOPLEFT",x,-33); row.guild:SetWidth(NAME_WIDTH-8-x)
             row.guild:SetText(M.GuildText(char))
             row.played:SetText(M.Format(entry.seconds,mode))
@@ -484,12 +496,14 @@ function U:RowTooltip(row)
     local char = entry.char
     local lines = {C.Escape(char.name.." · "..char.realm), L.level.." "..tostring(char.level or "?"), M.GuildText(char),
         string.format(L.fullTime,M.Format(entry.seconds,self.db.settings.format))}
-    if char.flavor then lines[#lines+1] = L.client..": "..(L[char.flavor] or char.flavor) end
+    lines[#lines+1] = L.client..": "..C.Escape(M.ClientText(char))
     if entry.key == T.key and char._local then
-        lines[#lines+1] = L.active
         lines[#lines+1] = T.base and L.estimate or L.noSync
-    else lines[#lines+1] = L.known end
-    if M.Number(char.serverAt) then lines[#lines+1] = string.format(L.sync,date("%Y-%m-%d %H:%M",char.serverAt)) end
+    elseif not M.Number(char.serverAt) or not M.Number(char.serverSeconds) then lines[#lines+1] = L.noSync
+    elseif entry.seconds and entry.seconds>char.serverSeconds then lines[#lines+1] = L.estimate end
+    if M.Number(char.serverAt) then
+        lines[#lines+1] = {text=string.format(L.sync,date("%Y-%m-%d %H:%M",char.serverAt)),wrap=false}
+    end
     lines[#lines+1] = self.removedOnly and L.restoreHint or L.removeHint
     if self.removedOnly then lines[#lines+1] = L.removalHelp end
     tooltip(row,lines)
@@ -507,16 +521,22 @@ function U:Init(db)
     if not Minimap then return end
     local b=C.Frame("Button","HourstoneMinimapButton",Minimap); self.minimap=b
     b:SetSize(MINIMAP_SIZE,MINIMAP_SIZE); b:SetFrameStrata("MEDIUM"); b:SetFrameLevel(Minimap:GetFrameLevel()+8)
-    artwork(b,"MinimapBackground",MINIMAP_SIZE,MINIMAP_SIZE,0,0,"BACKGROUND")
-    -- Whole artwork, at least two UI units inside the rim; scale with the surrounding minimap.
-    local inset=(MINIMAP_SIZE-MINIMAP_ICON)/2
-    b.icon=artwork(b,"Logo",MINIMAP_ICON,MINIMAP_ICON,inset,inset)
+    -- Blizzard's tracking-button geometry, as used by LibDBIcon. The border's
+    -- transparent padding differs between Retail and the Classic families.
+    local retail=C.Retail()
+    b.background=b:CreateTexture(nil,"BACKGROUND"); b.background:SetTexture(136467)
+    b.background:SetSize(retail and 24 or 20,retail and 24 or 20)
+    if retail then b.background:SetPoint("CENTER") else b.background:SetPoint("TOPLEFT",7,-5) end
+    local iconSize=retail and 18 or 17
+    b.icon=artwork(b,"Logo",iconSize,iconSize,7,6)
+    if retail then b.icon:ClearAllPoints(); b.icon:SetPoint("CENTER") end
     b.mask=b:CreateMaskTexture(nil,"ARTWORK")
     b.mask:SetTexture(ROOT.."CircleMask.tga","CLAMPTOBLACKADDITIVE","CLAMPTOBLACKADDITIVE")
-    b.mask:SetSize(MINIMAP_MASK,MINIMAP_MASK); b.mask:SetPoint("CENTER")
+    b.mask:SetSize(MINIMAP_MASK,MINIMAP_MASK); b.mask:SetPoint("CENTER",b.icon,"CENTER",0,0)
     b.icon:AddMaskTexture(b.mask)
-    artwork(b,"MinimapBorder",MINIMAP_SIZE,MINIMAP_SIZE,0,0,"OVERLAY")
-    b:SetHighlightTexture(ROOT.."MinimapHover.tga","ADD")
+    b.border=b:CreateTexture(nil,"OVERLAY"); b.border:SetTexture(136430)
+    b.border:SetSize(retail and 50 or 53,retail and 50 or 53); b.border:SetPoint("TOPLEFT",0,0)
+    b:SetHighlightTexture(136477,"ADD")
     b:RegisterForClicks("LeftButtonUp"); b:RegisterForDrag("LeftButton")
     b:SetScript("OnClick",function() if not b.suppressUntil or C.Now()>=b.suppressUntil then self:Toggle() end end)
     b:SetScript("OnEnter",function() tooltip(b,{"Hourstone – Azeroth Hours",L.open,L.move,L.commands,L.hint}) end)

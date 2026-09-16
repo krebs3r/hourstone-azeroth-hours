@@ -1,40 +1,49 @@
-# Hourstone 0.2.2 — development
+# Hourstone 0.2.3 — development
 
-Right-click a character and confirm **Remove** to hide it from the overview and
-its totals. Its playtime and your WoW character are preserved. Choose **Removed
-characters** in the gear menu and right-click an entry to restore it. The summary
-cards always count tracked characters only.
+Realm and client filters now sit together above the table. A dedicated client
+column beside playtime shows each character's game version and sorts by its
+displayed name. Unknown client families sort last in either direction.
 
-A new character login also restores removals already known to the addon. Reloads,
-zoning and `/played` do not. An active removed character continues to record time.
-If another PC removed it while you were offline, synchronize first, then log in
-with the character again. Changes are saved when WoW logs out or reloads.
+The minimap button uses Blizzard's tracking border, background and highlight,
+with Retail/Classic placement and the complete Hourstone logo. The footer reads
+`v0.2.3 with ♥ by krebs3r`. Character tooltips keep the last server timestamp on
+one line and explain estimated or unconfirmed time without an online/offline claim.
 
-Update Hourstone to 0.2.2 and Companion to 0.1.3 on every PC for protocol 3 removal
-and restore synchronization. Guild tracking is retained. Legacy protocol 1 and 2
-input remains readable; existing characters and settings migrate automatically
-to saved-data schema 3. The addon remains usable without Companion.
+Right-click an entry and confirm **Delete** to exclude it from the overview and
+its totals. Its playtime and your WoW character are preserved. Choose **Deleted
+characters** in the gear menu and right-click to restore an entry. A new character
+login restores known deletions too; `/reload`, zoning and `/played` do not. If a
+deletion happened on another PC while offline, synchronize before logging in again.
 
-## Installation
+## Installation and compatibility
 
-With WoW closed, extract `Hourstone-0.2.2.zip` into each client's `Interface/AddOns`
-folder. Keep existing SavedVariables and settings. The companion imports after
-WoW saves and makes its data addon available on the next game start or reload.
-The first installation of the data addon requires a complete WoW restart.
+With WoW closed, extract `Hourstone-0.2.3.zip` into each client's `Interface/AddOns`
+folder. Keep existing SavedVariables. Characters, guilds, settings and the saved
+minimap position are preserved. Protocol and saved-data schema remain at version
+3, unchanged from Hourstone 0.2.2; no new migration is required. Companion 0.1.3
+and later remains compatible. The addon also runs without Companion.
 
 ## Deutsch
 
-Charaktere lassen sich nach einem Rechtsklick und einer Bestätigung aus der
-Übersicht entfernen. Die Spielzeit bleibt gespeichert, dein WoW-Charakter wird
-nicht gelöscht. Unter Zahnrad → **Entfernte Charaktere** stellt ein Rechtsklick
-den Eintrag wieder her. Die Kennzahlen zählen nur die nicht entfernten Charaktere.
+Realm- und Clientfilter stehen jetzt gemeinsam neben der Suche über der Tabelle.
+Eine eigene sortierbare Clientspalte links neben der Spielzeit zeigt die Spielversion
+des Charakters. Unbekannte Clients stehen in beiden Sortierrichtungen zuletzt.
 
-Ein neuer Charakter-Login stellt bekannte Entfernungen ebenfalls wieder her;
-`/reload`, Gebietswechsel und `/played` nicht. Nach einer Offline-Entfernung auf
-einem anderen Rechner zuerst synchronisieren und anschließend erneut einloggen.
-Auch ein ausgeblendeter aktiver Charakter erfasst seine Spielzeit weiter.
-Aktualisiere Addon auf 0.2.2 und Companion auf 0.1.3 auf allen PCs. Bestehende
-Charakter-, Gilden- und Einstellungsdaten bleiben erhalten.
+Der Minimap-Button nutzt Blizzards Rahmen, Hintergrund und Hovereffekt mit passenden
+Retail-/Classic-Abständen und vollständigem Logo. Im Footer steht
+`v0.2.3 with ♥ by krebs3r`. Im Charakter-Tooltip bleibt der letzte Serverzeitstempel
+auf einer Zeile. Geschätzte oder unbestätigte Spielzeit wird erklärt; eine
+Online-/Offline-Anzeige entfällt.
 
-Automated contract, tracking and layout tests use synthetic data. Live-client
-and two-device provider checks remain necessary before public release.
+Einträge lassen sich per Rechtsklick und **Löschen** aus der Übersicht ausblenden.
+Unter Zahnrad → **Gelöschte Charaktere** stellt ein Rechtsklick sie wieder her.
+WoW-Charakter und Spielzeit bleiben erhalten. Ein neuer Login stellt bekannte
+Löschungen ebenfalls wieder her; `/reload` genügt nicht. Nach einer Löschung auf
+einem anderen PC während des Offline-Betriebs zuerst synchronisieren, dann einloggen.
+
+Bei geschlossenem WoW `Hourstone-0.2.3.zip` nach `Interface/AddOns` entpacken.
+Charaktere, Gilden, Einstellungen und Minimap-Position bleiben erhalten.
+Protokoll und Datenschema bleiben bei Version 3; keine neue Migration erforderlich.
+
+Automated checks use synthetic data. Native minimap/font rendering, live-client
+behavior and two-device provider checks still require practical verification.

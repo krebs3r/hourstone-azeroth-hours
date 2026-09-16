@@ -7,11 +7,41 @@ assert(U.total:GetText()==H.M.Format(1125000,"combined"))
 U:SetFormat("hours"); assert(db.settings.format=="hours")
 assert(U.rows[1].name:GetText()==IDENTITY.name and U.rows[1].active:IsShown())
 U:RowTooltip(U.rows[1]); assert(#GameTooltip.lines>=4)
+assert(U.rows[1].client.text==H.M.ClientText(H.T.record))
+assert(U.rows[1].realm.text==IDENTITY.realm)
+assert(U.creditWith.text=="with")
+assert(U.search.parent==U.realmButton.parent and U.realmButton.parent==U.clientButton.parent)
+U.search.scripts.OnEnter(U.search); assert(GameTooltip.lines[1]==H.L.searchHelp)
+U.search.scripts.OnLeave(); assert(not GameTooltip:IsShown())
+U.headers.flavor.button:Click(); assert(U.sort=="flavor" and not U.descending)
+U.headers.flavor.button:Click(); assert(U.sort=="flavor" and U.descending)
+U:SetSort("seconds")
+local timestamp="2026-09-16 19:21"
+local originalDate=date; date=function(format) assert(format=="%Y-%m-%d %H:%M"); return timestamp end
+local function checkTooltip(entry,expectedNotice)
+    U:RowTooltip({entry=entry})
+    local foundStamp,foundNotice=false,false
+    for i,line in ipairs(GameTooltip.lines) do
+        assert(not line:lower():find("offline",1,true) and not line:lower():find("online",1,true))
+        assert(line~="Current character" and line~="Aktueller Charakter")
+        if line==string.format(H.L.sync,timestamp) then assert(GameTooltip.lineWrap[i]==false); foundStamp=true end
+        if line==expectedNotice then foundNotice=true end
+    end
+    assert(foundStamp==(entry.char.serverAt~=nil))
+    if expectedNotice then assert(foundNotice) end
+end
+checkTooltip(U.rows[1].entry,H.L.estimate)
+checkTooltip({key="remote",seconds=200,char={name="Remote",realm="Realm",level=10,flavor="era",serverSeconds=100,serverAt=EPOCH}},H.L.estimate)
+checkTooltip({key="remote",seconds=100,char={name="Remote",realm="Realm",level=10,flavor="era",serverSeconds=100,serverAt=EPOCH}})
+checkTooltip({key="legacy",seconds=100,char={name="Legacy",realm="Realm",level=10}},H.L.noSync)
+date=originalDate
 for i=1,140 do
     db.characters["other:"..i]={name=string.rep("Long",8)..i,realm="Realm "..(i%15),level=i%91,seconds=i*1000,class="WARRIOR",updatedAt=EPOCH-i}
 end
 U:Refresh(); assert(U.maxOffset==133)
 U:ToggleClients(); assert(U.clientMenu:IsShown())
+U:ToggleRealms(); assert(U.menu:IsShown() and not U.clientMenu:IsShown())
+U:ToggleClients(); assert(U.clientMenu:IsShown() and not U.menu:IsShown())
 U.clientRows.era.scripts.OnClick()
 assert(U.flavor=="era" and not U.clientMenu:IsShown() and U.offset==0)
 assert(U.visibleCount==0 or H.C.Flavor()=="era")

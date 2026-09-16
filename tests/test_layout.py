@@ -126,7 +126,7 @@ class Layout(unittest.TestCase):
         self.assertEqual(u.frame.height,612)
         u.Scroll(u,999); offset=u.offset
         lua.execute('tick(2)'); self.assertEqual(u.offset,offset)
-        self.assertEqual(u.db.version,2)
+        self.assertEqual(u.db.version,3)
         self.assertFalse(u.db.settings.compact)
         self.assertEqual(dict(u.db.settings.position.items()),{"x":17,"y":43})
         self.assertEqual(u.db.characters["test:20"].seconds,20000)
@@ -153,7 +153,7 @@ class Layout(unittest.TestCase):
                         self.assertTrue(heart.texture.endswith("Heart.tga"))
                         self.assertAlmostEqual(heart.points[1][4]-version.points[1][4]-version.width,5)
                         self.assertAlmostEqual(author.points[1][4]-heart.points[1][4]-heart.width,5)
-                        self.assertEqual(u.settings.height,190)
+                        self.assertEqual(u.settings.height,214)
                         self.assertIsNone(u.densityToggle)
                         lua.globals().ZERO_FONT_METRICS=False
                         self.assertLess(u.title.GetUnboundedStringWidth(u.title),u.title.width)

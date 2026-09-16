@@ -1,7 +1,7 @@
 local _, H = ...
 local S, M = {}, H.M
 H.S = S
-S.FORMAT = 2
+S.FORMAT = 3
 local flavors = {retail=true, mists=true, tbc=true, era=true}
 local regions = {us=true, kr=true, eu=true, tw=true, cn=true, unknown=true}
 local fields = {"sourceId", "region", "flavor", "guid", "name", "realm", "class", "level",
@@ -97,12 +97,16 @@ end
 function S.Import(db, payload)
     S.received, S.status = {}, "absent"
     if payload == nil then return true end
-    if type(payload) ~= "table" or (payload.formatVersion ~= 1 and payload.formatVersion ~= S.FORMAT) or type(payload.sources) ~= "table" then
+    if type(payload) ~= "table" or (payload.formatVersion ~= 1 and payload.formatVersion ~= 2 and payload.formatVersion ~= S.FORMAT) or type(payload.sources) ~= "table" then
         S.status = "incompatible"; return false
     end
     local scope = payload.sources[db.sourceId]
     if scope == nil then return true end
     if type(scope) ~= "table" or type(scope.observations) ~= "table" then S.status = "invalid"; return false end
+    if (payload.formatVersion < 3 and scope.visibility ~= nil)
+        or (payload.formatVersion == 3 and not H.V.ValidList(scope.visibility)) then S.status = "invalid"; return false end
+    local visibility = H.V.Merge(db.visibility, payload.formatVersion == 3 and scope.visibility or {})
+    if not visibility then S.status = "invalid"; return false end
     local imported, count = {}, 0
     for index, o in pairs(scope.observations) do
         count = count + 1
@@ -113,10 +117,11 @@ function S.Import(db, payload)
         local key = S.Key(o)
         imported[key] = S.Choose(imported[key], copy(o))
     end
+    db.visibility = visibility
     S.received, S.status = imported, "ready"
     return true
 end
-function S.Display(db, valueFor)
+function S.Display(db, valueFor, removedOnly)
     local selected, originalKeys = {}, {}
     for key, o in pairs(db.characters) do
         if type(o) == "table" then
@@ -135,7 +140,10 @@ function S.Display(db, valueFor)
         if winner == o then originalKeys[key] = "sync:" .. key end
         selected[key] = chosen
     end
-    local characters = {}
-    for key, row in pairs(selected) do characters[originalKeys[key] or ("sync:" .. key)] = row end
+    local characters, hidden = {}, {}
+    for _, state in ipairs(db.visibility or {}) do hidden[S.Key(state)] = H.V.Hidden(state) end
+    for key, row in pairs(selected) do
+        if (hidden[key] == true) == (removedOnly == true) then characters[originalKeys[key] or ("sync:" .. key)] = row end
+    end
     return {characters=characters}
 end

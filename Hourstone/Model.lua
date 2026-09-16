@@ -1,7 +1,7 @@
 local _, H = ...
 local M, L = {}, H.L
 H.M = M
-M.SCHEMA = 2
+M.SCHEMA = 3
 function M.Number(value)
     return type(value) == "number" and value == value and value >= 0 and value < math.huge
 end
@@ -9,6 +9,13 @@ function M.Init(db)
     if type(db) ~= "table" then db = {} end
     if M.Number(db.version) and db.version > M.SCHEMA then return nil, "future" end
     local previous = M.Number(db.version) and db.version or 1
+    if previous < 3 then
+        if db.visibility ~= nil then return nil, "invalid" end
+        db.visibility = {}
+    elseif not H.V.ValidList(db.visibility) then return nil, "invalid" end
+    local visibility = H.V.Merge(db.visibility, {})
+    if not visibility then return nil, "invalid" end
+    db.visibility = visibility
     db.version = M.SCHEMA
     if type(db.sourceId) ~= "string" or not db.sourceId:match("^[A-Za-z0-9_-]+$") or #db.sourceId > 128 then
         db.sourceId = H.C.SourceId()

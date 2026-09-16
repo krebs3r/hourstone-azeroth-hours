@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.2 — unreleased
+
+- Remove a character from the overview and totals after confirmation, retaining its saved playtime. Restore it in the removed-character view or at a subsequent actual character login.
+- Synchronize removal and restoration across devices with protocol 3 and Companion 0.1.3. SavedVariables schema 3 preserves existing characters, guilds and settings.
+- Keep offline and concurrent removals hidden until observed and explicitly restored; reloads, zoning and server playtime updates never restore a character.
+
 ## 0.2.1 — unreleased
 
 - Record and display each character’s guild, including confirmed guildless and not-yet-recorded states.

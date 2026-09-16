@@ -2,7 +2,7 @@ local _, H = ...
 local T, C, M = {}, H.C, H.M
 H.T = T
 function T:Init(db)
-    self.db, self.started, self.wantSync = db, false, false
+    self.db, self.started, self.wantSync, self.pendingInitialLogin, self.pendingReload = db, false, false, false, false
 end
 function T:UpdateIdentity(level)
     local identity = C.Identity(self.db.sourceId)
@@ -15,6 +15,7 @@ function T:UpdateIdentity(level)
     for key, candidate in pairs(self.db.characters) do
         if key ~= self.key and type(candidate) == "table" and candidate.guid == identity.guid and candidate.flavor == identity.flavor
             and (candidate.region == nil or candidate.region == "unknown" or candidate.region == identity.region) then
+            if not H.V.AdoptRegion(self.db, candidate, identity) then return false end
             record = H.S.Choose(record, candidate); self.db.characters[key] = nil
             if type(self.db.runtime) == "table" and self.db.runtime.key == key then self.db.runtime.key = self.key end
         end
@@ -26,14 +27,16 @@ function T:UpdateIdentity(level)
     self.record = record
     return true
 end
-function T:Begin(isReload)
+function T:Begin(isReload, isInitialLogin)
     if self.started then return end
+    if isInitialLogin == true then self.pendingInitialLogin = true end
+    if isReload == true then self.pendingReload = true end
     if not self:UpdateIdentity() then return end
     local now, saved = C.Now(), self.db.runtime
     local carry, gap = 0, 0
     -- Only the client's explicit reload flag may restore a session. Never use wall-clock
     -- time to infer that a new login is a continuation of the previous session.
-    if isReload and type(saved) == "table" and saved.key == self.key and M.Number(saved.at)
+    if self.pendingReload and type(saved) == "table" and saved.key == self.key and M.Number(saved.at)
         and now >= saved.at and M.Number(saved.session) then
         carry, gap = saved.session, now - saved.at
     end
@@ -41,6 +44,8 @@ function T:Begin(isReload)
     self.base = M.Number(self.record.seconds) and (self.record.seconds + gap) or nil
     self.baseAt, self.started = now, true
     self.db.runtime = nil
+    if self.pendingInitialLogin then H.V.Restore(self.db, self.record) end
+    self.pendingInitialLogin, self.pendingReload = false, false
     self:UpdateGuild(false)
     self:Request()
 end

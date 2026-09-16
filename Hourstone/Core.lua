@@ -5,8 +5,8 @@ frame:RegisterEvent("ADDON_LOADED")
 frame:SetScript("OnEvent",function(_,event,...)
     if event == "ADDON_LOADED" then
         if ... ~= name then return end
-        local db = H.M.Init(HourstoneDB)
-        if not db then print(H.L.futureDB); frame:UnregisterAllEvents(); return end
+        local db, reason = H.M.Init(HourstoneDB)
+        if not db then print(reason == "future" and H.L.futureDB or H.L.invalidDB); frame:UnregisterAllEvents(); return end
         HourstoneDB = db
         H.S.Import(db, HourstoneSync)
         H.T:Init(db); H.UI:Init(db)
@@ -28,8 +28,8 @@ frame:SetScript("OnEvent",function(_,event,...)
             if H.UI.frame and H.UI.frame:IsShown() then H.UI:Refresh() end
         end)
     elseif event == "PLAYER_ENTERING_WORLD" then
-        local _, reload = ...
-        H.T:Begin(reload == true); H.T:UpdateIdentity(); H.T:UpdateGuild(false)
+        local initialLogin, reload = ...
+        H.T:Begin(reload == true, initialLogin == true); H.T:UpdateIdentity(); H.T:UpdateGuild(false)
     elseif event == "TIME_PLAYED_MSG" then H.T:Receive(...)
     elseif event == "PLAYER_LEVEL_UP" then H.T:UpdateIdentity(...)
     elseif event == "PLAYER_UPDATE_RESTING" then H.T:UpdateIdentity()

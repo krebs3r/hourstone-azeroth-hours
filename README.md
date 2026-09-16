@@ -21,10 +21,17 @@ Repeat for each installation. The addon runs independently without another addon
 - Character name, class, level, realm, guild, cumulative playtime and last update.
 - Search by character or guild, realm and client filters, sortable columns, total and filtered playtime.
 - Decimal hours or days / hours / minutes, plus the current login session.
+- Remove characters from the overview without losing their saved playtime; restore them from a separate list.
 - Movable window, 65–130% size setting and optional draggable minimap button.
 - `/hourstone` or `/azerothhours`: open or close; `/hourstone minimap`: show or hide the minimap button; `/hourstone reset`: reset window position.
 
 Use the gear button for display settings. Click column headings to sort, scroll longer lists, and hover a character for full details.
+
+## Removing and restoring characters
+
+Right-click a character and confirm **Remove** to hide it from the overview and its totals. This never deletes a WoW character or its saved playtime. In the gear menu, choose **Removed characters**, then right-click an entry to restore it. Use the same menu to return to tracked characters. The summary cards always exclude removed characters, including while browsing the removed list.
+
+A new login with that character also restores removals already known to the addon. Removing your currently played character keeps it hidden until you restore it or log in again; its time continues to be recorded. `/reload`, zoning and `/played` do not restore it. If another PC removed it while this PC was offline, synchronize first and then make a new character login. Removal and restore changes are saved with the normal WoW logout/reload and exchanged by Companion.
 
 ## Tracking and saved data
 
@@ -36,7 +43,7 @@ Guild membership is recorded for each character when you play it. Guild changes 
 
 ## Optional synchronization
 
-Hourstone 0.2.1 supports [protocol 2](docs/sync-protocol-v2.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.2 or later, including guild membership. Update the addon and companion on every computer together; legacy protocol 1 input remains readable. It combines saved character observations from selected local installations after all WoW clients have closed. On the next start, Hourstone can display the combined list and filter it by client family. The companion can also exchange device snapshots through a shared folder between PCs. Published Hourstone 0.1.x releases do not support this protocol.
+Hourstone 0.2.2 supports [protocol 3](docs/sync-protocol-v3.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.3 or later, including guild membership and shared removal/restore controls. Update the addon and companion on every computer together; legacy protocol 1 and 2 input remains readable. It combines saved character observations from selected local installations after all WoW clients have closed. On the next start, Hourstone can display the combined list and filter it by client family. The companion can also exchange device snapshots through a shared folder between PCs. Published Hourstone 0.1.x releases do not support this protocol.
 
 Repeated observations of the same character are merged, never added. Confirmed server measurements are stored separately from local estimates. UI settings, request timing and the current session remain local. Synchronization cannot transfer `/played` between distinct characters, fetch unvisited characters or update a running client in real time. The companion's documentation explains setup, backups and limitations.
 

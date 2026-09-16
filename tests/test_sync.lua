@@ -19,14 +19,14 @@ local function payload(source, rows)
 end
 local db=M.Init({version=1,sourceId="migration-source",characters={legacy={guid="Player-1-ABC",flavor="retail",
     name="Synthetic",realm="Test Realm",seconds=1234,updatedAt=2000,syncedAt=1000,serverSeconds=99,serverAt=99}}})
-assert(db.version==2 and db.sourceId=="migration-source")
+assert(db.version==3 and db.sourceId=="migration-source")
 assert(db.characters.legacy.seconds==1234 and db.characters.legacy.serverSeconds==nil and db.characters.legacy.serverAt==nil)
 assert(db.characters.legacy.region=="unknown" and db.characters.legacy.sourceId==db.sourceId)
 assert(M.Init(db).sourceId==db.sourceId)
 local fresh=M.Init({version="broken",sourceId="bad:id"})
-assert(fresh.version==2 and fresh.sourceId:match("^hs%-"))
+assert(fresh.version==3 and fresh.sourceId:match("^hs%-"))
 assert(M.Init(fresh).sourceId==fresh.sourceId)
-assert(M.Init({version=3})==nil)
+assert(M.Init({version=4})==nil)
 
 local a,b=observation(),observation({sourceId="source-b",seconds=1020,serverSeconds=1020,serverAt=1020,updatedAt=1020})
 assert(S.Valid(a) and S.Valid(b))
@@ -56,7 +56,7 @@ assert(S.Import(db,payload(db.sourceId,{a,b,a})))
 local count=0; for _ in pairs(S.received) do count=count+1 end
 assert(count==1 and S.received[S.Key(b)].seconds==1020)
 assert(db.characters.legacy.seconds==1234 and db.characters[S.Key(b)]==nil)
-assert(not S.Import(db,{formatVersion=3,sources={}}) and next(S.received)==nil)
+assert(not S.Import(db,{formatVersion=4,sources={}}) and next(S.received)==nil)
 assert(not S.Import(db,payload(db.sourceId,{a,{}})) and next(S.received)==nil)
 assert(S.Import(db,nil) and S.status=="absent")
 

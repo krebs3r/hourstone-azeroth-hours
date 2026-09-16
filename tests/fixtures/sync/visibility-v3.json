@@ -1,0 +1,392 @@
+{
+  "formatVersion": 3,
+  "cases": [
+    {
+      "name": "removed",
+      "states": [
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 1
+          },
+          "restored": {}
+        }
+      ],
+      "expected": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 1
+        },
+        "restored": {}
+      },
+      "hidden": true
+    },
+    {
+      "name": "restore-acknowledges-observed-removal",
+      "states": [
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 1
+          },
+          "restored": {}
+        },
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 1
+          },
+          "restored": {
+            "actor-a": 1
+          }
+        }
+      ],
+      "expected": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 1
+        },
+        "restored": {
+          "actor-a": 1
+        }
+      },
+      "hidden": false
+    },
+    {
+      "name": "unseen-concurrent-removal-still-hidden",
+      "states": [
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 1
+          },
+          "restored": {
+            "actor-a": 1
+          }
+        },
+        {
+          "sourceId": "source-z",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-b": 1
+          },
+          "restored": {}
+        }
+      ],
+      "expected": {
+        "sourceId": "source-z",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 1,
+          "actor-b": 1
+        },
+        "restored": {
+          "actor-a": 1
+        }
+      },
+      "hidden": true
+    },
+    {
+      "name": "later-restore-all-known-actors",
+      "states": [
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 3,
+            "actor-b": 2
+          },
+          "restored": {
+            "actor-a": 1
+          }
+        },
+        {
+          "sourceId": "source-z",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 3,
+            "actor-b": 2
+          },
+          "restored": {
+            "actor-a": 3,
+            "actor-b": 2
+          }
+        }
+      ],
+      "expected": {
+        "sourceId": "source-z",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 3,
+          "actor-b": 2
+        },
+        "restored": {
+          "actor-a": 3,
+          "actor-b": 2
+        }
+      },
+      "hidden": false
+    },
+    {
+      "name": "new-removal-after-restore",
+      "states": [
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 4
+          },
+          "restored": {
+            "actor-a": 4
+          }
+        },
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 5
+          },
+          "restored": {
+            "actor-a": 4
+          }
+        }
+      ],
+      "expected": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 5
+        },
+        "restored": {
+          "actor-a": 4
+        }
+      },
+      "hidden": true
+    },
+    {
+      "name": "stale-snapshot-cannot-hide-restored",
+      "states": [
+        {
+          "sourceId": "source-z",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 8
+          },
+          "restored": {
+            "actor-a": 8
+          }
+        },
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 3
+          },
+          "restored": {}
+        }
+      ],
+      "expected": {
+        "sourceId": "source-z",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 8
+        },
+        "restored": {
+          "actor-a": 8
+        }
+      },
+      "hidden": false
+    },
+    {
+      "name": "integer-limit",
+      "states": [
+        {
+          "sourceId": "source-a",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-VIS",
+          "removed": {
+            "actor-a": 9007199254740991
+          },
+          "restored": {
+            "actor-a": 9007199254740991
+          }
+        }
+      ],
+      "expected": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 9007199254740991
+        },
+        "restored": {
+          "actor-a": 9007199254740991
+        }
+      },
+      "hidden": false
+    }
+  ],
+  "invalid": [
+    {
+      "name": "restore-without-removal",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {},
+        "restored": {
+          "actor-a": 1
+        }
+      }
+    },
+    {
+      "name": "restore-beyond-removal",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 1
+        },
+        "restored": {
+          "actor-a": 2
+        }
+      }
+    },
+    {
+      "name": "fractional-revision",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 1.5
+        },
+        "restored": {}
+      }
+    },
+    {
+      "name": "negative-revision",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": -1
+        },
+        "restored": {}
+      }
+    },
+    {
+      "name": "above-integer-limit",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 9007199254740992
+        },
+        "restored": {}
+      }
+    },
+    {
+      "name": "invalid-actor-id",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor:a": 1
+        },
+        "restored": {}
+      }
+    },
+    {
+      "name": "invalid-region",
+      "state": {
+        "sourceId": "source-a",
+        "region": "xx",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {},
+        "restored": {}
+      }
+    },
+    {
+      "name": "zero-removal",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 0
+        },
+        "restored": {}
+      }
+    },
+    {
+      "name": "zero-restore",
+      "state": {
+        "sourceId": "source-a",
+        "region": "eu",
+        "flavor": "retail",
+        "guid": "Player-1-VIS",
+        "removed": {
+          "actor-a": 1
+        },
+        "restored": {
+          "actor-a": 0
+        }
+      }
+    }
+  ]
+}

@@ -11,6 +11,12 @@ Lade das ZIP aus [GitHub Releases](https://github.com/krebs3r/hourstone-azeroth-
 - Das Zahnrad öffnet Einstellungen für Minimap und Größe. Ziehe die Titelleiste, um das Fenster zu verschieben.
 - Die Suche nach Charakter oder Gilde sowie Realm- und Clientfilter grenzen die Liste ein. Spaltenüberschriften sortieren sie; das Mausrad bewegt längere Listen.
 
+## Charaktere entfernen und wiederherstellen
+
+Klicke mit der rechten Maustaste auf einen Charakter und bestätige **Entfernen**, um ihn aus der Übersicht und ihren Summen auszublenden. Sein gespeicherter Spielzeitstand bleibt erhalten; dein WoW-Charakter wird niemals gelöscht. Unter Zahnrad → **Entfernte Charaktere** findest du ausgeblendete Einträge. Ein Rechtsklick stellt den gewählten Eintrag wieder her. Über dasselbe Menü wechselst du zurück. Die Kennzahlen zählen auch in dieser Ansicht ausschließlich die nicht entfernten Charaktere.
+
+Ein neuer Login mit diesem Charakter stellt bereits bekannte Entfernungen ebenfalls wieder her. Entfernst du den aktuell gespielten Charakter, bleibt er bis zum Wiederherstellen oder nächsten Login ausgeblendet; seine Spielzeit wird weiter erfasst. `/reload`, Gebietswechsel und `/played` stellen ihn nicht wieder her. Wurde er auf einem anderen PC entfernt, während dieser Rechner offline war, muss zuerst synchronisiert und danach neu mit dem Charakter eingeloggt werden. Entfernungen und Wiederherstellungen werden beim normalen Logout/Reload gespeichert und vom Companion abgeglichen.
+
 ## Erfasste Zeit
 
 Ein Charakter erscheint nach dem ersten Login mit aktiviertem Addon. Sein serverseitiger `/played`-Wert enthält auch die Zeit vor der Installation. Noch nicht besuchte Charaktere lassen sich nicht automatisch abfragen.
@@ -25,7 +31,7 @@ Die Charakterliste zeigt auch die zuletzt erfasste Gilde. Gildenwechsel und Aust
 
 ## Optionaler Abgleich zwischen Clients
 
-Hourstone 0.2.1 unterstützt [Protokoll 2](sync-protocol-v2.md) des separaten [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) ab 0.1.2 einschließlich Gildendaten. Aktualisiere Addon und Companion gemeinsam auf allen Rechnern. Alte Eingaben mit Protokoll 1 bleiben lesbar. Der Companion führt gespeicherte Charakterdaten ausgewählter lokaler Installationen zusammen, sobald alle WoW-Clients beendet sind. Beim nächsten Start zeigt Hourstone die gemeinsame Übersicht mit Clientfilter. Über einen gemeinsamen Ordner kann der Companion auch Gerätestände zwischen PCs austauschen. Die veröffentlichten Hourstone-Versionen 0.1.x unterstützen dieses Protokoll noch nicht.
+Hourstone 0.2.2 unterstützt [Protokoll 3](sync-protocol-v3.md) des separaten [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) ab 0.1.3 einschließlich Gildendaten sowie Entfernen und Wiederherstellen. Aktualisiere Addon und Companion gemeinsam auf allen Rechnern. Alte Eingaben mit Protokoll 1 und 2 bleiben lesbar. Der Companion führt gespeicherte Charakterdaten ausgewählter lokaler Installationen zusammen, sobald alle WoW-Clients beendet sind. Beim nächsten Start zeigt Hourstone die gemeinsame Übersicht mit Clientfilter. Über einen gemeinsamen Ordner kann der Companion auch Gerätestände zwischen PCs austauschen. Die veröffentlichten Hourstone-Versionen 0.1.x unterstützen dieses Protokoll noch nicht.
 
 Doppelte Stände desselben Charakters werden zusammengeführt und niemals addiert. Bestätigte Serverwerte bleiben von lokalen Schätzungen getrennt. Fensterposition, Einstellungen, Anfragen und die laufende Sitzung bleiben lokal. Der Abgleich überträgt keine `/played`-Zeit zwischen unterschiedlichen Charakteren und ist kein Live-Abgleich während des Spiels. Einrichtung, Sicherungen und Grenzen stehen in der Companion-Anleitung.
 

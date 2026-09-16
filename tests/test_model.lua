@@ -5,7 +5,7 @@ assert(M.Format(nil)==L.unavailable and M.Format(-1)==L.unavailable)
 assert(M.Format(0,"combined")== (H.de and "0 T. 0 Std. 0 Min." or "0d 0h 0m"))
 assert(not M.Number(0/0) and not M.Number(math.huge))
 local db=M.Init({settings={scale=99,format="broken",position={x="5",y="-8"}}})
-assert(db.version==2 and db.settings.scale==1.3 and db.settings.format=="combined")
+assert(db.version==3 and db.settings.scale==1.3 and db.settings.format=="combined")
 assert(db.settings.position.x==5)
 assert(M.Init({version=99})==nil)
 db.characters={

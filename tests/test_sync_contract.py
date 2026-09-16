@@ -14,8 +14,28 @@ def ordered(values):
 
 
 class SyncContract(unittest.TestCase):
+    def test_shared_visibility_cases(self):
+        fixture = json.loads((ROOT / "tests/fixtures/sync/visibility-v3.json").read_text(encoding="utf-8"))
+        for case in fixture["cases"]:
+            for reverse in (False, True):
+                with self.subTest(case=case["name"], reverse=reverse):
+                    lua = runtime()
+                    lua.globals().STATES = lua.table_from(case["states"][::-1] if reverse else case["states"], recursive=True)
+                    lua.execute('RESULT=assert(H.V.Merge(STATES, {})); HIDDEN=H.V.Hidden(RESULT[1])')
+                    actual = lua.globals().RESULT[1]
+                    for field in ("sourceId", "region", "flavor", "guid"):
+                        self.assertEqual(actual[field], case["expected"][field])
+                    for field in ("removed", "restored"):
+                        self.assertEqual(dict(actual[field].items()), case["expected"][field])
+                    self.assertEqual(lua.globals().HIDDEN, case["hidden"])
+        for case in fixture["invalid"]:
+            with self.subTest(invalid=case["name"]):
+                lua = runtime()
+                lua.globals().STATE = lua.table_from(case["state"], recursive=True)
+                lua.execute('assert(not H.V.Valid(STATE))')
+
     def test_shared_merge_cases(self):
-        for version in (1, 2):
+        for version in (1, 2, 3):
             fixture = json.loads((ROOT / f"tests/fixtures/sync/contract-v{version}.json").read_text(encoding="utf-8"))
             self.assertEqual(fixture["formatVersion"], version)
             for case in fixture["cases"]:
@@ -26,7 +46,7 @@ class SyncContract(unittest.TestCase):
                         lua.globals().OBSERVATIONS = lua.table_from(observations, recursive=True)
                         lua.globals().FORMAT_VERSION = version
                         lua.execute('''local db=H.M.Init({sourceId="contract-target"})
-                            assert(H.S.Import(db,{formatVersion=FORMAT_VERSION,sources={[db.sourceId]={observations=OBSERVATIONS}}}))
+                            assert(H.S.Import(db,{formatVersion=FORMAT_VERSION,sources={[db.sourceId]={observations=OBSERVATIONS, visibility=FORMAT_VERSION == 3 and {} or nil}}}))
                             SELECTED=H.S.Display(db).characters''')
                         selected = list(lua.globals().SELECTED.values())
                         self.assertEqual(len(selected), case["expectedCount"])

@@ -13,6 +13,7 @@ Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a l
 
 - Tracking: delayed server answers, request intervals, retries, authoritative replacement of estimates, level and character changes, zoning, reload session carry, new-login resets and offline exclusion.
 - Guilds: delayed API information, joining/leaving, Unicode names, safe tooltip text, independent metadata merging, legacy snapshots and guild search.
+- Removal and restoration: confirmation/cancel, visible-only totals, retained playtime, removed-character view, new-login restoration, missing GUID retries, reload/zoning exclusion, unknown-region adoption, offline and concurrent controls, idempotent merges and bounded validation.
 - Model and synchronization: record validation, schema migration, server measurements versus estimates, deterministic merging, duplicate handling and imported records. Protocol fixtures contain synthetic data only.
 - Layout: retained [baseline](../tests/fixtures/layout/baseline.json) and [adjustments](../tests/fixtures/layout/adjustments.json), dynamic list height, scrolling, filters, anchors, labels with unavailable metrics, saved settings and minimap containment.
 - Scaling: multiple display sizes, global and addon scales, and small-screen fitting.
@@ -34,6 +35,7 @@ Version 0.1.1 has reported in-game coverage for Retail, Mists Classic, TBC Anniv
 4. Verify search by character and guild, realm and client filters, all sort columns, totals, both formats, long character/guild names and large lists. Check a guild member and a guildless character; leave/join on a test character and confirm reload persistence and synchronization without changing playtime.
 5. Check addon scales 65%, 100% and 130%, global UI scaling, smaller displays, settings, drag behavior, minimap visibility, both slash commands and controls during combat.
 6. For companion sync, close every WoW client, sync two installations with synthetic or private local data, then start each client and compare the merged list. Repeat the same sync to verify no double counting and verify that settings and sessions remain local.
-7. Verify the companion refuses writes while WoW is running, preserves backups and reports malformed or newer-protocol data without overwriting it. Keep logs and real SavedVariables outside the repository.
+7. Remove an offline character and the active character. Check the confirmation, overview totals, removed list, manual restoration and continued local tracking. Reload and change zones; both must remain removed. Make a new character login; the known removal must be restored without changing saved playtime. Repeat between two devices, including an offline removal that only reaches the character after its earlier login: synchronize, then make another actual login.
+8. Verify the companion refuses writes while WoW is running, preserves backups and reports malformed or newer-protocol data without overwriting it. Keep logs and real SavedVariables outside the repository.
 
 Use issue reports to describe reproducible behavior without including personal account paths, credentials or raw character databases.

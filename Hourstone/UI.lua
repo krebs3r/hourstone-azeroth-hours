@@ -126,12 +126,14 @@ end
 function U:CloseMenus()
     self.menu:Hide(); self.sortMenu:Hide(); self.settings:Hide()
     if self.clientMenu then self.clientMenu:Hide() end
+    if self.removeDialog then self.removeDialog:Hide(); self.pendingRemoval=nil end
 end
 function U:ToggleSettings()
     self:Create(); local shown=self.settings:IsShown(); self:CloseMenus()
     self.settings:SetShown(not shown); self:SettingsText()
 end
 function U:SettingsText()
+    self.removedToggle.label:SetText(self.removedOnly and L.showTracked or L.removedCharacters)
     self.minimapBox:SetChecked(self.db.settings.minimap)
     self.scaleLabel:SetText(math.floor(self.db.settings.scale*100+.5).." %")
     self.updatingScale=true; self.scaleSlider:SetValue(self.db.settings.scale*100); self.updatingScale=false
@@ -253,6 +255,14 @@ function U:Create()
         local glow=solid(row,"HIGHLIGHT",203/255,184/255,130/255,12/255); glow:SetAllPoints()
         row:SetScript("OnEnter",function(owner) self:RowTooltip(owner) end)
         row:SetScript("OnLeave",function() GameTooltip:Hide() end)
+        row:RegisterForClicks("RightButtonUp")
+        row:SetScript("OnClick",function(owner,button)
+            if button ~= "RightButton" or not owner.entry then return end
+            if self.removedOnly then
+                if not H.V.Restore(self.db,owner.entry.char) then print(L.visibilityError) end
+                GameTooltip:Hide(); self:Refresh()
+            else self:ConfirmRemoval(owner.entry.char) end
+        end)
     end
     self.empty=text(self.list,L.empty,11,8,0,684,MUTED,ROW_HEIGHT,"CENTER")
     self.scroll=rect("Slider",self.list,695,2,5,ROW_HEIGHT-4)
@@ -306,7 +316,7 @@ function U:Create()
         local glow=solid(b,"HIGHLIGHT",187/255,161/255,102/255,37/255); glow:SetAllPoints()
         b:SetScript("OnClick",function() self:SetSort(field) end); self.sortRows[field]=b
     end
-    self.settings=rect("Frame",f,24,47,252,190); local settings=self.settings
+    self.settings=rect("Frame",f,24,47,252,214); local settings=self.settings
     settings:SetFrameLevel(f:GetFrameLevel()+35); settings:EnableMouse(true); settings:Hide(); skin(settings,self.panelName)
     text(settings,L.settings,15,13,13,202,GOLD,22)
     self.settingsClose=closeButton(settings,222,15.5,17,function() settings:Hide() end)
@@ -343,10 +353,38 @@ function U:Create()
         end
     end)
     self.reset=control(settings,L.reset,13,114.2,226,25,function() self:Position(true) end)
-    self.done=control(settings,L.done,157,147.2,82,25,function() settings:Hide() end)
+    self.done=control(settings,L.done,157,180.2,82,25,function() settings:Hide() end)
+    self.removedToggle=control(settings,L.removedCharacters,13,147.2,226,25,function()
+        self:SetRemovedView(not self.removedOnly)
+    end,"Toggle")
+    self.removedToggle:SetScript("OnEnter",function(owner) tooltip(owner,{L.removedCharacters,L.removalHelp}) end)
+    self.removedToggle:SetScript("OnLeave",function() GameTooltip:Hide() end)
+    self.removeDialog=rect("Frame",f,110,30,500,205)
+    self.removeDialog:SetFrameLevel(f:GetFrameLevel()+50); self.removeDialog:EnableMouse(true)
+    skin(self.removeDialog,self.panelName); self.removeDialog:Hide()
+    text(self.removeDialog,L.removeTitle,14,18,14,464,GOLD,28)
+    self.removeBody=text(self.removeDialog,"",12,18,49,464,nil,96)
+    self.removeBody:SetWordWrap(true)
+    self.removeCancel=control(self.removeDialog,L.cancel,230,162,118,27,function() self:CloseMenus() end,"Toggle")
+    self.removeConfirm=control(self.removeDialog,L.remove,360,162,122,27,function()
+        local identity=self.pendingRemoval
+        if identity and not H.V.Remove(self.db,identity) then print(L.visibilityError) end
+        self:CloseMenus(); self:Refresh()
+    end)
     f:SetScript("OnHide",function() search:ClearFocus(); self:CloseMenus(); GameTooltip:Hide() end)
     f:SetScript("OnMouseDown",function() self:CloseMenus(); search:ClearFocus() end)
     self:LayoutRows(0); self:SettingsText()
+end
+function U:SetRemovedView(removedOnly)
+    self.removedOnly=removedOnly == true
+    self.realm,self.flavor,self.searchText,self.offset=nil,nil,"",0
+    self:CloseMenus(); self.search:SetText(""); self:SettingsText(); self:Refresh()
+end
+function U:ConfirmRemoval(char)
+    self:CloseMenus(); GameTooltip:Hide()
+    self.pendingRemoval={sourceId=char.sourceId or self.db.sourceId,region=char.region or "unknown",flavor=char.flavor,guid=char.guid}
+    self.removeBody:SetText(string.format(L.removeBody,C.Escape(char.name.." · "..char.realm)))
+    self.removeDialog:Show()
 end
 function U:ToggleRealms()
     local shown=self.menu:IsShown(); self:CloseMenus(); if shown then return end
@@ -376,10 +414,12 @@ function U:Refresh()
     self.refreshing=true
     local mode=self.db.settings.format
     local display=H.S.Display(self.db,function(key,char) return T:Value(key,char) end)
+    local _,overview=M.List(display)
+    if self.removedOnly then display=H.S.Display(self.db,function(key,char) return T:Value(key,char) end,true) end
     local entries,stats=M.List(display,self.searchText,self.realm,self.sort,self.descending,nil,self.flavor)
     self.stats,self.visibleCount=stats,#entries; self:LayoutRows(#entries)
-    self.total:SetText(stats.count>0 and stats.missing==stats.count and L.unavailable or M.Format(stats.total,mode))
-    self.count:SetText(tostring(stats.count))
+    self.total:SetText(overview.count>0 and overview.missing==overview.count and L.unavailable or M.Format(overview.total,mode))
+    self.count:SetText(tostring(overview.count))
     self.realms:SetText("· "..(#stats.realms==1 and L.oneRealm or string.format(L.realms,#stats.realms)))
     self.realms:ClearAllPoints(); self.realms:SetPoint("TOPLEFT",280.2+occupied(self.count)+8,-35.5)
     self.realms:SetWidth(126.8-occupied(self.count)-8)
@@ -390,7 +430,8 @@ function U:Refresh()
     for field,header in pairs(self.headers) do
         local b=header.button
         local on=self.sort==field or (field=="name" and (self.sort=="level" or self.sort=="realm"))
-        b.label:SetText(header.title..(field=="name" and self.sort~="name" and on and " · "..L[self.sort] or ""))
+        local title=field=="name" and self.removedOnly and L.removedCharacters or header.title
+        b.label:SetText(title..(field=="name" and self.sort~="name" and on and " · "..L[self.sort] or ""))
         b.label:SetTextColor(unpack(on and GOLD or {197/255,191/255,171/255}))
         b.arrow:SetShown(on or field=="name")
         b.arrow:SetTexCoord(0,1,on and not self.descending and 1 or 0,on and not self.descending and 0 or 1)
@@ -421,9 +462,9 @@ function U:Refresh()
             row.updated:SetTextColor(unpack(active and {156/255,194/255,176/255} or {167/255,171/255,165/255}))
         end
     end
-    self.empty:SetShown(#entries==0); self.empty:SetText(stats.count==0 and L.noCharacters or L.empty)
-    local count=string.format(L.shown,#entries,stats.count)
-    if self.realm or self.flavor or (self.searchText and self.searchText~="") then
+    self.empty:SetShown(#entries==0); self.empty:SetText(stats.count==0 and (self.removedOnly and L.noRemoved or L.noCharacters) or L.empty)
+    local count=string.format(self.removedOnly and L.removedShown or L.shown,#entries,stats.count)
+    if not self.removedOnly and (self.realm or self.flavor or (self.searchText and self.searchText~="")) then
         count=count.." · "..string.format(L.filteredTime,M.SumText(stats.visible,stats.visibleMissing,#entries,mode))
     end
     self.footer:SetText(count)
@@ -447,6 +488,8 @@ function U:RowTooltip(row)
         lines[#lines+1] = T.base and L.estimate or L.noSync
     else lines[#lines+1] = L.known end
     if M.Number(char.serverAt) then lines[#lines+1] = string.format(L.sync,date("%Y-%m-%d %H:%M",char.serverAt)) end
+    lines[#lines+1] = self.removedOnly and L.restoreHint or L.removeHint
+    if self.removedOnly then lines[#lines+1] = L.removalHelp end
     tooltip(row,lines)
 end
 function U:UpdateMinimap()

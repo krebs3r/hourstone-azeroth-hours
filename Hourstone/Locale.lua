@@ -21,6 +21,13 @@ local en = {
     sync = "Last server sync: %s", noSync = "Waiting for the server's /played value.",
     known = "Last known value; this character is offline.", fullTime = "Total: %s",
     request = "Sync requested", requestWait = "Sync queued (60-second request interval)",
+    removedCharacters = "Removed characters", showTracked = "Show tracked characters", remove = "Remove", restore = "Restore", cancel = "Cancel",
+    removeTitle = "Remove character from overview?", removeBody = "%s stays saved, but no longer counts toward the overview. This does not delete your WoW character. Restore it here or log in again after the removal has synchronized.",
+    removeHint = "Right click: remove from overview", restoreHint = "Right click: restore to overview",
+    removedShown = "%d / %d removed characters shown", noRemoved = "No removed characters.",
+    removalHelp = "Playtime stays saved. A new character login restores known removals; /reload does not. For an offline removal, synchronize first, then log in again.",
+    visibilityError = "Hourstone could not save this change. Your existing character data is unchanged.",
+    invalidDB = "Hourstone: saved character controls are invalid. Saved data has been kept; please restore a valid backup.",
     futureDB = "Hourstone: saved data is from a newer addon version. Please update Hourstone.",
 }
 local german = {
@@ -43,6 +50,13 @@ local german = {
     sync = "Letzter Serverabgleich: %s", noSync = "Warte auf den /played-Wert des Servers.",
     known = "Letzter bekannter Stand; dieser Charakter ist offline.", fullTime = "Gesamt: %s",
     request = "Abgleich angefragt", requestWait = "Abgleich vorgemerkt (60 Sekunden Anfrageabstand)",
+    removedCharacters = "Entfernte Charaktere", showTracked = "Erfasste Charaktere anzeigen", remove = "Entfernen", restore = "Wiederherstellen", cancel = "Abbrechen",
+    removeTitle = "Charakter aus der Übersicht entfernen?", removeBody = "%s bleibt gespeichert, zählt aber nicht mehr zur Übersicht. Dein WoW-Charakter wird nicht gelöscht. Stelle ihn hier wieder her oder logge dich nach dem Abgleich erneut ein.",
+    removeHint = "Rechtsklick: aus der Übersicht entfernen", restoreHint = "Rechtsklick: wiederherstellen",
+    removedShown = "%d / %d entfernte Charaktere angezeigt", noRemoved = "Keine entfernten Charaktere.",
+    removalHelp = "Die Spielzeit bleibt gespeichert. Ein neuer Charakter-Login stellt bekannte Entfernungen wieder her; /reload genügt nicht. Bei einer Offline-Entfernung zuerst synchronisieren, dann neu einloggen.",
+    visibilityError = "Hourstone konnte die Änderung nicht speichern. Deine bisherigen Charakterdaten bleiben erhalten.",
+    invalidDB = "Hourstone: Die gespeicherten Charaktermarkierungen sind ungültig. Die Daten bleiben erhalten; bitte eine gültige Sicherung wiederherstellen.",
     futureDB = "Hourstone: Die gespeicherten Daten stammen aus einer neueren Addon-Version. Bitte Hourstone aktualisieren.",
 }
 H.L = de and setmetatable(german, { __index = en }) or en

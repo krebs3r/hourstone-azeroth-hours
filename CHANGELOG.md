@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.1 — 2026-09-17
+
+- First public 0.3.x release: includes the Retail progress view and scaling improvements from the development milestone below.
+- Prevent periodic refreshes and display events from repositioning the window during a drag. Save the released position before recalculating the layout, including when the window is closed mid-drag.
+- Add regression coverage for both Retail views, Classic clients, global UI scales and interrupted drags.
+
+## 0.3.0 — development milestone included in 0.3.1
+
+- Add a Retail Progress tab: current keystone, highest completed Mythic+ level this week and three Great Vault rows with three slots each.
+- Read localized dungeon names, key levels, weekly completions and Vault thresholds from Blizzard APIs; distinguish confirmed empty, unknown and stale data.
+- Capture progress for the logged-in character, retain offline observations and invalidate old weekly data at the server reset. Keep progress local; SavedVariables schema and Companion protocol remain 3.
+- Extend scale to 65–200% in 5% steps, reducing visible rows before fitting the window to smaller screens.
+- Preserve Classic playtime views, character/guild filters, removal/restoration and the existing synchronization contract.
+- Add progress, layout and scaling regressions and synthetic visual previews. Native-client acceptance is recorded separately in the validation guide.
+
 ## 0.2.3 — 2026-09-16
 
 - First public 0.2.x release: includes the development milestones below, adding guild tracking, reversible overview deletion and optional Companion protocol 3 integration since public 0.1.1.

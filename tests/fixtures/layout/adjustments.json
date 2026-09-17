@@ -23,7 +23,12 @@
     185,
     25
   ],
-  "client": [379, 120, 139, 26],
+  "client": [
+    379,
+    120,
+    139,
+    26
+  ],
   "combinedButton": [
     525,
     120.5,
@@ -107,8 +112,34 @@
   ],
   "done": [
     181,
-    227.2,
+    183,
     82,
     25
-  ]
+  ],
+  "reset": [
+    37,
+    183,
+    137,
+    25
+  ],
+  "retailTabHeight": 32,
+  "progress": {
+    "columns": [
+      230,
+      164,
+      122,
+      184
+    ],
+    "rowHeight": 64,
+    "table": [
+      10,
+      184,
+      700,
+      24
+    ],
+    "baseHeight": 244,
+    "vaultBoxSize": 16,
+    "vaultRowPitch": 18,
+    "vaultSlotPitch": 23
+  }
 }

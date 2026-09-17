@@ -1,10 +1,10 @@
 # Hourstone – Azeroth Hours
 
-Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten World-of-Warcraft-Charaktere, die Gesamtspielzeit und die aktuelle Sitzung in einem kompakten Fenster. Suche, Filter, Sortierung und zwei Zeitformate erleichtern die Übersicht.
+Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten World-of-Warcraft-Charaktere, die Gesamtspielzeit und die aktuelle Sitzung in einem kompakten Fenster. In Retail zeigt die Ansicht **Fortschritt** außerdem Schlüsselsteine, die beste M+-Stufe dieser Woche und Schatzkammer-Slots. Suche, Filter, Sortierung und eine Fenstergröße bis 200 % erleichtern die Übersicht.
 
-![Hourstone 0.2.3 mit oberen Realm- und Clientfiltern und eigener Clientspalte](assets/addon-overview-de.png)
+![Hourstone 0.3.1 mit Charakteren, Gilden sowie Realm- und Clientfiltern](assets/addon-overview-de.png)
 
-Die Charakterübersicht vereint Suche, Realm- und Clientfilter und zeigt Gilde und Spielzeit jedes Charakters.
+Die Charakterübersicht vereint Suche, Realm- und Clientfilter und zeigt Gilde und Spielzeit jedes Charakters. Die Bilder zeigen gerenderte Ansichten der Addon-Oberfläche mit Beispielcharakteren.
 
 ## Installation und Bedienung
 
@@ -12,10 +12,22 @@ Lade das ZIP aus [GitHub Releases](https://github.com/krebs3r/hourstone-azeroth-
 
 - `/hourstone` oder `/azerothhours` öffnet und schließt das Fenster.
 - `/hourstone minimap` schaltet den Minimap-Button um; `/hourstone reset` setzt die Fensterposition zurück.
-- Das Zahnrad öffnet Einstellungen für Minimap und Größe. Ziehe die Titelleiste, um das Fenster zu verschieben.
+- Das Zahnrad öffnet Einstellungen für Minimap und Größe (65–200 % in 5-%-Schritten). Bei hoher Skalierung erscheinen weniger Zeilen; das Mausrad erreicht alle Charaktere. Erst wenn Breite oder Mindesthöhe nicht passen, wird das Fenster verkleinert. Ziehe die Titelleiste, um es zu verschieben. Version 0.3.1 behebt das Zurückspringen während des Ziehens; beim Loslassen wird die gewählte Position gespeichert.
 - Die Suche nach Charakter oder Gilde sowie die danebenstehenden Realm- und Clientfilter grenzen die Liste ein. Die Clientspalte steht links neben der Spielzeit. Spaltenüberschriften sortieren die Liste; unbekannte Clients stehen dabei zuletzt. Das Mausrad bewegt längere Listen.
 - Der Minimap-Button verwendet Blizzards Rahmen, Hintergrund und Hovereffekt mit vollständigem Hourstone-Logo. Seine gespeicherte Position bleibt erhalten.
 - Ein Charakter-Tooltip zeigt alle gespeicherten Details und den Zeitpunkt des letzten Serverabgleichs auf einer Zeile. Er behauptet keinen Online-/Offline-Status.
+
+## Fortschritt in Retail
+
+![Hourstone 0.3.1 mit Schlüsselsteinen, M+-Wochenbestleistung und Schatzkammer-Slots](assets/addon-progress-de.png)
+
+Mit **Spielzeit | Fortschritt** wechselst du die Ansicht im selben Fenster. Fortschritt zeigt neben Charakter, Realm und Gilde den eigenen Schlüsselstein, die höchste abgeschlossene M+-Stufe dieser Woche und je drei Schatzkammer-Slots für Dungeon, Raid und Welt. Tooltips zeigen vollständige Namen, Fortschritt, Schwierigkeit und Erfassungszeit. Suche und Realm-/Clientfilter gelten in beiden Ansichten. Classic behält die Spielzeitansicht.
+
+Dungeonname, Schlüsselsteinstufe, Wochenabschlüsse und Slot-Schwellen stammen direkt aus WoW. Du musst keine Instanzen oder Saisonlisten pflegen. Abschlüsse außerhalb der Zeit zählen ebenfalls, abgebrochene Läufe nicht. Lange Namen werden in der Tabelle gekürzt; die Stufe bleibt sichtbar und der Tooltip enthält den vollständigen Namen.
+
+Logge dich zunächst mit jedem gewünschten Charakter ein. Ausgeloggte Charaktere zeigen den letzten lokalen Stand. „Kein Schlüsselstein“, „Noch nicht erfasst“ und „Veraltet“ sind unterschiedliche Zustände. Nach dem Wochenreset werden alte Daten als veraltet markiert, bis sie neu erfasst wurden. Abholbare Vorwochenbelohnungen zählen nicht als aktueller Wochenfortschritt. Vorübergehend fehlende oder geschützte API-Werte löschen keine gültigen Daten.
+
+Fortschritt bleibt lokal je WoW-Installation und Account. WoW speichert ihn beim Logout oder `/reload`. Der Companion überträgt weiterhin Spielzeit, Gilde sowie das Löschen und Wiederherstellen von Übersichtseinträgen; Fortschritt wird nicht synchronisiert.
 
 ## Einträge aus der Übersicht löschen und wiederherstellen
 
@@ -37,7 +49,7 @@ Die Charakterliste zeigt auch die zuletzt erfasste Gilde. Gildenwechsel und Aust
 
 ## Optionaler Abgleich zwischen Clients
 
-Hourstone 0.2.3 unterstützt [Protokoll 3](sync-protocol-v3.md) des separaten [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) ab 0.1.3 einschließlich Gildendaten sowie Löschen und Wiederherstellen von Übersichtseinträgen. Beim Upgrade von der veröffentlichten Version 0.1.1 werden die gespeicherten Daten auf Schema 3 umgestellt; Charaktere und Einstellungen bleiben erhalten. Gegenüber dem Entwicklungsstand 0.2.2 ändern sich Protokoll und Datenschema nicht erneut. Alte Eingaben mit Protokoll 1 und 2 bleiben lesbar. Hourstone 0.1.x unterstützt den Companion nicht.
+Hourstone 0.3.1 unterstützt [Protokoll 3](sync-protocol-v3.md) des separaten [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) ab 0.1.3 einschließlich Gildendaten sowie Löschen und Wiederherstellen von Übersichtseinträgen. Beim Upgrade von der veröffentlichten Version 0.1.1 werden die gespeicherten Daten auf Schema 3 umgestellt; Charaktere und Einstellungen bleiben erhalten. Bei einem Upgrade von 0.2.2 oder neuer bleiben Protokoll und Hauptdatenschema unverändert. Fortschritt bleibt lokal. Alte Eingaben mit Protokoll 1 und 2 bleiben lesbar. Hourstone 0.1.x unterstützt den Companion nicht.
 
 WoW speichert zunächst beim Ausloggen oder mit `/reload`. Der Companion liest die gespeicherten Stände deiner ausgewählten Installationen und Accounts ein, führt sie zusammen und stellt die gemeinsame Übersicht für das Addon bereit. Hourstone übernimmt sie beim nächsten Login oder `/reload`. Nach der ersten Installation des Companion-Datenaddons WoW einmal vollständig schließen und neu starten. Für mehrere PCs einen Ordner wählen, den Dropbox, OneDrive oder ein anderer Dienst auf allen Geräten synchronisiert und dauerhaft lokal verfügbar hält. Darüber tauscht der Companion die Gerätestände aus.
 
@@ -45,6 +57,6 @@ WoW speichert zunächst beim Ausloggen oder mit `/reload`. Der Companion liest d
 
 Doppelte Stände desselben Charakters werden zusammengeführt und niemals addiert. Bestätigte Serverwerte bleiben von lokalen Schätzungen getrennt. Fensterposition, Einstellungen, Anfragen und die laufende Sitzung bleiben lokal. Der Abgleich überträgt keine `/played`-Zeit zwischen unterschiedlichen Charakteren und ist kein Live-Abgleich während des Spiels. Einrichtung, Sicherungen und Grenzen stehen in der Companion-Anleitung.
 
-Retail, Mists Classic, TBC Anniversary und Classic Era sind als Clientfamilien vorgesehen. Für Version 0.1.1 liegen Spieltests dieser vier Familien vor. Hardcore, Season of Discovery und der neue Companion-Ablauf benötigen gesonderte Prüfungen. Siehe [Validierung](VALIDATION.md).
+Retail, Mists Classic, TBC Anniversary und Classic Era sind unterstützte Clientfamilien. Hardcore und Season of Discovery verwenden die Era-Schnittstelle und wurden nicht gesondert geprüft. Aktuelle Spieltests und automatische Prüfungen stehen in der [Validierung](VALIDATION.md).
 
 Fehler bitte über [GitHub Issues](https://github.com/krebs3r/hourstone-azeroth-hours/issues) mit Addon-Version, Client-Build und Schritten zum Nachstellen melden. Keine Zugangsdaten, persönlichen Account-Pfade oder vollständigen Charakterdatenbanken anhängen.

@@ -16,6 +16,7 @@ function T:UpdateIdentity(level)
         if key ~= self.key and type(candidate) == "table" and candidate.guid == identity.guid and candidate.flavor == identity.flavor
             and (candidate.region == nil or candidate.region == "unknown" or candidate.region == identity.region) then
             if not H.V.AdoptRegion(self.db, candidate, identity) then return false end
+            if H.P and H.P.db == self.db then H.P:Adopt(candidate, identity) end
             record = H.S.Choose(record, candidate); self.db.characters[key] = nil
             if type(self.db.runtime) == "table" and self.db.runtime.key == key then self.db.runtime.key = self.key end
         end

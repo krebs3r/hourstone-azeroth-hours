@@ -15,7 +15,8 @@ from run import runtime
 
 ANCHORS={"TOPLEFT":(0,0),"TOP":(.5,0),"TOPRIGHT":(1,0),"LEFT":(0,.5),"CENTER":(.5,.5),"RIGHT":(1,.5),"BOTTOMLEFT":(0,1),"BOTTOM":(.5,1),"BOTTOMRIGHT":(1,1)}
 
-def render(project,locale,settings=False,mode='combined',population=8,addon_scale=1,minimap=False):
+def render(project,locale,settings=False,mode='combined',population=8,addon_scale=1,minimap=False,
+           view='played',screen=(2560,1440),setup=None,tooltip=None):
     lua=runtime(project,locale)
     lua.globals().PREVIEW_COUNT=population
     lua.execute('''fire("ADDON_LOADED","Hourstone"); fire("PLAYER_ENTERING_WORLD",true,false)
@@ -39,12 +40,18 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
         for i=9,PREVIEW_COUNT do HourstoneDB.characters["test:"..i]={name="Longcharactername"..i,realm="Realm "..i,level=60,seconds=i*1000,class="MAGE",flavor=clients[(i-1)%4+1],updatedAt=EPOCH-3000} end
         if PREVIEW_COUNT==0 then HourstoneDB.characters={} end
         configure_display(2560,1440,.8); H.UI:Toggle()''')
-    if settings: lua.execute("H.UI:ToggleSettings()")
-    frames=list(lua.globals().ALL_FRAMES.values())
     u=lua.globals().H.UI
+    if setup:
+        lua.execute(setup)
+    lua.globals().configure_display(screen[0],screen[1],.8)
+    if hasattr(u,'SetView') and u.SetView is not None:
+        u.SetView(u,view)
     u.db.settings.format=mode
     u.db.settings.scale=addon_scale; u.ApplyScale(u); u.SettingsText(u)
     u.LayoutRows(u); u.Refresh(u)
+    if settings: u.ToggleSettings(u)
+    if tooltip: u.ProgressTooltip(u,u.rows[1],tooltip)
+    frames=list(lua.globals().ALL_FRAMES.values())
     target=u.minimap if minimap else u.frame
     root=target.id
     records={f.id:dict(f.items()) for f in frames}
@@ -88,6 +95,12 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
             level=max(level,records[parent.id].get("frameLevel",1)); parent=records[parent.id].get("parent")
         z=level*10+{"BACKGROUND":0,"BORDER":1,"ARTWORK":2,"OVERLAY":3}.get(f.get("layer"),4)
         style=f"left:{x}px;top:{y}px;width:{w}px;height:{h}px;z-index:{z};"
+        opacity=f.get("alpha",1)
+        ancestor=f.get("parent")
+        while ancestor is not None:
+            opacity*=records[ancestor.id].get("alpha",1)
+            ancestor=records[ancestor.id].get("parent")
+        style+=f"opacity:{opacity};"
         color=f.get("color")
         rgba=list(color.values()) if color is not None else [1,1,1,1]
         if len(rgba)==3: rgba.append(1)
@@ -96,7 +109,9 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
             value=html.escape(f.get("text",""))
             value=re.sub(r"\|c[0-9a-fA-F]{2}([0-9a-fA-F]{6})(.*?)\|r",r'<i style="color:#\1;font-style:normal">\2</i>',value)
             family="Georgia,serif"
-            pieces.append(f'<span style="{style}color:{css};font-family:{family};line-height:{h}px;font-size:{f.get("fontSize",12)}px;text-align:{f.get("align","LEFT").lower()}">{value}</span>')
+            line_height=f.get("fontSize",12)*1.2 if f.get("wordWrap") else h
+            whitespace='pre-wrap' if f.get("wordWrap") else 'pre'
+            pieces.append(f'<span style="{style}white-space:{whitespace};color:{css};font-family:{family};line-height:{line_height}px;font-size:{f.get("fontSize",12)}px;text-align:{f.get("align","LEFT").lower()}">{value}</span>')
         elif f.get("texture"):
             native={136430:"MiniMap-TrackingBorder",136467:"UI-Minimap-Background",136477:"UI-Minimap-ZoomButton-Highlight"}
             name=native.get(f["texture"],str(f["texture"]).split("\\")[-1].replace(".tga",".png"))
@@ -108,8 +123,7 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
                 iw,ih=w/abs(u2-u1),h/abs(v2-v1)
                 transform=f'scale({-1 if u2<u1 else 1},{-1 if v2<v1 else 1})'
                 tint="filter:grayscale(1) brightness(.6);" if f.get("desaturated") else ""
-                opacity=f.get("alpha",1)
-                pieces.append(f'<div style="{style}overflow:hidden;transform:{transform};opacity:{opacity};{tint}"><img alt="" src="data:image/png;base64,{image}" style="position:absolute;width:{iw}px;height:{ih}px;left:{-min(u1,u2)*iw}px;top:{-min(v1,v2)*ih}px"></div>')
+                pieces.append(f'<div style="{style}overflow:hidden;transform:{transform};{tint}"><img alt="" src="data:image/png;base64,{image}" style="position:absolute;width:{iw}px;height:{ih}px;left:{-min(u1,u2)*iw}px;top:{-min(v1,v2)*ih}px"></div>')
             elif "GEAR" in name:
                 # Browser-only approximation of the client-owned gear texture.
                 gear=base64.b64encode((ROOT/"docs/assets/Gear.png").read_bytes()).decode()
@@ -123,6 +137,8 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
                 pieces.append(f'<div style="{style}"><img alt="" src="data:image/png;base64,{check}" style="position:absolute;inset:6px;width:12px;height:12px"></div>')
             elif name=="UI-Minimap-Background":
                 pieces.append(f'<div style="{style}border-radius:50%;background:#10161a"></div>')
+            elif name=="WHITE8X8":
+                pieces.append(f'<div style="{style}background:{css}"></div>')
             elif name=="MiniMap-TrackingBorder":
                 # Approximate only the visible rim. The native texture has
                 # transparent padding; compare its actual shape inside WoW.
@@ -135,13 +151,46 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     return f'<div class="window" data-physical-width="{width:g}" data-physical-height="{height:g}" style="width:{width}px;height:{height}px"><div class="canvas" style="transform:scale({factor});width:{target.width}px;height:{target.height}px">'+''.join(pieces)+'</div></div>'
 
 def product_pages():
-    """Write synthetic product layouts for documentation captures."""
-    css='body{margin:0;background:#171c22;color:#eee;font-family:Segoe UI,sans-serif}.product{width:720px;padding:28px 32px 24px}h1{font-size:20px;font-weight:600;margin:0 0 20px}.window,.canvas{position:relative}.canvas{transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}p{font-size:12px;color:#a9aaa2;margin:18px 0 0;line-height:1.6}'
+    """Write clean documentation views from the shipping Lua UI and sample data.
+
+    Keep provenance in the surrounding documentation caption: these browser
+    renders approximate client-owned fonts/artwork and are not in-game captures.
+    Product images contain only the addon, without development banners.
+    """
+    version=re.search(r'^## Version: (.+)$',(ROOT/'Hourstone/Hourstone.toc').read_text(),re.M)[1]
+    setup=(ROOT/'tests/fixtures/progress/preview.lua').read_text(encoding='utf-8')
+    css='body{margin:0;background:#10171d;color:#eee}.product{width:max-content;padding:40px;background:radial-gradient(ellipse at 50% 0%,#25323b 0%,#111a21 65%,#10171d 100%)}.window,.canvas{position:relative}.window{box-shadow:0 16px 36px #0006}.canvas{transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}'
     destination=ROOT/"dist"; destination.mkdir(exist_ok=True)
     for locale,language in (("deDE","de"),("enUS","en")):
-        overview=render(1,locale,population=8).replace("A very long synthetic guild name for layout review","Silver Dawn Expedition")
-        page=f'<!doctype html><html lang="{language}"><meta charset="utf-8"><title>Hourstone · {language.upper()} layout preview</title><style>{css}</style><main class="product"><h1>Hourstone – Azeroth Hours</h1>'+overview+'</main></html>'
-        path=destination/f"addon-product-{language}.html"; path.write_text(page,encoding="utf-8"); print(path)
+        variants=[('overview',dict(view='played',screen=(1920,1080))),
+                  ('progress',dict(view='progress',screen=(1280,650)))]
+        if language=='de':
+            variants.append(('settings',dict(view='progress',settings=True,addon_scale=2,screen=(1920,1080))))
+        for name,options in variants:
+            content=render(1,locale,setup=setup,**options)
+            page=f'<!doctype html><html lang="{language}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Hourstone {version} · {name} · {language.upper()}</title><style>{css}</style><main class="product">{content}</main></html>'
+            suffix='' if name=='overview' else f'{name}-'
+            path=destination/f'addon-product-{suffix}{language}.html'
+            path.write_text(page,encoding='utf-8'); print(path)
+
+
+def progress_pages():
+    """Render shipping Lua frames with synthetic progress for design acceptance."""
+    version=re.search(r'^## Version: (.+)$',(ROOT/'Hourstone/Hourstone.toc').read_text(),re.M)[1]
+    setup=(ROOT/'tests/fixtures/progress/preview.lua').read_text(encoding='utf-8')
+    css='body{margin:24px;background:#171c22;color:#eee;font-family:Segoe UI,sans-serif}h1{font-size:18px;font-weight:500}p{font-size:12px;color:#aaa}.window,.canvas{position:relative}.canvas{transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}'
+    destination=ROOT/'dist/design'; destination.mkdir(exist_ok=True,parents=True)
+    for language,locale in (('de','deDE'),('en','enUS')):
+        for name,options in (
+            ('progress',dict(view='progress',screen=(1280,650))),
+            ('tooltip',dict(view='progress',screen=(1920,1080),tooltip='dungeon')),
+            ('settings',dict(view='progress',settings=True,addon_scale=2,screen=(1920,1080))),
+            ('played',dict(view='played',screen=(1920,1080))),
+        ):
+            content=render(1,locale,setup=setup,**options)
+            label=f'Hourstone {version} · {name} · {language.upper()}'
+            page=f'<!doctype html><html lang="{language}"><meta charset="utf-8"><title>{label}</title><style>{css}</style><h1>{label}</h1>{content}<p>Synthetic data · Actual Lua frame layout · Browser approximation, not an in-game capture.</p></html>'
+            path=destination/f'{name}-{language}.html'; path.write_text(page,encoding='utf-8'); print(path)
 
 
 def main():
@@ -159,6 +208,8 @@ def main():
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--product-pages",action="store_true",help="Also write labeled synthetic layouts for documentation images")
+    parser.add_argument("--product-pages",action="store_true",help="Also write clean documentation views of the implemented UI with sample data")
+    parser.add_argument("--progress-pages",action="store_true",help="Also render the real progress UI, tooltip and scaling states")
     args=parser.parse_args(); main()
     if args.product_pages: product_pages()
+    if args.progress_pages: progress_pages()

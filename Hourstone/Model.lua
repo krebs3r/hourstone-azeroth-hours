@@ -2,6 +2,11 @@ local _, H = ...
 local M, L = {}, H.L
 H.M = M
 M.SCHEMA = 3
+M.SCALE_MIN, M.SCALE_MAX, M.SCALE_STEP = .65, 2, .05
+function M.Scale(value)
+    if not M.Number(value) then return 1 end
+    return math.max(M.SCALE_MIN, math.min(M.SCALE_MAX, math.floor(value / M.SCALE_STEP + .5) * M.SCALE_STEP))
+end
 function M.Number(value)
     return type(value) == "number" and value == value and value >= 0 and value < math.huge
 end
@@ -36,7 +41,8 @@ function M.Init(db)
     if type(db.settings) ~= "table" then db.settings = {} end
     local s = db.settings
     if s.format ~= "hours" then s.format = "combined" end
-    s.scale = M.Number(s.scale) and math.max(.65, math.min(1.3, s.scale)) or 1
+    s.scale = M.Scale(s.scale)
+    if s.view ~= "progress" then s.view = "played" end
     s.minimap = s.minimap ~= false
     s.minimapAngle = M.Number(s.minimapAngle) and s.minimapAngle % 360 or 225
     if type(s.position) ~= "table" or not M.Number(math.abs(tonumber(s.position.x) or math.huge))

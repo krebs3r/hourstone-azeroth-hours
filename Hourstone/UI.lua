@@ -5,6 +5,9 @@ local ROOT = "Interface\\AddOns\\Hourstone\\Media\\"
 local FONT = STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF"
 local GOLD, MUTED = {243/255,206/255,112/255}, {169/255,170/255,162/255}
 local WIDTH, ROW_HEIGHT, CAPACITY = 720, 50, 8
+local PROGRESS_HEIGHT, TAB_HEIGHT, PROGRESS_NAME = 64, 32, 230
+local PROGRESS_COLUMNS = {230,164,122,184}
+local CATEGORIES = {"dungeon","raid","world"}
 local NAME_WIDTH, CLIENT_WIDTH, PLAYED_WIDTH, UPDATED_WIDTH = 280, 120, 185, 115
 local SEARCH_WIDTH, FILTER_WIDTH, FORMAT_WIDTH, COMBINED_WIDTH = 216, 139, 185, 111
 local MINIMAP_SIZE, MINIMAP_MASK = 31, 24
@@ -102,17 +105,37 @@ local function occupied(label)
     local w=label:GetUnboundedStringWidth()
     return w and w>0 and math.min(w,label:GetWidth()) or label:GetWidth()
 end
-function U:ApplyScale()
+local function place(region,x,y,w,h)
+    region:ClearAllPoints(); region:SetPoint("TOPLEFT",x,-y)
+    if w then region:SetWidth(w) end
+    if h then region:SetHeight(h) end
+end
+local function ellipsis(label,value)
+    label:SetText(value)
+    local width=label:GetUnboundedStringWidth()
+    if width<=label:GetWidth() then return end
+    local chars={}
+    for c in value:gmatch("[%z\1-\127\194-\244][\128-\191]*") do chars[#chars+1]=c end
+    repeat
+        chars[#chars]=nil; label:SetText(table.concat(chars).."…")
+    until #chars==0 or label:GetUnboundedStringWidth()<=label:GetWidth()
+end
+function U:IsProgress() return C.Retail() and self.db.settings.view=="progress" end
+function U:ApplyScale(layoutOnly)
+    if self.windowDragging then return end
+    if self.ready and not layoutOnly then self:Refresh(); return end
     local sw,sh=GetPhysicalScreenSize()
     local fitting=math.min((sw-20)/WIDTH,(sh-20)/self.frame:GetHeight())
-    self.frame:SetScale(math.min(self.db.settings.scale,fitting)*(768/sh)/UIParent:GetEffectiveScale())
+    local requested=self.scaleDragging and self.dragScale or self.db.settings.scale
+    self.frame:SetScale(math.min(requested,fitting)*(768/sh)/UIParent:GetEffectiveScale())
     self:Position()
 end
 function U:Position(reset)
+    if self.windowDragging then return end
     local f,p=self.frame,self.db.settings.position
     if reset then self.db.settings.position=nil; p=nil; self.anchorHeight=f:GetHeight() end
     local height=p and tonumber(p.height) or self.anchorHeight or 262
-    if not M.Number(height) or height<248 or height>612 then height=262 end
+    if not M.Number(height) or height<248 or height>244+CAPACITY*PROGRESS_HEIGHT then height=262 end
     -- Stored center offsets remain compatible. Remember the height at placement
     -- so filtering grows downward from the same header instead of making it jump.
     local x,y=p and p.x or 0,(p and p.y or 0)+(height-f:GetHeight())/2
@@ -126,10 +149,18 @@ function U:SavePosition()
     local ratio=self.frame:GetScale()
     self.db.settings.position={x=x-px/ratio,y=y-py/ratio,height=self.frame:GetHeight()}
 end
+function U:FinishWindowDrag()
+    if not self.windowDragging then return end
+    self.frame:StopMovingOrSizing()
+    self:SavePosition()
+    self.windowDragging=nil
+    self:Refresh()
+end
 function U:CloseMenus()
     self.menu:Hide(); self.sortMenu:Hide(); self.settings:Hide()
     if self.clientMenu then self.clientMenu:Hide() end
     if self.removeDialog then self.removeDialog:Hide(); self.pendingRemoval=nil end
+    if self.progressTip then self.progressTip:Hide() end
 end
 function U:ToggleSettings()
     self:Create(); local shown=self.settings:IsShown(); self:CloseMenus()
@@ -140,22 +171,70 @@ function U:SettingsText()
     self.minimapBox:SetChecked(self.db.settings.minimap)
     self.scaleLabel:SetText(math.floor(self.db.settings.scale*100+.5).." %")
     self.updatingScale=true; self.scaleSlider:SetValue(self.db.settings.scale*100); self.updatingScale=false
-    self.scaleFill:SetWidth(224*(self.db.settings.scale-.65)/.65)
+    self.scaleFill:SetWidth(224*(self.db.settings.scale-M.SCALE_MIN)/(M.SCALE_MAX-M.SCALE_MIN))
 end
 function U:SetFormat(mode) self.db.settings.format=mode; self:Refresh() end
+function U:SetView(view)
+    if not C.Retail() or (view~="played" and view~="progress") then return end
+    self.viewSort=self.viewSort or {}
+    self.viewSort[self.db.settings.view]={self.sort,self.descending}
+    self.db.settings.view=view
+    local sort=self.viewSort[view] or (view=="progress" and {"name",false} or {"seconds",true})
+    self.sort,self.descending,self.offset=sort[1],sort[2],0
+    self:CloseMenus(); self:Refresh()
+    if view=="progress" and H.P then H.P:Schedule("open") end
+end
 function U:SetSort(field)
     if self.sort==field then self.descending=not self.descending
     else self.sort,self.descending=field,field=="seconds" or field=="level" or field=="updatedAt" end
     self.offset=0; self:CloseMenus(); self:Refresh()
 end
 function U:LayoutRows(count)
-    local slots=math.max(1,math.min(CAPACITY,count or self.visibleCount or 0))
-    if self.slots==slots then return end
-    self.slots=slots; local h=slots*ROW_HEIGHT
-    self.frame:SetHeight(212+h); self.panelLayout()
+    local progress=self:IsProgress()
+    local rowHeight=progress and PROGRESS_HEIGHT or ROW_HEIGHT
+    local tabs=C.Retail() and TAB_HEIGHT or 0
+    local _,sh=GetPhysicalScreenSize()
+    local base=212+tabs
+    local requested=self.scaleDragging and self.dragScale or self.db.settings.scale
+    local fittingRows=math.floor(((sh-20)/requested-base)/rowHeight)
+    local slots=math.max(1,math.min(CAPACITY,fittingRows,count or self.visibleCount or 0))
+    self.slots,self.rowHeight=slots,rowHeight; local h=slots*rowHeight
+    self.frame:SetHeight(base+h); self.panelLayout()
+    place(self.toolbar,10,114+tabs)
+    place(self.table,10,152+tabs)
     self.table:SetHeight(24+h); self.list:SetHeight(h); self.scroll:SetHeight(h-4)
-    self.footerFrame:ClearAllPoints(); self.footerFrame:SetPoint("TOPLEFT",10,-(176+h))
-    self:ApplyScale()
+    place(self.scroll,progress and 684 or 695,progress and 18 or 2,progress and 14 or 5,progress and h-36 or h-4)
+    self.scroll:GetThumbTexture():SetWidth(progress and 11 or 4)
+    -- A single progress row leaves only 28 units of track. Keep travel space
+    -- for dragging even at 200% on a small display.
+    self.scroll:GetThumbTexture():SetHeight(math.min(28,self.scroll:GetHeight()/2))
+    place(self.scrollDown,684,h-17)
+    for _,divider in ipairs(self.headerDividers) do divider:SetShown(progress) end
+    place(self.sortMenu,10,177+tabs)
+    place(self.footerFrame,10,176+tabs+h)
+    self.format:SetShown(not progress)
+    if self.tabs then selected(self.playedTab,not progress); selected(self.progressTab,progress) end
+    local fields={"name","flavor","seconds","updatedAt"}
+    local titles={L.character,L.keystone,L.thisWeek,L.vault}
+    local normal={NAME_WIDTH,CLIENT_WIDTH,PLAYED_WIDTH,UPDATED_WIDTH}
+    local x=0
+    for index,field in ipairs(fields) do
+        local header=self.headers[field]; local width=progress and PROGRESS_COLUMNS[index] or normal[index]
+        place(header.button,x,0,width,24)
+        header.button.label:SetWidth(width-(not progress and field=="seconds" and 32 or 24))
+        header.button.label:SetJustifyH(not progress and field=="seconds" and "RIGHT" or "LEFT")
+        header.title=progress and titles[index] or L[({"character","client","played","updated"})[index]]
+        x=x+width
+    end
+    for i,row in ipairs(self.rows) do
+        place(row,0,(i-1)*rowHeight,700,rowHeight)
+        row.active:SetHeight(rowHeight-1); place(row.separator,0,rowHeight-1)
+        row.client:SetShown(not progress); row.played:SetShown(not progress); row.updated:SetShown(not progress)
+        row.progress:SetShown(progress)
+        for _,divider in ipairs(row.dividers) do divider:SetHeight(rowHeight-1); divider:SetShown(progress) end
+    end
+    self.empty:SetHeight(rowHeight)
+    self:ApplyScale(true)
 end
 function U:Create()
     if self.frame then return end
@@ -167,8 +246,10 @@ function U:Create()
     self:ApplyScale(); UISpecialFrames[#UISpecialFrames+1]="HourstoneWindow"
     self.header=rect("Frame",f,10,10,700,40)
     self.header:EnableMouse(true); self.header:RegisterForDrag("LeftButton")
-    self.header:SetScript("OnDragStart",function() self:CloseMenus(); f:StartMoving() end)
-    self.header:SetScript("OnDragStop",function() f:StopMovingOrSizing(); self:SavePosition() end)
+    self.header:SetScript("OnDragStart",function()
+        self:CloseMenus(); self.windowDragging=true; f:StartMoving()
+    end)
+    self.header:SetScript("OnDragStop",function() self:FinishWindowDrag() end)
     for y=0,2 do for x=0,1 do
         local rivet=artwork(self.header,"Rivet",3,3,3.5+x*6,12+y*6)
         rivet:SetTexCoord(.03125,.96875,.03125,.96875); rivet:SetAlpha(.75)
@@ -203,6 +284,12 @@ function U:Create()
     self.summary:SetScript("OnLeave",function() GameTooltip:Hide() end)
     line(self.summary,0,63,700,1,150/255,144/255,128/255,66/255)
 
+    if C.Retail() then
+        self.tabs=rect("Frame",f,10,114,700,TAB_HEIGHT)
+        self.playedTab=control(self.tabs,L.played,5,4,90,25,function() self:SetView("played") end)
+        self.progressTab=control(self.tabs,L.progress,98,4,102,25,function() self:SetView("progress") end)
+    end
+
     self.toolbar=rect("Frame",f,10,114,700,38)
     local search=rect("EditBox",self.toolbar,0,6,SEARCH_WIDTH,26); self.search=search
     skin(search,"Toggle"); search:SetFont(FONT,11,""); search:SetTextColor(231/255,225/255,206/255)
@@ -230,7 +317,7 @@ function U:Create()
     self.combined=control(self.format,L.combined,0,0,COMBINED_WIDTH,25,function() self:SetFormat("combined") end)
     self.hours=control(self.format,L.hours,COMBINED_WIDTH+3,0,FORMAT_WIDTH-COMBINED_WIDTH-3,25,function() self:SetFormat("hours") end)
 
-    self.sort,self.descending,self.offset="seconds",true,0
+    self.sort,self.descending,self.offset=self:IsProgress() and "name" or "seconds",not self:IsProgress(),0
     self.table=rect("Frame",f,10,152,700,24+ROW_HEIGHT); self.headers={}
     for _,spec in ipairs({{"name","character",0,NAME_WIDTH},{"flavor","client",NAME_WIDTH,CLIENT_WIDTH},
         {"seconds","played",NAME_WIDTH+CLIENT_WIDTH,PLAYED_WIDTH},{"updatedAt","updated",NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH,UPDATED_WIDTH}}) do
@@ -240,6 +327,7 @@ function U:Create()
         if field=="seconds" then b.label:SetWidth(w-32) end
         b.arrow=arrow(b,field=="seconds" and w-19 or 80,10.5)
         b:SetScript("OnClick",function()
+            if self:IsProgress() and field~="name" then return end
             if field=="name" then
                 local shown=self.sortMenu:IsShown(); self:CloseMenus(); self.sortMenu:SetShown(not shown)
             else self:SetSort(field) end
@@ -247,6 +335,8 @@ function U:Create()
         self.headers[field]={button=b,width=w,title=title}
     end
     line(self.table,0,23,700,1,169/255,160/255,139/255,101/255)
+    self.headerDividers={}
+    for _,x in ipairs({230,394,516}) do self.headerDividers[#self.headerDividers+1]=line(self.table,x,2,1,19,.43,.46,.43,.4) end
     self.list=rect("Frame",self.table,0,24,700,ROW_HEIGHT); self.list:EnableMouseWheel(true)
     self.list:SetScript("OnMouseWheel",function(_,delta) self:Scroll(-delta*3) end)
     self.rows={}
@@ -254,7 +344,9 @@ function U:Create()
         local row=rect("Button",self.list,0,(i-1)*ROW_HEIGHT,700,ROW_HEIGHT); self.rows[i]=row
         row.bg=solid(row,"BACKGROUND",1,1,1,0); row.bg:SetAllPoints()
         row.active=line(row,0,0,2,ROW_HEIGHT-1,104/255,202/255,232/255)
-        line(row,0,ROW_HEIGHT-1,700,1,141/255,138/255,114/255,59/255)
+        row.separator=line(row,0,ROW_HEIGHT-1,700,1,141/255,138/255,114/255,59/255)
+        row.dividers={}
+        for _,x in ipairs({230,394,516}) do row.dividers[#row.dividers+1]=line(row,x,0,1,ROW_HEIGHT-1,.43,.46,.43,.3) end
         row.dot=artwork(row,"LiveDot",5,5,8,8.5)
         row.name=text(row,"",13,8,3,NAME_WIDTH-77,nil,16)
         row.level=text(row,"",10,NAME_WIDTH-62,5,54,{196/255,184/255,154/255},12)
@@ -263,17 +355,53 @@ function U:Create()
         row.client=text(row,"",11,NAME_WIDTH+8,0,CLIENT_WIDTH-16,{168/255,170/255,165/255},ROW_HEIGHT-1)
         row.played=text(row,"",12,NAME_WIDTH+CLIENT_WIDTH+5,0,PLAYED_WIDTH-19,{238/255,225/255,187/255},ROW_HEIGHT-1,"RIGHT")
         row.updated=text(row,"",11,NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,{167/255,171/255,165/255},ROW_HEIGHT-1)
+        row.progress=rect("Frame",row,PROGRESS_NAME,0,470,PROGRESS_HEIGHT)
+        row.keyText=text(row.progress,"",12,12,11,140,GOLD,18)
+        row.keyLevel=text(row.progress,"",12,120,11,34,GOLD,18,"RIGHT")
+        row.keyNote=text(row.progress,"",10,12,31,140,MUTED,17)
+        row.weekText=text(row.progress,"",15,176,11,98,GOLD,19)
+        row.weekNote=text(row.progress,"",10,176,33,98,MUTED,16)
+        row.keyHover=rect("Frame",row.progress,0,0,164,PROGRESS_HEIGHT)
+        row.keyHover:EnableMouse(true)
+        row.keyHover:SetScript("OnEnter",function() self:ProgressTooltip(row,"keystone") end)
+        row.weekHover=rect("Frame",row.progress,164,0,122,PROGRESS_HEIGHT)
+        row.weekHover:EnableMouse(true)
+        row.weekHover:SetScript("OnEnter",function() self:ProgressTooltip(row,"weekly") end)
+        row.vault={}
+        for j,category in ipairs(CATEGORIES) do
+            local group=rect("Frame",row.progress,286,5+(j-1)*18,174,18)
+            group.label=text(group,L[category],10,12,0,62,{.78,.8,.8},18)
+            group:EnableMouse(true)
+            group:SetScript("OnEnter",function() self:ProgressTooltip(row,category) end)
+            group:SetScript("OnLeave",function() self:HideProgressTooltip() end)
+            group.slots={}
+            for slot=1,3 do
+                local box=rect("Frame",group,80+(slot-1)*23,1,16,16)
+                box.edge=solid(box,"BACKGROUND",.5,.43,.25,1); box.edge:SetAllPoints()
+                box.fill=line(box,1,1,14,14,.035,.06,.065,1)
+                box.check=artwork(box,"Check",14,14,1,1,"OVERLAY")
+                box.unknown=text(box,"?",11,0,0,16,MUTED,16,"CENTER")
+                group.slots[slot]=box
+            end
+            row.vault[category]=group
+        end
+        row.keyHover:SetScript("OnLeave",function() self:HideProgressTooltip() end)
+        row.weekHover:SetScript("OnLeave",function() self:HideProgressTooltip() end)
         local glow=solid(row,"HIGHLIGHT",203/255,184/255,130/255,12/255); glow:SetAllPoints()
         row:SetScript("OnEnter",function(owner) self:RowTooltip(owner) end)
-        row:SetScript("OnLeave",function() GameTooltip:Hide() end)
+        row:SetScript("OnLeave",function() GameTooltip:Hide(); self:HideProgressTooltip() end)
         row:RegisterForClicks("RightButtonUp")
-        row:SetScript("OnClick",function(owner,button)
+        local function rowClick(owner,button)
             if button ~= "RightButton" or not owner.entry then return end
             if self.removedOnly then
                 if not H.V.Restore(self.db,owner.entry.char) then print(L.visibilityError) end
                 GameTooltip:Hide(); self:Refresh()
             else self:ConfirmRemoval(owner.entry.char) end
-        end)
+        end
+        row:SetScript("OnClick",rowClick)
+        row.keyHover:SetScript("OnMouseUp",function(_,button) rowClick(row,button) end)
+        row.weekHover:SetScript("OnMouseUp",function(_,button) rowClick(row,button) end)
+        for _,group in pairs(row.vault) do group:SetScript("OnMouseUp",function(_,button) rowClick(row,button) end) end
     end
     self.empty=text(self.list,L.empty,11,8,0,684,MUTED,ROW_HEIGHT,"CENTER")
     self.scroll=rect("Slider",self.list,695,2,5,ROW_HEIGHT-4)
@@ -284,10 +412,16 @@ function U:Create()
     self.scroll:SetScript("OnValueChanged",function(_,v)
         if not self.refreshing then self.offset=math.floor(v+.5); self:Refresh() end
     end)
+    self.scrollUp=rect("Button",self.list,684,0,14,17); skin(self.scrollUp,"Toggle")
+    self.scrollDown=rect("Button",self.list,684,ROW_HEIGHT-17,14,17); skin(self.scrollDown,"Toggle")
+    self.scrollUp:SetScript("OnClick",function() self:Scroll(-1) end)
+    self.scrollDown:SetScript("OnClick",function() self:Scroll(1) end)
+    local up=arrow(self.scrollUp,3,6,8,5); up:SetTexCoord(0,1,1,0)
+    arrow(self.scrollDown,3,6,8,5)
     self.footerFrame=rect("Frame",f,10,176+ROW_HEIGHT,700,26)
     self.footer=text(self.footerFrame,"",10,5,2,540,{166/255,166/255,155/255},24)
     self.footerFrame:EnableMouse(true)
-    self.footerFrame:SetScript("OnEnter",function(owner) tooltip(owner,{self.footer:GetText()}) end)
+    self.footerFrame:SetScript("OnEnter",function(owner) tooltip(owner,{self.footer:GetText(),self:IsProgress() and L.progressHint or L.hint}) end)
     self.footerFrame:SetScript("OnLeave",function() GameTooltip:Hide() end)
     self.clientMenu=rect("Frame",self.clientButton,0,29,168,141)
     self.clientMenu:SetFrameLevel(f:GetFrameLevel()+30); skin(self.clientMenu,self.panelName)
@@ -350,7 +484,7 @@ function U:Create()
     text(settings,L.scale,11,13,68,177,{215/255,201/255,157/255},13.2)
     self.scaleLabel=text(settings,"",11,190,68,49,{215/255,201/255,157/255},13.2,"RIGHT")
     self.scaleSlider=rect("Slider",settings,13,87.2,226,18)
-    self.scaleSlider:SetOrientation("HORIZONTAL"); self.scaleSlider:SetMinMaxValues(65,130); self.scaleSlider:SetValueStep(5)
+    self.scaleSlider:SetOrientation("HORIZONTAL"); self.scaleSlider:SetMinMaxValues(M.SCALE_MIN*100,M.SCALE_MAX*100); self.scaleSlider:SetValueStep(M.SCALE_STEP*100)
     if self.scaleSlider.SetObeyStepOnDrag then self.scaleSlider:SetObeyStepOnDrag(true) end
     line(self.scaleSlider,0,6,226,6,131/255,119/255,89/255)
     line(self.scaleSlider,1,7,224,4,39/255,38/255,31/255)
@@ -358,15 +492,37 @@ function U:Create()
     self.scaleSlider:SetThumbTexture(ROOT..(C.Retail() and "GoldThumb" or "SilverThumb")..".tga")
     local thumb=self.scaleSlider:GetThumbTexture(); thumb:SetSize(10,18)
     thumb:SetTexCoord(C.Retail() and .2265625 or .2109375,C.Retail() and .765625 or .78125,.015625,.984375)
+    local function beginScaleDrag()
+        if not self.scaleDragging then
+            self.dragScale=self.db.settings.scale; self.scaleDragging=true
+        end
+    end
     self.scaleSlider:SetScript("OnValueChanged",function(_,value)
         if not self.updatingScale then
-            self.db.settings.scale=math.max(.65,math.min(1.3,math.floor(value/5+.5)*.05))
-            self:ApplyScale(); self:SettingsText()
+            -- Native track clicks may change the value before OnMouseDown.
+            -- Capture the old scale before that first change moves the control.
+            if IsMouseButtonDown and IsMouseButtonDown("LeftButton") then beginScaleDrag() end
+            self.db.settings.scale=M.Scale(value/100)
+            if not self.scaleDragging then self:ApplyScale() end
+            self:SettingsText()
         end
     end)
-    self.reset=control(settings,L.reset,13,114.2,226,25,function() self:Position(true) end)
-    self.done=control(settings,L.done,157,180.2,82,25,function() settings:Hide() end)
-    self.removedToggle=control(settings,L.removedCharacters,13,147.2,226,25,function()
+    self.scaleSlider:SetScript("OnMouseDown",function(_,button)
+        if button=="LeftButton" then beginScaleDrag() end
+    end)
+    local function finishScaleDrag()
+        if not self.scaleDragging then return end
+        self.scaleDragging,self.dragScale=nil,nil
+        self:ApplyScale()
+    end
+    self.scaleSlider:SetScript("OnMouseUp",finishScaleDrag)
+    settings:SetScript("OnHide",finishScaleDrag)
+    self.scaleMin=text(settings,math.floor(M.SCALE_MIN*100).." %",10,13,108,70,MUTED,15)
+    self.scaleMax=text(settings,math.floor(M.SCALE_MAX*100).." %",10,169,108,70,MUTED,15,"RIGHT")
+    self.reset=control(settings,L.reset,13,136,137,25,function() self:Position(true) end,"Toggle")
+    self.reset.label:SetFont(FONT,10,""); place(self.reset.label,5,0,127,25)
+    self.done=control(settings,L.done,157,136,82,25,function() settings:Hide() end)
+    self.removedToggle=control(settings,L.removedCharacters,13,177,226,25,function()
         self:SetRemovedView(not self.removedOnly)
     end,"Toggle")
     self.removedToggle:SetScript("OnEnter",function(owner) tooltip(owner,{L.removedCharacters,L.removalHelp}) end)
@@ -383,7 +539,16 @@ function U:Create()
         if identity and not H.V.Remove(self.db,identity) then print(L.visibilityError) end
         self:CloseMenus(); self:Refresh()
     end)
-    f:SetScript("OnHide",function() search:ClearFocus(); self:CloseMenus(); GameTooltip:Hide() end)
+    self.progressTip=rect("Frame",f,WIDTH+12,26,310,180)
+    self.progressTip:SetFrameLevel(f:GetFrameLevel()+45); self.progressTip:SetClampedToScreen(true)
+    self.tipLayout=skin(self.progressTip,self.panelName); self.progressTip:Hide(); self.tipLines={}; self.tipMarks={}
+    self.tipTitle=text(self.progressTip,"",16,16,12,278,GOLD,40); self.tipTitle:SetWordWrap(true)
+    self.tipDivider=line(self.progressTip,16,57,278,1,.6,.5,.28,.7)
+    self.tipFooterDivider=line(self.progressTip,16,150,278,1,.6,.5,.28,.7)
+    self.ready=true
+    f:SetScript("OnHide",function()
+        self:FinishWindowDrag(); search:ClearFocus(); self:CloseMenus(); GameTooltip:Hide()
+    end)
     f:SetScript("OnMouseDown",function() self:CloseMenus(); search:ClearFocus() end)
     self:LayoutRows(0); self:SettingsText()
 end
@@ -421,8 +586,131 @@ end
 function U:Scroll(delta)
     self.offset=math.max(0,math.min(self.maxOffset or 0,self.offset+delta)); self:Refresh()
 end
+function U:RenderProgress(row)
+    local info=H.P and H.P:Get(row.entry.char) or {supported=false}
+    row.progressInfo=info
+    local key,week,vault=info.keystone or {},info.weekly or {},info.vault or {}
+    local stale=key.status=="stale"
+    local hasKey=(key.status=="known" or stale) and key.present
+    row.keyLevel:SetText(hasKey and ("+"..tostring(key.level)) or "")
+    row.keyLevel:SetShown(hasKey)
+    local levelWidth=hasKey and math.max(30,row.keyLevel:GetUnboundedStringWidth()) or 0
+    place(row.keyLevel,152-levelWidth,11,levelWidth)
+    row.keyText:SetWidth(140-(hasKey and levelWidth+4 or 0))
+    local keyLabel=hasKey and (key.name or L.unknownDungeon) or ((key.status=="known" or stale) and L.noKeystone or L.notRecorded)
+    ellipsis(row.keyText,info.supported and C.Escape(keyLabel) or L.progressUnavailable)
+    row.keyNote:SetText(not info.supported and "" or (stale and L.stale or
+        (key.status=="known" and (hasKey and M.Age(key.updatedAt) or L.confirmed) or L.noProgressData)))
+    row.keyText:SetTextColor(unpack(stale and MUTED or (hasKey and GOLD or {.84,.86,.86})))
+    row.keyLevel:SetTextColor(unpack(stale and MUTED or GOLD))
+    local recorded=week.status=="known" or week.status=="stale"
+    row.weekText:SetText(recorded and week.level and week.level>0 and ("+"..week.level) or "–")
+    row.weekText:SetTextColor(unpack(week.status=="stale" and MUTED or GOLD))
+    row.weekNote:SetText(week.status=="stale" and (week.expired and L.previousWeek or L.stale) or (recorded and week.level and week.level>0 and L.completed or ""))
+    for _,category in ipairs(CATEGORIES) do
+        local group=row.vault[category]
+        local data=vault.rows and vault.rows[category] or {}
+        for slot,box in ipairs(group.slots) do
+            local value=data.slots and data.slots[slot]
+            local known=value and (data.status=="known" or data.status=="stale")
+            local unlocked=known and value.unlocked==true
+            box.check:SetShown(unlocked)
+            box.unknown:SetShown(info.supported and not known)
+            box.fill:SetColorTexture(unlocked and .32 or .035,unlocked and .22 or .06,unlocked and .035 or .065,1)
+            box.edge:SetColorTexture(unlocked and .95 or .5,unlocked and .7 or .43,unlocked and .25 or .25,1)
+            box:SetAlpha(data.status=="stale" and .38 or (info.supported and 1 or .25))
+        end
+    end
+end
+function U:HideProgressTooltip()
+    if self.progressTip then self.progressTip:Hide(); self.tipOwner=nil end
+end
+function U:ProgressTooltip(row,category)
+    if not row.entry then return end
+    GameTooltip:Hide()
+    local info=H.P and H.P:Get(row.entry.char) or {supported=false}
+    local titleKey=category=="weekly" and "thisWeek" or (category=="keystone" and "keystone" or "vault")
+    self.tipTitle:SetText(C.Escape(row.entry.char.name).." · "..L[titleKey])
+    local lines,marks={},{}
+    local source=info[category]
+    local function add(value) lines[#lines+1]=value end
+    if not info.supported then add(L.progressUnavailable)
+    elseif category=="keystone" then
+        source=source or {}
+        if source.present and (source.status=="known" or source.status=="stale") then
+            add(C.Escape(source.name or L.unknownDungeon).." +"..tostring(source.level))
+        else add((source.status=="known" or source.status=="stale") and L.noKeystone or L.notRecorded) end
+        if source.status=="stale" then add(L.stale) end
+    elseif category=="weekly" then
+        source=source or {}
+        add(source.level and source.level>0 and ("+"..source.level.." · "..L.completed) or
+            ((source.status=="known" or source.status=="stale") and L.noRuns or L.notRecorded))
+        if source.status=="stale" then add(source.expired and (L.stale.." · "..L.previousWeek) or L.stale) end
+    else
+        source=info.vault and info.vault.rows and info.vault.rows[category] or {}
+        add(L[category])
+        for index=1,3 do
+            local slot=source.slots and source.slots[index]
+            local value="?"
+            if slot and (source.status=="known" or source.status=="stale") then
+                marks[#lines+1]={unlocked=slot.unlocked,stale=source.status=="stale"}
+                value=string.format("%s    %d / %d %s",string.format(L.slot,index),
+                    math.min(slot.progress,slot.threshold),slot.threshold,L[category.."Units"])
+                if slot.difficultyName then value=value.." · "..C.Escape(slot.difficultyName) end
+                if slot.level and slot.level>0 and (category~="raid" or not slot.difficultyName) then
+                    value=value.." · "..(category=="dungeon" and "+" or (L.level.." "))..slot.level
+                end
+            else value=string.format(L.slot,index).." · "..L.notRecorded end
+            add(value)
+        end
+        if source.status=="stale" then add(L.stale) end
+    end
+    local footerStart=#lines+1
+    local week=info.weekly or {}
+    if titleKey=="vault" then
+        add(string.format(L.bestThisWeek,week.status=="known" and week.level and week.level>0 and ("+"..week.level) or "–"))
+    end
+    add(string.format(L.recordedAt,source and source.updatedAt and M.Age(source.updatedAt) or L.notRecorded))
+    -- Reserve enough wrapped lines even while native metrics are unavailable.
+    -- WoW's height handles word boundaries; the conservative fallback also serves previews.
+    local function wrappedHeight(label,minimum)
+        local native=label.GetStringHeight and label:GetStringHeight() or 0
+        local width=label:GetUnboundedStringWidth()
+        return math.max(minimum,native>0 and native+4 or (math.ceil(width/label:GetWidth())+1)*15)
+    end
+    local titleHeight=wrappedHeight(self.tipTitle,40)
+    self.tipTitle:SetHeight(titleHeight); place(self.tipDivider,16,17+titleHeight)
+    local y=28+titleHeight
+    for i,value in ipairs(lines) do
+        if i==footerStart then place(self.tipFooterDivider,16,y+4); y=y+18 end
+        local label=self.tipLines[i]
+        if not label then label=text(self.progressTip,"",11,16,y,278,nil,32); label:SetWordWrap(true); self.tipLines[i]=label end
+        local mark=marks[i]
+        place(label,mark and 36 or 16,y,mark and 258 or 278,32); label:SetText(value); label:Show()
+        local height=wrappedHeight(label,24); label:SetHeight(height)
+        if mark then
+            local icon=self.tipMarks[i]
+            if not icon then
+                icon=rect("Frame",self.progressTip,16,y+5,14,14)
+                icon.edge=solid(icon,"BACKGROUND",.5,.43,.25,1); icon.edge:SetAllPoints()
+                icon.fill=line(icon,1,1,12,12,.035,.06,.065,1)
+                icon.check=artwork(icon,"Check",14,14,0,0,"OVERLAY")
+                self.tipMarks[i]=icon
+            end
+            place(icon,16,y+5); icon:Show(); icon.check:SetShown(mark.unlocked==true)
+            icon:SetAlpha(mark.stale and .38 or 1)
+        elseif self.tipMarks[i] then self.tipMarks[i]:Hide() end
+        label:SetTextColor(unpack(i>=footerStart and GOLD or {.85,.87,.89})); y=y+height+2
+    end
+    for i=#lines+1,#self.tipLines do self.tipLines[i]:Hide() end
+    for i,mark in pairs(self.tipMarks) do if not marks[i] then mark:Hide() end end
+    self.progressTip:SetHeight(y+10); self.tipLayout()
+    self.progressTip:Show(); self.tipOwner=row; self.tipCategory=category; self.tipIdentity=row.entry.key
+end
 function U:Refresh()
-    if not self.frame then return end
+    -- StartMoving owns the live anchor until release. Reapplying the saved
+    -- position from a timer or display event would snap it back under the mouse.
+    if not self.frame or self.windowDragging then return end
     self.refreshing=true
     local mode=self.db.settings.format
     local display=H.S.Display(self.db,function(key,char) return T:Value(key,char) end)
@@ -442,7 +730,7 @@ function U:Refresh()
     selected(self.combined,mode=="combined"); selected(self.hours,mode=="hours")
     for field,header in pairs(self.headers) do
         local b=header.button
-        local on=self.sort==field or (field=="name" and (self.sort=="level" or self.sort=="realm"))
+        local on=(not self:IsProgress() or field=="name") and (self.sort==field or (field=="name" and (self.sort=="level" or self.sort=="realm")))
         local title=field=="name" and self.removedOnly and L.removedCharacters or header.title
         b.label:SetText(title..(field=="name" and self.sort~="name" and on and " · "..L[self.sort] or ""))
         b.label:SetTextColor(unpack(on and GOLD or {197/255,191/255,171/255}))
@@ -452,42 +740,52 @@ function U:Refresh()
         b.arrow:SetVertexColor(unpack(on and GOLD or MUTED))
     end
     for field,b in pairs(self.sortRows) do b.label:SetTextColor(unpack(self.sort==field and GOLD or {228/255,215/255,180/255})) end
-    self.maxOffset=math.max(0,#entries-CAPACITY); self.offset=math.min(self.offset,self.maxOffset)
+    self.maxOffset=math.max(0,#entries-self.slots); self.offset=math.min(self.offset,self.maxOffset)
     self.scroll:SetMinMaxValues(0,self.maxOffset); self.scroll:SetValue(self.offset); self.scroll:SetShown(self.maxOffset>0)
+    self.scrollUp:SetShown(self:IsProgress() and self.maxOffset>0); self.scrollDown:SetShown(self:IsProgress() and self.maxOffset>0)
     for i,row in ipairs(self.rows) do
-        local entry=entries[i+self.offset]; row.entry=entry; row:SetShown(entry~=nil)
+        local entry=i<=self.slots and entries[i+self.offset] or nil; row.entry=entry; row:SetShown(entry~=nil)
         if entry then
             local char,active=entry.char,entry.key==T.key and entry.char._local
             row.active:SetShown(active); row.dot:SetShown(active)
             if active then row.bg:SetColorTexture(104/255,184/255,208/255,18/255)
             else row.bg:SetColorTexture(1,1,1,(i+self.offset)%2==0 and 3/255 or 0) end
+            local progress=self:IsProgress()
+            local nameWidth=progress and PROGRESS_NAME or NAME_WIDTH
             local x=active and 20 or 8
-            row.name:ClearAllPoints(); row.name:SetPoint("TOPLEFT",x,-3); row.name:SetWidth(NAME_WIDTH-69-x)
-            row.name:SetText(C.Escape(char.name)); row.name:SetTextColor(C.ClassColor(char.class))
+            local nameY,realmY,guildY=progress and 7 or 3,progress and 25 or 19,progress and 42 or 33
+            place(row.name,x,nameY,nameWidth-69-x)
+            ellipsis(row.name,C.Escape(char.name)); row.name:SetTextColor(C.ClassColor(char.class))
             row.level:SetText(L.level.." "..(M.Number(char.level) and tostring(char.level) or "?"))
-            row.level:ClearAllPoints(); row.level:SetPoint("TOPLEFT",x+occupied(row.name)+7,-5)
-            row.realm:ClearAllPoints(); row.realm:SetPoint("TOPLEFT",x,-19); row.realm:SetWidth(NAME_WIDTH-8-x)
+            place(row.level,x+occupied(row.name)+7,nameY+2)
+            place(row.dot,8,nameY+5.5)
+            place(row.realm,x,realmY,nameWidth-8-x)
             row.realm:SetText(C.Escape(char.realm))
             row.client:SetText(C.Escape(M.ClientText(char)))
-            row.guild:ClearAllPoints(); row.guild:SetPoint("TOPLEFT",x,-33); row.guild:SetWidth(NAME_WIDTH-8-x)
+            place(row.guild,x,guildY,nameWidth-8-x)
             row.guild:SetText(M.GuildText(char))
             row.played:SetText(M.Format(entry.seconds,mode))
             row.updated:SetText(active and entry.seconds and L.now or M.Age(char.updatedAt))
             row.updated:SetTextColor(unpack(active and {156/255,194/255,176/255} or {167/255,171/255,165/255}))
+            if progress then self:RenderProgress(row) end
         end
     end
     self.empty:SetShown(#entries==0); self.empty:SetText(stats.count==0 and (self.removedOnly and L.noRemoved or L.noCharacters) or L.empty)
-    local count=string.format(self.removedOnly and L.removedShown or L.shown,#entries,stats.count)
-    if not self.removedOnly and (self.realm or self.flavor or (self.searchText and self.searchText~="")) then
+    local count=string.format(self.removedOnly and L.removedShown or (self:IsProgress() and L.progressLocal or L.shown),#entries,stats.count)
+    if not self:IsProgress() and not self.removedOnly and (self.realm or self.flavor or (self.searchText and self.searchText~="")) then
         count=count.." · "..string.format(L.filteredTime,M.SumText(stats.visible,stats.visibleMissing,#entries,mode))
     end
     self.footer:SetText(count)
+    if self.tipOwner and self.progressTip:IsShown() then
+        if self.tipOwner.entry and self.tipOwner.entry.key==self.tipIdentity then self:ProgressTooltip(self.tipOwner,self.tipCategory)
+        else self:HideProgressTooltip() end
+    end
     self.refreshing=false
 end
 function U:Toggle()
     self:Create()
     if self.frame:IsShown() then self.frame:Hide()
-    else self.frame:Show(); T:Request(); self:Refresh() end
+    else self.frame:Show(); T:Request(); if H.P then H.P:Schedule("open") end; self:Refresh() end
 end
 
 function U:RowTooltip(row)

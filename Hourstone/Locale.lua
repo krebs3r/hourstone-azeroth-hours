@@ -3,6 +3,14 @@ local de = GetLocale() == "deDE"
 H.de = de
 local en = {
     tagline = "Your characters. Your time.", total = "Total time played", characters = "Characters",
+    progress = "Progress", keystone = "Keystone", thisWeek = "This week", vault = "Great Vault",
+    dungeon = "Dungeons", raid = "Raid", world = "World", slot = "Slot %d", completed = "completed",
+    dungeonUnits = "dungeons", raidUnits = "bosses", worldUnits = "activities",
+    unknownDungeon = "Unknown dungeon",
+    noKeystone = "No keystone", confirmed = "Confirmed", notRecorded = "Not yet recorded", noProgressData = "No data recorded",
+    stale = "Outdated", previousWeek = "Previous week", progressUnavailable = "Retail progress unavailable",
+    progressLocal = "%d / %d characters · recorded locally", progressHint = "Progress is recorded locally when each character logs in. It is not synchronized by the Companion.",
+    recordedAt = "Last recorded: %s", bestThisWeek = "Best level this week: %s", noRuns = "No completed dungeons", difficulty = "Difficulty: %s",
     session = "Current session", allTracked = "All tracked characters", character = "Character",
     level = "Level", realm = "Realm", played = "Time played", updated = "Updated",
     guild = "Guild", noGuild = "No guild", guildUnknown = "Not yet recorded",
@@ -33,6 +41,14 @@ local en = {
 }
 local german = {
     tagline = "Deine Charaktere. Deine Spielzeit.", total = "Gesamte Spielzeit", characters = "Charaktere",
+    progress = "Fortschritt", keystone = "Schlüsselstein", thisWeek = "Diese Woche", vault = "Schatzkammer",
+    dungeon = "Dungeon", raid = "Raid", world = "Welt", slot = "Slot %d", completed = "abgeschlossen",
+    dungeonUnits = "Dungeons", raidUnits = "Bosse", worldUnits = "Aktivitäten",
+    unknownDungeon = "Unbekannter Dungeon",
+    noKeystone = "Kein Schlüsselstein", confirmed = "Bestätigt", notRecorded = "Noch nicht erfasst", noProgressData = "Keine Daten vorhanden",
+    stale = "Veraltet", previousWeek = "Vorwoche", progressUnavailable = "Retail-Fortschritt nicht verfügbar",
+    progressLocal = "%d / %d Charaktere · lokal erfasst", progressHint = "Fortschritt wird beim Login jedes Charakters lokal erfasst. Er wird nicht über den Companion synchronisiert.",
+    recordedAt = "Zuletzt erfasst: %s", bestThisWeek = "Beste Stufe diese Woche: %s", noRuns = "Keine abgeschlossenen Dungeons", difficulty = "Schwierigkeit: %s",
     session = "Aktuelle Sitzung", allTracked = "Alle erfassten Charaktere", character = "Charakter",
     level = "Level", realm = "Realm", played = "Spielzeit", updated = "Aktualisiert",
     guild = "Gilde", noGuild = "Keine Gilde", guildUnknown = "Noch nicht erfasst",

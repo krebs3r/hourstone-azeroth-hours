@@ -72,12 +72,39 @@ SlashCmdList.HOURSTONE("minimap"); assert(U.minimap:IsShown() and U.minimapBox:G
 assert(U.densityToggle==nil and U.densityMenu==nil and #U.rows==8)
 for _,legacy in ipairs({false,true}) do
     db.settings.compact=legacy; U:LayoutRows()
-    assert(U.frame:GetHeight()==612 and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
+    assert(U.frame:GetHeight()==(H.C.Retail() and 644 or 612) and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
 end
-assert(U.frame:GetHeight()==612 and U.rows[1]:GetHeight()==50)
+assert(U.frame:GetHeight()==(H.C.Retail() and 644 or 612) and U.rows[1]:GetHeight()==50)
 local before=db.characters
 U.scaleSlider:SetValue(90); assert(math.abs(db.settings.scale-.9)<.001)
 U.scaleSlider:SetValue(130); assert(db.settings.scale==1.3 and db.characters==before)
+U.scaleSlider:SetValue(200); assert(db.settings.scale==2 and db.characters==before and U.scaleFill:GetWidth()==224)
+assert(U.slots<8 and U.maxOffset==U.visibleCount-U.slots)
+U:Scroll(999); assert(U.rows[U.slots].entry and not U.rows[U.slots+1]:IsShown())
+U.scaleSlider:SetValue(65); assert(db.settings.scale==.65 and U.scaleFill:GetWidth()==0)
+assert(U.scaleMin.text=="65 %" and U.scaleMax.text=="200 %")
+local stableScale,stableHeight=U.frame:GetScale(),U.frame:GetHeight()
+local originalMouseButtonDown=IsMouseButtonDown
+IsMouseButtonDown=function(button) return button=="LeftButton" end
+U.scaleSlider:SetValue(130) -- Native track clicks can change the value before OnMouseDown.
+assert(U.frame:GetScale()==stableScale and U.dragScale==.65)
+U.scaleSlider.scripts.OnMouseDown(U.scaleSlider,"LeftButton")
+assert(U.dragScale==.65) -- Do not replace the captured scale with the new requested value.
+U.scaleSlider:SetValue(130)
+assert(db.settings.scale==1.3 and U.scaleLabel.text=="130 %" and U.frame:GetScale()==stableScale)
+U:Refresh() -- The regular refresh must also keep the slider under the mouse.
+assert(U.frame:GetScale()==stableScale and U.frame:GetHeight()==stableHeight)
+U.scaleSlider:SetValue(150)
+assert(db.settings.scale==1.5 and U.scaleLabel.text=="150 %" and U.frame:GetScale()==stableScale)
+IsMouseButtonDown=originalMouseButtonDown
+U.scaleSlider.scripts.OnMouseUp(U.scaleSlider,"LeftButton")
+assert(not U.scaleDragging and U.dragScale==nil and U.frame:GetScale()>stableScale)
+U.settings:Show()
+U.scaleSlider.scripts.OnMouseDown(U.scaleSlider,"LeftButton")
+U.scaleSlider:SetValue(175); U.settings:Hide()
+assert(not U.scaleDragging and U.dragScale==nil)
+assert(math.abs(U.frame:GetEffectiveScale()*1080/768-1.75)<.0001)
+U.scaleSlider:SetValue(200)
 configure_display(800,600); U:ApplyScale(); assert(U.frame:GetEffectiveScale()*600/768<=780/720+.0001)
 U.search.scripts.OnEscapePressed(U.search); assert(not U.frame:IsShown())
 SlashCmdList.HOURSTONE(""); assert(U.frame:IsShown())
@@ -89,3 +116,40 @@ U.minimap.scripts.OnDragStart(); U.minimap.scripts.OnUpdate()
 U.minimap.scripts.OnDragStop(); assert(db.settings.minimapAngle>=0 and db.settings.minimapAngle<360)
 U.minimap.scripts.OnClick(); assert(not U.frame:IsShown())
 advance(1); U.minimap.scripts.OnClick(); assert(U.frame:IsShown())
+
+-- A live drag must retain WoW's moving anchor across the real one-second
+-- refresh and display events, then persist the released position before layout.
+configure_display(2560,1440,.8)
+U.scaleSlider:SetValue(130)
+local views=H.C.Retail() and {"played","progress"} or {"played"}
+for _,view in ipairs(views) do
+    U:SetView(view)
+    for _,parentScale in ipairs({.65,.8,1}) do
+        configure_display(2560,1440,parentScale); U:ApplyScale()
+        U.header.scripts.OnDragStart()
+        local saved=db.settings.position
+        U.frame:ClearAllPoints(); U.frame:SetPoint("CENTER",UIParent,"CENTER",90,-50)
+        local movingScale,movingHeight=U.frame:GetScale(),U.frame:GetHeight()
+        tick(1.1)
+        fire("UI_SCALE_CHANGED"); fire("DISPLAY_SIZE_CHANGED")
+        local _,_,_,x,y=U.frame:GetPoint()
+        assert(x==90 and y==-50,"Periodic refresh moved the dragged window")
+        assert(U.frame:GetScale()==movingScale and U.frame:GetHeight()==movingHeight)
+        assert(db.settings.position==saved,"A live drag must not persist an intermediate anchor")
+        U.header.scripts.OnDragStop()
+        assert(math.abs(db.settings.position.x-90)<.0001 and math.abs(db.settings.position.y+50)<.0001)
+        tick(1.1)
+        local _,_,_,releasedX,releasedY=U.frame:GetPoint()
+        assert(math.abs(releasedX-90)<.0001 and math.abs(releasedY+50)<.0001)
+    end
+end
+U.header.scripts.OnDragStart()
+U.frame:ClearAllPoints(); U.frame:SetPoint("CENTER",UIParent,"CENTER",60,20)
+U.frame:Hide()
+assert(math.abs(db.settings.position.x-60)<.0001 and math.abs(db.settings.position.y-20)<.0001)
+local hiddenPosition=db.settings.position
+U.header.scripts.OnDragStop() -- WoW can deliver the drag stop after hiding.
+assert(db.settings.position==hiddenPosition)
+U:Toggle(); tick(1.1)
+local _,_,_,reopenedX,reopenedY=U.frame:GetPoint()
+assert(math.abs(reopenedX-60)<.0001 and math.abs(reopenedY-20)<.0001)

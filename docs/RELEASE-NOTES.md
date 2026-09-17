@@ -1,80 +1,74 @@
-# Hourstone 0.2.3 — 2026-09-16
+# Hourstone 0.3.1 — 2026-09-17
 
-This is the first public 0.2.x release. Since 0.1.1, Hourstone adds guild tracking
-and guild search, reversible deletion of overview entries, and optional protocol 3
-integration with the separate Windows [Hourstone Companion](https://github.com/krebs3r/hourstone-companion).
-The addon continues to work independently. Companion is currently a source/development
-preview; a signed public installer is not yet available.
+Fixes the window jumping back during a drag: timed refreshes wait until release,
+then use the newly saved position. Closing the window during a drag is also handled.
 
-Realm and client filters now sit together above the table. A dedicated, sortable
-client column sits beside playtime; unknown clients sort last in both directions.
-The minimap button uses Blizzard's native tracking border, background and highlight
-with Retail/Classic placement and the complete logo. Tooltips keep the last server
-timestamp on one line and explain estimates without an online/offline claim.
-The footer reads `v0.2.3 with ♥ by krebs3r`.
+Retail now has **Time played / Progress** tabs in the existing window. The Progress
+view shows character and guild, the owned keystone,
+the highest completed Mythic+ level this week and three Great Vault rows with three
+slots each. Hover a cell for full names, slot requirements and the capture time.
 
-Right-click an entry and confirm **Delete** to exclude it from the overview and
-its totals. Your WoW character and saved playtime remain intact. In the gear menu,
-choose **Deleted characters** and right-click to restore an entry. A new character
-login also restores deletions already known to the addon; `/reload`, zoning and
-`/played` do not. After an offline deletion on another PC, synchronize before
-logging in again.
+![Hourstone Retail progress overview](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/v0.3.1/docs/assets/addon-progress-en.png)
+
+Rendered interface with example characters.
+
+Dungeon names, keystones, completed runs and Vault thresholds come from Blizzard's
+APIs. Completed overtime runs count; abandoned runs do not. Unknown data, a confirmed
+missing key and stale data have distinct displays. Previous reward data is not
+presented as this week's progress.
+
+The size control now covers **65–200%** in 5% steps. Larger settings first reduce
+the number of visible rows; scrolling keeps every character accessible. The window
+only shrinks below the requested size when its width or minimum height cannot fit.
+Classic clients keep the playtime view with the larger scale range.
 
 ## Installation and compatibility
 
-With WoW closed, extract `Hourstone-0.2.3.zip` into each client's `Interface/AddOns`
-folder. Keep existing SavedVariables. Upgrading from public 0.1.1 migrates data to
-schema 3 while preserving character records, settings and minimap position. Existing
-playtime is retained as the last unconfirmed value until a new server measurement.
-The 0.2.2 development build already uses schema/protocol 3 and needs no further
-migration. Guild information is recorded as you log in with each character.
+Extract `Hourstone-0.3.1.zip` into `Interface/AddOns` with WoW closed. Keep existing
+SavedVariables. Settings, character/guild data and removal controls are preserved.
+Existing Companion synchronization remains compatible. Progress stays local to
+the WoW installation and account; Companion continues to exchange playtime, guilds
+and delete/restore controls.
 
-Companion 0.1.3 and later can read the saved data after WoW logs out or `/reload`s.
-The addon reads the shared overview at the next login or `/reload`. After the first
-installation of the Companion data addon, fully close and restart WoW once. Between
-PCs, a service such as Dropbox or OneDrive transfers the chosen, locally available
-sync folder; this is a delayed exchange, not a live update of a running session.
+Log in with each desired Retail character to record it. Offline entries show their
+last observation, and weekly data becomes stale after the server reset until it is
+observed again. WoW persists the cache on logout or `/reload`.
 
-Validation: 60 Lua scenario suites and 33 Python tests passed. The new layout and
-minimap were checked in TBC Anniversary. Native checks for the new version in the
-other client families and two-PC synchronization checks remain outstanding.
+See [validation](https://github.com/krebs3r/hourstone-azeroth-hours/blob/v0.3.1/docs/VALIDATION.md) for in-game coverage, automated checks and
+Companion compatibility tests.
 
 ## Deutsch
 
-Dies ist die erste öffentliche Version der 0.2.x-Reihe. Gegenüber 0.1.1 sind
-Gildenerfassung und Gildensuche, wiederherstellbare Löschungen aus der Übersicht
-und die optionale Protokoll-3-Anbindung an den [Hourstone Companion](https://github.com/krebs3r/hourstone-companion)
-für Windows hinzugekommen. Das Addon funktioniert weiterhin eigenständig. Der
-Companion ist derzeit eine Quellcode-/Entwicklungsvorschau; ein signierter öffentlicher
-Installer steht noch aus.
+Behebt das Zurückspringen des Fensters beim Ziehen: Zeitgesteuerte Aktualisierungen
+warten bis zum Loslassen und verwenden dann die neu gespeicherte Position. Auch
+das Schließen während des Ziehens wird berücksichtigt.
 
-Realm- und Clientfilter stehen zusammen neben der Suche. Die eigene Clientspalte
-links neben der Spielzeit ist sortierbar; unbekannte Clients stehen zuletzt.
-Der Minimap-Button verwendet Blizzards Rahmen, Hintergrund und Hovereffekt mit
-passenden Retail-/Classic-Abständen und vollständigem Logo. Der letzte
-Serverzeitstempel bleibt im Tooltip auf einer Zeile. Geschätzte Spielzeit wird
-weiter erklärt; die Online-/Offline-Angabe entfällt. Im Footer steht
-`v0.2.3 with ♥ by krebs3r`.
+Retail erhält im bestehenden Fenster **Spielzeit | Fortschritt**. Die neue Ansicht
+zeigt Charakter und Gilde, den eigenen Schlüsselstein, die höchste
+abgeschlossene M+-Stufe dieser Woche sowie je drei Schatzkammer-Slots für Dungeon,
+Raid und Welt. Tooltips zeigen vollständige Namen, Anforderungen und Erfassungszeit.
 
-Mit Rechtsklick und **Löschen** blendest du einen Eintrag aus der Übersicht aus.
-WoW-Charakter und Spielzeit bleiben erhalten. Unter Zahnrad → **Gelöschte Charaktere**
-stellt ein Rechtsklick den Eintrag wieder her. Ein neuer Login stellt bereits bekannte
-Löschungen ebenfalls wieder her; `/reload` genügt nicht. Nach einer Löschung während
-des Offline-Betriebs zuerst synchronisieren, dann neu mit dem Charakter einloggen.
+![Hourstone-Fortschrittsübersicht in Retail](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/v0.3.1/docs/assets/addon-progress-de.png)
 
-Bei geschlossenem WoW das ZIP nach `Interface/AddOns` entpacken. Beim Upgrade von
-0.1.1 werden vorhandene Daten unter Erhalt von Charakteren, Einstellungen und
-Minimap-Position auf Schema 3 umgestellt. Gespeicherte Spielzeit bleibt bis zum
-nächsten Serverwert als unbestätigter letzter Stand erhalten. Gegenüber dem
-Entwicklungsstand 0.2.2 gibt es keine weitere Migration. Gilden werden bei den
-nächsten Charakter-Logins erfasst.
+Gerenderte Addon-Oberfläche mit Beispielcharakteren.
 
-Der Companion liest von WoW beim Ausloggen oder `/reload` gespeicherte Daten ein.
-Die gemeinsame Übersicht erscheint beim nächsten Login oder `/reload`; nach der
-ersten Einrichtung des Companion-Datenaddons WoW einmal vollständig neu starten.
-Für mehrere PCs überträgt beispielsweise Dropbox oder OneDrive den ausgewählten,
-dauerhaft lokal verfügbaren Syncordner.
+Hourstone liest diese Daten direkt aus WoW. Instanznamen, Schlüsselsteinstufen und
+Vault-Schwellen müssen nicht manuell gepflegt werden. Auch Abschlüsse außerhalb der
+Zeit zählen; abgebrochene Läufe nicht. Unbekannte Daten, ein bestätigter fehlender
+Schlüsselstein und veraltete Daten sind klar unterscheidbar. Vorwochenbelohnungen
+werden nicht als aktueller Wochenfortschritt ausgegeben.
 
-60 Lua-Szenariosuiten und 33 Python-Tests sind erfolgreich. Neues Layout und
-Minimap wurden in TBC Anniversary geprüft. Spieltests der neuen Version in den
-übrigen Clientfamilien und praktische Tests zwischen zwei PCs stehen noch aus.
+Die Größe lässt sich in 5-%-Schritten von **65 bis 200 %** einstellen. Bei hoher
+Skalierung erscheinen zuerst weniger Zeilen; alle Charaktere bleiben durch Scrollen
+erreichbar. Erst bei zu geringer Breite oder Mindesthöhe wird das Fenster kleiner
+als gewünscht. Classic behält seine Spielzeitansicht mit erweitertem Größenbereich.
+
+Das ZIP bei geschlossenem WoW nach `Interface/AddOns` entpacken. Vorhandene
+SavedVariables behalten. Der Companion-Abgleich bleibt kompatibel. Fortschritt
+wird lokal je Installation und Account gespeichert und nicht vom Companion übertragen.
+Für jeden gewünschten Charakter einmal einloggen. WoW speichert beim Logout oder
+`/reload`; nach dem Wochenreset bleiben alte Wochenstände bis zur nächsten Erfassung
+als veraltet erkennbar.
+
+Spieltests, automatische Prüfungen und Tests zur Companion-Kompatibilität stehen
+in der [Validierung](https://github.com/krebs3r/hourstone-azeroth-hours/blob/v0.3.1/docs/VALIDATION.md).

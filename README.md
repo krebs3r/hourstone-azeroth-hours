@@ -4,13 +4,13 @@
 
 **Your characters. Your time.**
 
-Track your World of Warcraft characters and their total `/played` time in one compact window. Search characters, filter realms and client families, and see both total playtime and the current session. German and English interfaces are included.
+Track your World of Warcraft characters and their total `/played` time in one compact window. In Retail, switch to **Progress** to check keystones, your weekly Mythic+ best and Great Vault slots across your characters. Search by character or guild, filter realms and client families, and size the window up to 200%. German and English interfaces are included.
 
 [Download](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest) · [CurseForge](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
-![Hourstone 0.2.3 overview with realm and client filters and a separate client column](docs/assets/addon-overview-en.png)
+![Hourstone 0.3.1 playtime overview with characters, guilds and realm and client filters](docs/assets/addon-overview-en.png)
 
-The character overview puts realm and client filters beside the search and shows each character's guild and playtime.
+The character overview puts realm and client filters beside the search and shows each character's guild and playtime. Images show the implemented interface rendered with example characters.
 
 ## Installation
 
@@ -26,10 +26,23 @@ Repeat for each installation. The addon runs independently without another addon
 - Search by character or guild, realm and client filters together above the table, sortable columns, total and filtered playtime.
 - Decimal hours or days / hours / minutes, plus the current login session.
 - Delete entries from the overview without losing their saved playtime; restore them from a separate list.
-- Movable window, 65–130% size setting and optional draggable minimap button.
+- Retail **Time played / Progress** tabs with the current keystone, highest completed Mythic+ level this week and nine Great Vault slots.
+- Movable window, 65–200% size setting in 5% steps and optional draggable minimap button. Larger scales show fewer rows and scroll; the window only shrinks when its width or minimum height cannot fit.
 - `/hourstone` or `/azerothhours`: open or close; `/hourstone minimap`: show or hide the minimap button; `/hourstone reset`: reset window position.
 
-Use the gear button for display settings. Click column headings to sort, including client names, scroll longer lists, and hover a character for full details. Unknown client families sort last. Tooltips show the recorded data and the last server timestamp without claiming an online/offline status.
+Use the gear button for display settings and drag the title bar to move the window. Version 0.3.1 fixes the window jumping back during a drag; its position is saved when you release it. Click column headings to sort, including client names, scroll longer lists, and hover a character for full details. Unknown client families sort last. Tooltips show the recorded data and the last server timestamp without claiming an online/offline status.
+
+## Retail progress
+
+![Hourstone 0.3.1 Retail progress with keystones, weekly Mythic+ best and Great Vault slots](docs/assets/addon-progress-en.png)
+
+The **Progress** tab keeps the character, realm and guild beside the current keystone, the highest completed Mythic+ level this week, and three slots each for Dungeon, Raid and World activities. Hover a progress cell or Vault row for details and its capture time. The gear menu controls size up to 200%; search and realm/client filters work in both views. Classic clients keep the playtime view.
+
+Hourstone reads the logged-in character's keystone, localized dungeon name, completed weekly runs and Vault thresholds from Blizzard's APIs. Completed overtime runs count toward the weekly best; abandoned runs do not. Dungeon abbreviations and seasonal thresholds are not hard-coded. A dungeon name may be shortened to fit, but its key level stays visible and the tooltip contains the full name.
+
+Each character must be visited with this version before its progress can be recorded. Offline characters show the last locally captured data. **No keystone**, **Not yet recorded** and **Outdated** are distinct states; a weekly reset makes old progress stale until a new observation. Previous rewards are not presented as this week's progress, and temporary or protected API values do not erase valid data.
+
+Progress is local to this installation and WoW account. WoW saves it at logout or `/reload`; it is not sent through Companion. Existing playtime, guilds and delete/restore controls remain compatible.
 
 ## Deleting and restoring overview entries
 
@@ -47,7 +60,7 @@ Guild membership is recorded for each character when you play it. Guild changes 
 
 ## Optional synchronization
 
-Hourstone 0.2.3 supports [protocol 3](docs/sync-protocol-v3.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.3 or later, including guild membership and shared delete/restore controls. Upgrading from the public 0.1.1 release migrates saved data to schema 3 while preserving existing characters and settings. An upgrade from the 0.2.2 development build keeps the same protocol and schema without another migration. Legacy protocol 1 and 2 input remains readable; Hourstone 0.1.x does not support the Companion.
+Hourstone 0.3.1 supports [protocol 3](docs/sync-protocol-v3.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.3 or later, including guild membership and shared delete/restore controls. Upgrading from the public 0.1.1 release migrates saved data to schema 3 while preserving existing characters and settings. An upgrade from 0.2.2 or later keeps the same protocol and schema without another migration. Legacy protocol 1 and 2 input remains readable; Hourstone 0.1.x does not support the Companion. Retail progress stays local and is not synchronized.
 
 WoW first saves by logging out or using `/reload`. The Companion reads the saved observations from your selected installations and accounts, combines them and makes the shared overview available to the addon. Hourstone reads that overview on the next login or `/reload`. After the initial installation of the Companion data addon, fully close and restart WoW once. Between PCs, choose a folder that Dropbox, OneDrive or another service synchronizes and keeps available locally on each device; the Companion exchanges device snapshots through that folder.
 
@@ -64,7 +77,7 @@ Repeated observations of the same character are merged, never added. Confirmed s
 | Burning Crusade Classic Anniversary | 20506 |
 | Classic Era | 11509 |
 
-The 0.1.1 release has reported in-game coverage for these four families. Hardcore and Season of Discovery use the Era interface and have not been separately verified. The new synchronization flow still requires native-client acceptance testing; see [validation](docs/VALIDATION.md).
+Hardcore and Season of Discovery use the Era interface and have not been separately verified. See [validation](docs/VALIDATION.md) for current in-game coverage and automated checks.
 
 ## Development
 

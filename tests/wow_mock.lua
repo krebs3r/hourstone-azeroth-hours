@@ -19,6 +19,7 @@ function GetAddOnMetadata() return TEST_VERSION end
 function GetPhysicalScreenSize() return SCREEN_WIDTH or 1920,SCREEN_HEIGHT or 1080 end
 if WOW_PROJECT_ID==1 then C_AddOns={GetAddOnMetadata=GetAddOnMetadata} end
 function GetCursorPosition() return 1500,800 end
+function IsMouseButtonDown(button) return button == "LeftButton" and MOUSE_LEFT_DOWN == true end
 function date(_,v) return tostring(v) end
 function advance(n) NOW=NOW+n; EPOCH=EPOCH+n end
 RAID_CLASS_COLORS={MAGE={r=.25,g=.78,b=.92},WARRIOR={r=.78,g=.61,b=.43},DRUID={r=1,g=.49,b=.04},PRIEST={r=1,g=1,b=1},HUNTER={r=.67,g=.83,b=.45},DEMONHUNTER={r=.77,g=.64,b=1},ROGUE={r=1,g=.95,b=.48},PALADIN={r=.96,g=.55,b=.73}}
@@ -92,6 +93,11 @@ function methods:GetUnboundedStringWidth()
 end
 -- A bounded FontString may already be truncated; this is not its intrinsic width.
 function methods:GetStringWidth() return math.min(self:GetUnboundedStringWidth(),self.width) end
+function methods:GetStringHeight()
+    local lines=self.wordWrap and math.max(1,math.ceil(self:GetUnboundedStringWidth()/math.max(1,self.width))) or 1
+    return lines*(self.fontSize or 12)*1.2
+end
+function methods:SetWordWrap(value) self.wordWrap=value end
 function methods:SetFont(path,size,flags) self.font,self.fontSize=path,size end
 function methods:SetText(s) self.text=tostring(s); if self.scripts.OnTextChanged then self.scripts.OnTextChanged(self) end end
 function methods:GetText() return rawget(self,"text") or "" end
@@ -156,7 +162,7 @@ function methods:SetJustifyV(v) self.valign=v end
 function methods:SetOwner() end
 function methods:ClearLines() self.lines={}; self.lineWrap={} end
 function methods:AddLine(line,_,_,_,wrap) self.lines[#self.lines+1]=line; self.lineWrap[#self.lines]=wrap end
-for _,key in ipairs({"SetFrameStrata","SetClampedToScreen","SetMovable","EnableMouse","RegisterForDrag","StartMoving","StopMovingOrSizing","SetAutoFocus","SetMaxLetters","SetTextInsets","ClearFocus","EnableMouseWheel","SetValueStep","SetObeyStepOnDrag","RegisterForClicks","SetWordWrap"}) do methods[key]=function() end end
+for _,key in ipairs({"SetFrameStrata","SetClampedToScreen","SetMovable","EnableMouse","RegisterForDrag","StartMoving","StopMovingOrSizing","SetAutoFocus","SetMaxLetters","SetTextInsets","ClearFocus","EnableMouseWheel","SetValueStep","SetObeyStepOnDrag","RegisterForClicks"}) do methods[key]=function() end end
 UIParent=new("Frame","UIParent"); UIParent:SetScale(1)
 function configure_display(w,h,scale)
     SCREEN_WIDTH,SCREEN_HEIGHT=w,h

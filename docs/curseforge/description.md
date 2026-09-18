@@ -38,9 +38,14 @@ Dungeon names, keystone levels, weekly runs and Vault requirements are read dire
 
 Log in with each Retail character to record its progress. Other characters show their last recorded state. **No keystone**, **Not yet recorded** and **Outdated** remain distinct; old weekly data is marked outdated after the reset until it is recorded again. Abandoned runs and claimable rewards from the previous week do not count as current weekly progress.
 
-**Progress stays local to this WoW installation and account.** WoW saves it at logout or `/reload`; the optional Companion does not transfer it.
+WoW saves locally recorded progress at logout or `/reload`. **Hourstone 0.3.2 and a protocol-4 Companion can synchronize progress** between selected installations and PCs. Received progress stays separate from local measurements.
 
 ## Optional Windows Companion
+
+**Progress synchronization requires Companion 0.2.0 on every participating PC.**
+Companion 0.2.0 is awaiting Microsoft Store certification and is not yet publicly
+available at this release. Existing Companion versions keep their playtime, guild
+and visibility features; Hourstone remains fully usable on its own.
 
 **Playing several WoW versions or using more than one PC? We recommend the optional [Hourstone Companion](https://github.com/krebs3r/hourstone-companion).** It brings the saved Hourstone data from your selected installations and accounts into one overview, including characters, guilds and playtime. The same character is counted once even if it is played on several devices.
 
@@ -52,9 +57,9 @@ For multiple PCs, choose a shared folder that Dropbox, OneDrive or another folde
 
 The exchange is automatic but not live: WoW must first save by logging out or using `/reload`, the Companion processes the saved data, and the folder service transfers changes between PCs. Hourstone reads the combined overview at the next login or `/reload`; after the first setup of the Companion data addon, fully close and restart WoW once. A deletion made while another PC was offline must reach that PC before a new character login can restore the entry.
 
-Download **[Companion 0.1.5 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5)** as an installer or portable package. This is an unsigned preview release. Setup instructions and source code are in the [Companion repository](https://github.com/krebs3r/hourstone-companion).
+Download **[Companion 0.1.6 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.6)** as an installer or portable package. This is an unsigned preview release. Setup instructions and source code are in the [Companion repository](https://github.com/krebs3r/hourstone-companion).
 
-Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Hourstone **0.3.1** remains compatible with this synchronization setup. Older Hourstone 0.1.x versions do not support the Companion. If the newest addon version is awaiting CurseForge approval, download [Hourstone 0.3.1 from GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.3.1). The addon remains fully usable without Companion and continues to update separately through CurseForge.
+Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Hourstone **0.3.2** remains compatible with protocol-3 Companions and additionally receives progress from protocol-4 Companions. Older Hourstone 0.1.x versions do not support the Companion. If the newest addon version is awaiting CurseForge approval, download [Hourstone 0.3.2 from GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.3.2). The addon remains fully usable without Companion and continues to update separately through CurseForge.
 
 ## Supported clients
 
@@ -94,9 +99,14 @@ Hourstone fragt Namen, Stufen, Wochenabschlüsse und Slot-Anforderungen direkt i
 
 Logge dich mit jedem gewünschten Retail-Charakter ein, um seinen Fortschritt zu erfassen. Andere Charaktere zeigen den letzten gespeicherten Stand. **Kein Schlüsselstein**, **Noch nicht erfasst** und **Veraltet** bleiben unterscheidbar. Nach dem Wochenreset werden alte Wochenwerte bis zur nächsten Erfassung als veraltet markiert. Abgebrochene Läufe und abholbare Vorwochenbelohnungen zählen nicht als aktueller Wochenfortschritt.
 
-**Fortschritt bleibt lokal je WoW-Installation und Account.** WoW speichert ihn beim Ausloggen oder mit `/reload`; der optionale Companion überträgt ihn nicht.
+WoW speichert lokal erfassten Fortschritt beim Ausloggen oder mit `/reload`. **Hourstone 0.3.2 und ein Companion mit Protokoll 4 können Fortschritt abgleichen**, auch zwischen PCs. Empfangene Daten bleiben von lokalen Messungen getrennt.
 
 ### Empfehlung: Hourstone Companion für Windows
+
+**Für den Fortschrittsabgleich ist Companion 0.2.0 auf jedem beteiligten PC nötig.**
+Companion 0.2.0 wartet auf die Microsoft-Store-Zertifizierung und ist zum Zeitpunkt
+dieses Releases noch nicht öffentlich verfügbar. Vorhandene Companion-Versionen
+behalten Spielzeit-, Gilden- und Sichtbarkeitsabgleich; Hourstone bleibt allein nutzbar.
 
 **Wenn du mehrere WoW-Versionen oder mehrere PCs nutzt, empfehlen wir den optionalen [Hourstone Companion](https://github.com/krebs3r/hourstone-companion).** Er führt die gespeicherten Charakter-, Gilden- und Spielzeitdaten deiner ausgewählten Installationen und Accounts zusammen. Derselbe Charakter wird auch bei Nutzung auf mehreren Geräten nur einmal gezählt.
 
@@ -104,6 +114,6 @@ Für den Austausch zwischen PCs wählst du einen gemeinsamen Ordner, den beispie
 
 Der Austausch erfolgt automatisch und zeitversetzt: WoW speichert beim Ausloggen oder mit `/reload`, der Companion liest den gespeicherten Stand ein und der Ordnerdienst überträgt die Änderungen. Das Addon übernimmt die gemeinsame Übersicht beim nächsten Login oder `/reload`. Nach der ersten Einrichtung des Companion-Datenaddons WoW einmal vollständig schließen und neu starten. Nach einer Löschung während des Offline-Betriebs zuerst synchronisieren, danach erneut mit dem Charakter einloggen, um den Eintrag wiederherzustellen.
 
-**[Companion 0.1.5 für Windows 11 x64 herunterladen](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5)** – als Installer oder portables Paket. Dies ist eine unsignierte Vorschauversion. Anleitung und Quellcode stehen im [Companion-Repository](https://github.com/krebs3r/hourstone-companion).
+**[Companion 0.1.6 für Windows 11 x64 herunterladen](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.6)** – als Installer oder portables Paket. Dies ist eine unsignierte Vorschauversion. Anleitung und Quellcode stehen im [Companion-Repository](https://github.com/krebs3r/hourstone-companion).
 
-Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Hourstone **0.3.1** bleibt mit diesem Abgleich kompatibel. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Sollte die neueste Addon-Version auf CurseForge noch auf Freigabe warten, lade [Hourstone 0.3.1 bei GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.3.1) herunter. Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.
+Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Hourstone **0.3.2** bleibt mit Companions mit Protokoll 3 kompatibel und empfängt zusätzlich Fortschritt von Companions mit Protokoll 4. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Sollte die neueste Addon-Version auf CurseForge noch auf Freigabe warten, lade [Hourstone 0.3.2 bei GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/tag/v0.3.2) herunter. Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.

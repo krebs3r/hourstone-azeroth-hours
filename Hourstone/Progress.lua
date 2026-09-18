@@ -85,6 +85,7 @@ function P:Init(db)
     self.now, self.resetAt, self.store = nil, nil, nil
     if self.frame then self.frame:UnregisterAllEvents() end
     if not self.enabled then return end
+    self:ReadClock()
     if type(db.progress) ~= "table" then db.progress = {version=self.VERSION, characters={}} end
     -- A future optional cache never blocks the rest of Hourstone or gets replaced.
     if db.progress.version ~= self.VERSION then return end
@@ -96,7 +97,6 @@ function P:Init(db)
         end
     end
     db.progress.characters, self.store = cleaned, db.progress
-    self:ReadClock()
     self.frame = self.frame or C.Frame("Frame")
     self.frame:SetScript("OnEvent", function(_, event) self:Schedule(event) end)
     for _, event in ipairs({"BAG_UPDATE_DELAYED", "CHALLENGE_MODE_MAPS_UPDATE", "CHALLENGE_MODE_COMPLETED",
@@ -173,8 +173,9 @@ end
 -- cached clock; WoW progress APIs run once for a pending event burst, never on
 -- the one-second UI refresh. A week boundary requests one fresh server answer.
 function P:Tick(delta)
-    if not self.enabled or not self.store then return end
+    if not self.enabled then return end
     if self.now then self.now = self.now + delta end
+    if not self.store then return end
     if self.resetAt and self.now and self.now >= self.resetAt then
         self:RequireVaultUpdate(self.resetAt)
         self.resetAt, self.ready = nil, {}
@@ -367,7 +368,7 @@ function P:Get(char)
     local empty = supported and "unknown" or "unavailable"
     local result = {supported=supported, keystone={status=empty, expired=false}, weekly={status=empty, expired=false}, vault={status=empty, rows={}}}
     local key = supported and H.S.Key(char, self.db.sourceId) or nil
-    local record = key and self.store and self.store.characters[key]
+    local record = key and self:Projection(char)
     if record then
         result.keystone = copyKey(record.keystone) or result.keystone
         result.weekly = copyWeek(record.weekly) or result.weekly

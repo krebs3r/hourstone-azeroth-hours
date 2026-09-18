@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "name": "families retain independent timestamps and whole values",
+      "progress": [
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": true, "mapID": 42, "level": 12, "name": "Dungeon A", "updatedAt": 110, "resetAt": 200 }, "weekly": { "level": 15, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } },
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": false, "updatedAt": 105, "resetAt": 200 }, "weekly": { "level": 16, "seasonID": 1, "updatedAt": 115, "resetAt": 200 } }
+      ],
+      "expected": [
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": true, "mapID": 42, "level": 12, "name": "Dungeon A", "updatedAt": 110, "resetAt": 200 }, "weekly": { "level": 16, "seasonID": 1, "updatedAt": 115, "resetAt": 200 } }
+      ]
+    },
+    {
+      "name": "new confirmed emptiness and season beat larger old values",
+      "progress": [
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": true, "mapID": 42, "level": 15, "updatedAt": 190, "resetAt": 200 }, "weekly": { "level": 20, "seasonID": 1, "updatedAt": 190, "resetAt": 200 } },
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": false, "updatedAt": 210, "resetAt": 300 }, "weekly": { "level": 0, "seasonID": 2, "updatedAt": 210, "resetAt": 300 } }
+      ],
+      "expected": [
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": false, "updatedAt": 210, "resetAt": 300 }, "weekly": { "level": 0, "seasonID": 2, "updatedAt": 210, "resetAt": 300 } }
+      ]
+    },
+    {
+      "name": "reset jitter is not the primary clock",
+      "progress": [
+        { "sourceId": "hs-z", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 19, "seasonID": 1, "updatedAt": 100, "resetAt": 202 } },
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 0, "seasonID": 1, "updatedAt": 101, "resetAt": 200 } }
+      ],
+      "expected": [
+        { "sourceId": "hs-z", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 0, "seasonID": 1, "updatedAt": 101, "resetAt": 200 } }
+      ]
+    },
+    {
+      "name": "equal timestamps use source before payload",
+      "progress": [
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 99, "seasonID": 1, "updatedAt": 100, "resetAt": 202 } },
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 1, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } }
+      ],
+      "expected": [
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 1, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } }
+      ]
+    },
+    {
+      "name": "same-source tie uses typed payload and UTF8 names",
+      "progress": [
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": true, "mapID": 42, "level": 9, "name": "A", "updatedAt": 100, "resetAt": 200 } },
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": true, "mapID": 42, "level": 10, "name": "Ä", "updatedAt": 100, "resetAt": 200 } }
+      ],
+      "expected": [
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "keystone": { "present": true, "mapID": 42, "level": 10, "name": "Ä", "updatedAt": 100, "resetAt": 200 } }
+      ]
+    },
+    {
+      "name": "unknown region remains scoped to each source",
+      "progress": [
+        { "sourceId": "hs-b", "region": "unknown", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 2, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } },
+        { "sourceId": "hs-a", "region": "unknown", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 1, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } }
+      ],
+      "expected": [
+        { "sourceId": "hs-a", "region": "unknown", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 1, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } },
+        { "sourceId": "hs-b", "region": "unknown", "flavor": "retail", "guid": "Player-1-A", "weekly": { "level": 2, "seasonID": 1, "updatedAt": 100, "resetAt": 200 } }
+      ]
+    },
+    {
+      "name": "vault rows stay atomic and unlock is derived",
+      "progress": [
+        { "sourceId": "hs-a", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "vault": { "rows": { "dungeon": { "updatedAt": 100, "resetAt": 200, "slots": [ { "progress": 8, "threshold": 1, "level": 15, "unlocked": true }, { "progress": 8, "threshold": 4, "level": 14, "unlocked": true }, { "progress": 8, "threshold": 8, "level": 13, "unlocked": true } ] }, "raid": { "updatedAt": 100, "resetAt": 200, "slots": [ { "progress": 0, "threshold": 2, "level": 0, "unlocked": false }, { "progress": 0, "threshold": 4, "level": 0, "unlocked": false }, { "progress": 0, "threshold": 6, "level": 0, "unlocked": false } ] } } } },
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "vault": { "rows": { "dungeon": { "updatedAt": 110, "resetAt": 201, "slots": [ { "progress": 1, "threshold": 1, "level": 10, "unlocked": false }, { "progress": 1, "threshold": 4, "level": 0, "unlocked": true }, { "progress": 1, "threshold": 8, "level": 0, "unlocked": false } ] } } } }
+      ],
+      "expected": [
+        { "sourceId": "hs-b", "region": "eu", "flavor": "retail", "guid": "Player-1-A", "vault": { "rows": { "dungeon": { "updatedAt": 110, "resetAt": 201, "slots": [ { "progress": 1, "threshold": 1, "level": 10, "unlocked": true }, { "progress": 1, "threshold": 4, "level": 0, "unlocked": false }, { "progress": 1, "threshold": 8, "level": 0, "unlocked": false } ] }, "raid": { "updatedAt": 100, "resetAt": 200, "slots": [ { "progress": 0, "threshold": 2, "level": 0, "unlocked": false }, { "progress": 0, "threshold": 4, "level": 0, "unlocked": false }, { "progress": 0, "threshold": 6, "level": 0, "unlocked": false } ] } } } }
+      ]
+    }
+  ]
+}

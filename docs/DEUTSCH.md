@@ -25,9 +25,9 @@ Mit **Spielzeit | Fortschritt** wechselst du die Ansicht im selben Fenster. Fort
 
 Dungeonname, Schlüsselsteinstufe, Wochenabschlüsse und Slot-Schwellen stammen direkt aus WoW. Du musst keine Instanzen oder Saisonlisten pflegen. Abschlüsse außerhalb der Zeit zählen ebenfalls, abgebrochene Läufe nicht. Lange Namen werden in der Tabelle gekürzt; die Stufe bleibt sichtbar und der Tooltip enthält den vollständigen Namen.
 
-Logge dich zunächst mit jedem gewünschten Charakter ein. Ausgeloggte Charaktere zeigen den letzten lokalen Stand. „Kein Schlüsselstein“, „Noch nicht erfasst“ und „Veraltet“ sind unterschiedliche Zustände. Nach dem Wochenreset werden alte Daten als veraltet markiert, bis sie neu erfasst wurden. Abholbare Vorwochenbelohnungen zählen nicht als aktueller Wochenfortschritt. Vorübergehend fehlende oder geschützte API-Werte löschen keine gültigen Daten.
+Logge dich zunächst mit jedem gewünschten Charakter ein. Ausgeloggte Charaktere zeigen den letzten erfassten Stand. „Kein Schlüsselstein“, „Noch nicht erfasst“ und „Veraltet“ sind unterschiedliche Zustände. Nach dem Wochenreset werden alte Daten als veraltet markiert, bis sie neu erfasst wurden. Abholbare Vorwochenbelohnungen zählen nicht als aktueller Wochenfortschritt. Vorübergehend fehlende oder geschützte API-Werte löschen keine gültigen Daten.
 
-Fortschritt bleibt lokal je WoW-Installation und Account. WoW speichert ihn beim Logout oder `/reload`. Der Companion überträgt weiterhin Spielzeit, Gilde sowie das Löschen und Wiederherstellen von Übersichtseinträgen; Fortschritt wird nicht synchronisiert.
+WoW speichert lokal erfassten Fortschritt beim Logout oder `/reload`. Ein Companion mit [Protokoll 4](sync-protocol-v4.md) kann ihn zwischen ausgewählten Installationen und Accounts abgleichen. Empfangene Stände werden mit den lokalen Messungen angezeigt, aber nicht als neue lokale Messungen gespeichert. Ältere Companions übertragen weiterhin Spielzeit, Gilde sowie das Löschen und Wiederherstellen von Übersichtseinträgen.
 
 ## Einträge aus der Übersicht löschen und wiederherstellen
 
@@ -49,11 +49,16 @@ Die Charakterliste zeigt auch die zuletzt erfasste Gilde. Gildenwechsel und Aust
 
 ## Optionaler Abgleich zwischen Clients
 
-Hourstone 0.3.1 unterstützt [Protokoll 3](sync-protocol-v3.md) des separaten [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) ab 0.1.3 einschließlich Gildendaten sowie Löschen und Wiederherstellen von Übersichtseinträgen. Beim Upgrade von der veröffentlichten Version 0.1.1 werden die gespeicherten Daten auf Schema 3 umgestellt; Charaktere und Einstellungen bleiben erhalten. Bei einem Upgrade von 0.2.2 oder neuer bleiben Protokoll und Hauptdatenschema unverändert. Fortschritt bleibt lokal. Alte Eingaben mit Protokoll 1 und 2 bleiben lesbar. Hourstone 0.1.x unterstützt den Companion nicht.
+**Für den Fortschrittsabgleich ist Companion 0.2.0 auf jedem beteiligten PC nötig.**
+Companion 0.2.0 ist zur Microsoft-Store-Zertifizierung eingereicht und zum Zeitpunkt
+dieses Releases noch nicht öffentlich verfügbar. Vorhandene Companion-Versionen
+bleiben für Spielzeit, Gilden und Sichtbarkeit kompatibel.
+
+Hourstone 0.3.2 unterstützt [Protokoll 4](sync-protocol-v4.md) eines kompatiblen [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) einschließlich Retail-Fortschritt, Gildendaten sowie Löschen und Wiederherstellen von Übersichtseinträgen. Companion 0.1.3–0.1.6 bleibt für die bisherigen Protokoll-3-Funktionen kompatibel. Beim Upgrade von der veröffentlichten Version 0.1.1 werden die gespeicherten Daten auf Schema 3 umgestellt; Charaktere und Einstellungen bleiben erhalten. Bei einem Upgrade von 0.2.2 oder neuer bleibt das Hauptdatenschema 3 erhalten. Alte Eingaben mit Protokoll 1–3 bleiben lesbar. Ein neuer Companion kann lokale Fortschrittsdaten bereits aus 0.3.1 lesen; Fortschritt zurück ins Spiel senden kann er erst an ein Addon mit ausgewiesener Protokoll-4-Unterstützung. Hourstone 0.1.x unterstützt den Companion nicht.
 
 WoW speichert zunächst beim Ausloggen oder mit `/reload`. Der Companion liest die gespeicherten Stände deiner ausgewählten Installationen und Accounts ein, führt sie zusammen und stellt die gemeinsame Übersicht für das Addon bereit. Hourstone übernimmt sie beim nächsten Login oder `/reload`. Nach der ersten Installation des Companion-Datenaddons WoW einmal vollständig schließen und neu starten. Für mehrere PCs einen Ordner wählen, den Dropbox, OneDrive oder ein anderer Dienst auf allen Geräten synchronisiert und dauerhaft lokal verfügbar hält. Darüber tauscht der Companion die Gerätestände aus.
 
-[Hourstone Companion 0.1.5 für Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5) ist als Installer und portables Paket verfügbar. Dies ist eine unsignierte Vorschauversion. Einrichtung und Quellcode stehen im Companion-Repository. Das Addon bleibt eigenständig nutzbar.
+[Hourstone Companion 0.1.6 für Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.6) ist als Installer und portables Paket verfügbar. Dies ist eine unsignierte Vorschauversion. Einrichtung und Quellcode stehen im Companion-Repository. Das Addon bleibt eigenständig nutzbar.
 
 Doppelte Stände desselben Charakters werden zusammengeführt und niemals addiert. Bestätigte Serverwerte bleiben von lokalen Schätzungen getrennt. Fensterposition, Einstellungen, Anfragen und die laufende Sitzung bleiben lokal. Der Abgleich überträgt keine `/played`-Zeit zwischen unterschiedlichen Charakteren und ist kein Live-Abgleich während des Spiels. Einrichtung, Sicherungen und Grenzen stehen in der Companion-Anleitung.
 

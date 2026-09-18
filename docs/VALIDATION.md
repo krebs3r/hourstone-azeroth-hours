@@ -16,7 +16,7 @@ Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a l
 - Removal and restoration: confirmation/cancel, visible-only totals, retained playtime, removed-character view, new-login restoration, missing GUID retries, reload/zoning exclusion, unknown-region adoption, offline and concurrent controls, idempotent merges and bounded validation.
 - Model and synchronization: record validation, schema migration, server measurements versus estimates, deterministic merging, duplicate handling and imported records. Protocol fixtures contain synthetic data only.
 - Layout: retained [baseline](../tests/fixtures/layout/baseline.json) and [adjustments](../tests/fixtures/layout/adjustments.json), dynamic list height, upper realm/client filters, menu exclusivity and anchors, client sorting including unknown values, column boundaries, nowrap server timestamps, footer credits with unavailable font metrics, saved settings and native minimap references/geometry across four client families.
-- Progress: Retail API observations, completed weekly runs, keystone changes and confirmed absence, category/index-based Vault slots, unknown/protected values, reset expiry, offline reads and local identity adoption. Progress does not enter the protocol-3 observation payload.
+- Progress: Retail API observations, completed weekly runs, keystone changes and confirmed absence, category/index-based Vault slots, unknown/protected values, reset expiry, offline reads and local identity adoption. Progress stays outside legacy protocol-3 payloads; protocol 4 carries independent progress observations.
 - Scaling: 65%, 130%, 150%, 175% and 200% across display sizes and global UI scales; adaptive visible row capacity, complete scrolling and minimum-size fitting.
 - Assets and packaging: source hashes, exact RGBA conversion, font hashes and licenses, TOC metadata, archive structure, deterministic bytes and SHA-256.
 - Publishing: checksum verification and duplicate-upload prevention, without contacting external publishing services in tests.
@@ -27,6 +27,18 @@ Layout references are design specifications. The approved Progress mockup is kep
 The simulator's font metrics and the Lua-derived browser preview approximate native rendering. They do not prove real font appearance, combat behavior, taint safety or SavedVariables file timing.
 
 ## Native-client coverage
+
+Release 0.3.2 proceeds on 2026-09-18 with the native-client and physical two-PC
+checks below still pending. Publication does not convert automated or simulated
+results into native-client acceptance.
+
+Version 0.3.2 has 90 passing Lua scenario suites and 38 passing Python tests. Shared
+protocol-4 golden fixtures execute in both Lua and .NET, covering family-level
+merge convergence, reset timestamp jitter, explicit empty values, source isolation
+and legacy compatibility. Tests also verify that receiving progress never writes
+it into the local collection cache and that future local cache versions remain
+untouched. Native-client acceptance of 0.3.2 and practical two-PC synchronization
+remain pending.
 
 Version 0.3.1 adds a drag regression that fails against 0.3.0: moving anchors must survive the real one-second Core refresh and display events until release. It covers both Retail views, Classic, three global UI scales, closing during a drag and a late drag-stop event. All 80 Lua scenario suites and 34 Python tests pass. The patch was loaded in Retail; sustained manual dragging requires native confirmation because the desktop automation's short drag gestures did not move the frame.
 

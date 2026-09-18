@@ -26,6 +26,11 @@ class Packaging(unittest.TestCase):
             self.assertEqual(source.size,shipped.size)
             self.assertEqual(source.tobytes(),shipped.tobytes())
 
+    def test_protocol4_capability_is_explicit(self):
+        toc=(ROOT/"Hourstone/Hourstone.toc").read_text(encoding="utf-8")
+        self.assertIn("## X-Hourstone-Sync-Protocol: 4",toc.splitlines())
+        self.assertLess(toc.index("ProgressSync.lua"),toc.index("Core.lua"))
+
     def test_tag_mismatch_is_rejected(self):
         with self.assertRaisesRegex(ValueError,"does not match"):
             package.validate(tag="v9.9.9")

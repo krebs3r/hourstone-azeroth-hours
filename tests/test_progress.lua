@@ -70,7 +70,7 @@ assert(P:Get(T.record).vault.status=="unknown") -- an empty cache is not nine lo
 vault=activities()
 P:Schedule("open"); P:Tick(.5)
 assert(P:Get(T.record).vault.status=="known" and P:Get(T.record).vault.rows.world.slots[1].progress==4)
-assert(db.version==3 and S.FORMAT==3 and db.progress.version==1)
+assert(db.version==3 and S.FORMAT==4 and db.progress.version==1)
 local function update(...)
     advance(1)
     for _,event in ipairs({...}) do fire(event) end

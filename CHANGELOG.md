@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.2 — 2026-09-18
+
+- Receive Retail keystones, weekly Mythic+ best and all three Great Vault rows through Companion protocol 4, while retaining protocol 1–3 input support.
+- Merge the five progress families independently using their server capture times and deterministic ties. Keep received observations separate from locally collected SavedVariables; a newer keystone may decrease or be absent.
+- Preserve schema 3 and the version-1 local progress cache, unknown/empty/stale states and server-provided weekly reset deadlines. Future local cache versions remain untouched.
+- Advertise protocol-4 support in the TOC so the Companion can continue writing protocol 3 to older addon installations.
+- Add cross-language progress fixtures and regressions for source provenance, weekly expiry, malformed input and legacy compatibility.
+
 ## 0.3.1 — 2026-09-17
 
 - First public 0.3.x release: includes the Retail progress view and scaling improvements from the development milestone below.

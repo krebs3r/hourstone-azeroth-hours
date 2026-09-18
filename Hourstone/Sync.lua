@@ -1,7 +1,7 @@
 local _, H = ...
 local S, M = {}, H.M
 H.S = S
-S.FORMAT = 3
+S.FORMAT = 4
 local flavors = {retail=true, mists=true, tbc=true, era=true}
 local regions = {us=true, kr=true, eu=true, tw=true, cn=true, unknown=true}
 local fields = {"sourceId", "region", "flavor", "guid", "name", "realm", "class", "level",
@@ -95,18 +95,24 @@ local function copy(o)
     return result
 end
 function S.Import(db, payload)
-    S.received, S.status = {}, "absent"
+    S.received, S.receivedProgress, S.status = {}, {}, "absent"
     if payload == nil then return true end
-    if type(payload) ~= "table" or (payload.formatVersion ~= 1 and payload.formatVersion ~= 2 and payload.formatVersion ~= S.FORMAT) or type(payload.sources) ~= "table" then
+    if type(payload) ~= "table" or (payload.formatVersion ~= 1 and payload.formatVersion ~= 2 and payload.formatVersion ~= 3 and payload.formatVersion ~= S.FORMAT) or type(payload.sources) ~= "table" then
         S.status = "incompatible"; return false
     end
     local scope = payload.sources[db.sourceId]
     if scope == nil then return true end
     if type(scope) ~= "table" or type(scope.observations) ~= "table" then S.status = "invalid"; return false end
     if (payload.formatVersion < 3 and scope.visibility ~= nil)
-        or (payload.formatVersion == 3 and not H.V.ValidList(scope.visibility)) then S.status = "invalid"; return false end
-    local visibility = H.V.Merge(db.visibility, payload.formatVersion == 3 and scope.visibility or {})
+        or (payload.formatVersion >= 3 and not H.V.ValidList(scope.visibility))
+        or (payload.formatVersion < 4 and scope.progressObservations ~= nil) then S.status = "invalid"; return false end
+    local visibility = H.V.Merge(db.visibility, payload.formatVersion >= 3 and scope.visibility or {})
     if not visibility then S.status = "invalid"; return false end
+    local progress = {}
+    if payload.formatVersion == 4 then
+        progress = H.P.MergeSources(scope.progressObservations)
+        if not progress then S.status = "invalid"; return false end
+    end
     local imported, count = {}, 0
     for index, o in pairs(scope.observations) do
         count = count + 1
@@ -118,7 +124,7 @@ function S.Import(db, payload)
         imported[key] = S.Choose(imported[key], copy(o))
     end
     db.visibility = visibility
-    S.received, S.status = imported, "ready"
+    S.received, S.receivedProgress, S.status = imported, H.P.IndexObservations(progress), "ready"
     return true
 end
 function S.Display(db, valueFor, removedOnly)

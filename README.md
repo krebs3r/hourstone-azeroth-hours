@@ -40,9 +40,9 @@ The **Progress** tab keeps the character, realm and guild beside the current key
 
 Hourstone reads the logged-in character's keystone, localized dungeon name, completed weekly runs and Vault thresholds from Blizzard's APIs. Completed overtime runs count toward the weekly best; abandoned runs do not. Dungeon abbreviations and seasonal thresholds are not hard-coded. A dungeon name may be shortened to fit, but its key level stays visible and the tooltip contains the full name.
 
-Each character must be visited with this version before its progress can be recorded. Offline characters show the last locally captured data. **No keystone**, **Not yet recorded** and **Outdated** are distinct states; a weekly reset makes old progress stale until a new observation. Previous rewards are not presented as this week's progress, and temporary or protected API values do not erase valid data.
+Each character must be visited with this version before its progress can be recorded. Offline characters show the last captured data. **No keystone**, **Not yet recorded** and **Outdated** are distinct states; a weekly reset makes old progress stale until a new observation. Previous rewards are not presented as this week's progress, and temporary or protected API values do not erase valid data.
 
-Progress is local to this installation and WoW account. WoW saves it at logout or `/reload`; it is not sent through Companion. Existing playtime, guilds and delete/restore controls remain compatible.
+WoW saves locally recorded progress at logout or `/reload`. Companion versions supporting [protocol 4](docs/sync-protocol-v4.md) can synchronize it between selected installations and accounts. Received progress is displayed alongside local observations without becoming a local measurement. Older Companions continue to synchronize playtime, guilds and delete/restore controls.
 
 ## Deleting and restoring overview entries
 
@@ -60,11 +60,16 @@ Guild membership is recorded for each character when you play it. Guild changes 
 
 ## Optional synchronization
 
-Hourstone 0.3.1 supports [protocol 3](docs/sync-protocol-v3.md) with the separate [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) 0.1.3 or later, including guild membership and shared delete/restore controls. Upgrading from the public 0.1.1 release migrates saved data to schema 3 while preserving existing characters and settings. An upgrade from 0.2.2 or later keeps the same protocol and schema without another migration. Legacy protocol 1 and 2 input remains readable; Hourstone 0.1.x does not support the Companion. Retail progress stays local and is not synchronized.
+**Progress synchronization requires Companion 0.2.0 on every participating PC.**
+Companion 0.2.0 has been submitted for Microsoft Store certification and is not
+yet publicly available at this release. Existing Companion versions remain
+compatible with their playtime, guild and visibility features.
+
+Hourstone 0.3.2 supports [protocol 4](docs/sync-protocol-v4.md) with a compatible [Hourstone Companion](https://github.com/krebs3r/hourstone-companion), including Retail progress, guild membership and shared delete/restore controls. Companion 0.1.3–0.1.6 remains compatible for the existing protocol-3 features. Upgrading from the public 0.1.1 release migrates saved data to schema 3 while preserving existing characters and settings. An upgrade from 0.2.2 or later keeps SavedVariables schema 3 without another migration. Legacy protocol 1–3 input remains readable; Hourstone 0.1.x does not support the Companion. New Companions read the local progress cache from 0.3.1, but send progress back only to an addon advertising protocol-4 support.
 
 WoW first saves by logging out or using `/reload`. The Companion reads the saved observations from your selected installations and accounts, combines them and makes the shared overview available to the addon. Hourstone reads that overview on the next login or `/reload`. After the initial installation of the Companion data addon, fully close and restart WoW once. Between PCs, choose a folder that Dropbox, OneDrive or another service synchronizes and keeps available locally on each device; the Companion exchanges device snapshots through that folder.
 
-[Hourstone Companion 0.1.5 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.5) is available as an installer or portable package. This is an unsigned preview release. Its repository contains setup information and source code. Hourstone remains fully usable on its own.
+[Hourstone Companion 0.1.6 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.6) is available as an installer or portable package. This is an unsigned preview release. Its repository contains setup information and source code. Hourstone remains fully usable on its own.
 
 Repeated observations of the same character are merged, never added. Confirmed server measurements are stored separately from local estimates. UI settings, request timing and the current session remain local. Synchronization cannot transfer `/played` between distinct characters, fetch unvisited characters or update a running client in real time. The companion's documentation explains setup, backups and limitations.
 

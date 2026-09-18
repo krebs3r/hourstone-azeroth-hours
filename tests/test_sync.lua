@@ -56,7 +56,7 @@ assert(S.Import(db,payload(db.sourceId,{a,b,a})))
 local count=0; for _ in pairs(S.received) do count=count+1 end
 assert(count==1 and S.received[S.Key(b)].seconds==1020)
 assert(db.characters.legacy.seconds==1234 and db.characters[S.Key(b)]==nil)
-assert(not S.Import(db,{formatVersion=4,sources={}}) and next(S.received)==nil)
+assert(not S.Import(db,{formatVersion=5,sources={}}) and next(S.received)==nil)
 assert(not S.Import(db,payload(db.sourceId,{a,{}})) and next(S.received)==nil)
 assert(S.Import(db,nil) and S.status=="absent")
 

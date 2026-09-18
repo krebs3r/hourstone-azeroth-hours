@@ -1,0 +1,21 @@
+{
+  "tag": "v0.3.2",
+  "project_id": 1697059,
+  "sha256": "362adf37e0969c3267be68e4717ce9e97fd9a01da0c30903084bbe2adca0de5c",
+  "file_name": "Hourstone-0.3.2.zip",
+  "game_versions": [
+    "12.1.0",
+    "2.5.6",
+    "5.5.4",
+    "1.15.9"
+  ],
+  "game_version_ids": [
+    16519,
+    16533,
+    16168,
+    16630
+  ],
+  "status": "upload-pending",
+  "started_at": "2026-09-18T20:45:01.012811+00:00",
+  "run_id": "35393066766"
+}

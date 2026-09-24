@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.3 — 2026-09-24
+
+- Register Hourstone in WoW's Addons menu at runtime where the client provides it. Left click opens or closes the window like the minimap button; the tooltip uses the existing helpers. Right clicks are ignored, as on the minimap button.
+- Hide the minimap button once on clients with the Addons menu. The settings option and `/hourstone minimap` still work, and turning the button back on persists. Clients without the menu keep the button unchanged. Hiding the button prints where Hourstone can still be opened.
+- Support the WoW: Forever beta (interface 16001). Forever uses the Retail API with Hourstone's Classic design and playtime view; the Retail progress view is not offered there. Forever characters keep the Retail client family required by Companion protocol 4.
+- Resolve CurseForge game versions only within WoW client families, including WoW: Forever (1.60.1).
+- Add simulation coverage for WoW: Forever, the Addons menu entry, and the migration across reloads.
+
 ## 0.3.2 — 2026-09-18
 
 - Receive Retail keystones, weekly Mythic+ best and all three Great Vault rows through Companion protocol 4, while retaining protocol 1–3 input support.

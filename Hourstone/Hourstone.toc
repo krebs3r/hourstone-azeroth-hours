@@ -1,9 +1,9 @@
-## Interface: 120100, 50504, 20506, 11509
+## Interface: 120100, 50504, 20506, 11509, 16001
 ## Title: Hourstone - Azeroth Hours
 ## Notes: Your characters. Your time. Account-wide character playtime tracker.
 ## Notes-deDE: Deine Charaktere. Deine Spielzeit. Spielzeit aller erfassten Charaktere.
 ## Author: krebs3r
-## Version: 0.3.2
+## Version: 0.3.3
 ## X-Hourstone-Sync-Protocol: 4
 ## SavedVariables: HourstoneDB
 ## OptionalDeps: Hourstone_Sync

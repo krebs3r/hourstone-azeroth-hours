@@ -93,7 +93,7 @@ assert(S.status=="ready" and #S.receivedProgress[S.Key(a)]==2)
 assert(db.progress==nil and next(db.characters)==nil)
 P:Init(db)
 local data=P:Get(a)
-if H.C.Retail() then
+if H.C.RetailProgress() then
     assert(data.keystone.status=="known" and data.keystone.level==2 and data.weekly.level==13)
     assert(next(db.progress.characters)==nil) -- foreign observations are never re-exportable local measurements
     data.keystone.level=100; data.vault.rows.raid.slots[1].progress=100
@@ -134,7 +134,7 @@ assert(next(S.Display(db,nil,true).characters)~=nil and S.receivedProgress[S.Key
 scope.visibility[1].restored["writer-one"]=1
 assert(S.Import(db,controlled) and not H.V.IsRemoved(db,a) and next(S.Display(db).characters)~=nil)
 
-if H.C.Retail() then
+if H.C.RetailProgress() then
     -- Real collector initialization cannot adopt a received week's best as a
     -- local baseline, including before the first local progress API response.
     C_DateAndTime={GetSecondsUntilWeeklyReset=function() return 3600 end}

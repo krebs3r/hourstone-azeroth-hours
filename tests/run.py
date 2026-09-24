@@ -22,14 +22,21 @@ def font(path,size):
 def measure(path,size,text):
     return font(path,size).getlength(re.sub(r"\|c[0-9a-fA-F]{8}|\|r","",text))/64
 
-def runtime(project=1, locale="deDE", backdrop=True):
+INTERFACES = {1: 120100, 19: 50504, 5: 20506, 2: 11509}
+FOREVER = 16001
+
+def runtime(project=1, locale="deDE", backdrop=True, interface=None, compartment=None):
     lua = LuaRuntime(unpack_returned_tuples=True)
     lua.globals().TEST_LOCALE = locale
+    lua.globals().TEST_INTERFACE = interface or INTERFACES.get(project)
     lua.globals().TEST_VERSION = re.search(r"## Version: (.+)",(ROOT/"Hourstone/Hourstone.toc").read_text())[1]
     lua.globals().MEASURE_TEXT = measure
     lua.globals().WOW_PROJECT_ID = project
     lua.globals().BackdropTemplateMixin = lua.table() if backdrop else None
     lua.execute((ROOT / "tests/wow_mock.lua").read_text(encoding="utf-8"))
+    # Only Retail and WoW: Forever (both project 1) have the Addons menu.
+    if not (project == 1 if compartment is None else compartment):
+        lua.execute("AddonCompartmentFrame=nil")
     lua.execute("H={}")
     loader = lua.eval('function(code,name) local f,e=loadstring(code,name); assert(f,e); f("Hourstone",H) end')
     for line in (ROOT / "Hourstone/Hourstone.toc").read_text().splitlines():
@@ -40,16 +47,18 @@ def runtime(project=1, locale="deDE", backdrop=True):
 def main():
     tests = sorted((ROOT / "tests").glob("test_*.lua"))
     count = 0
-    for project, locale in [(1,"deDE"),(19,"enUS"),(5,"deDE"),(2,"enUS"),(999,"frFR")]:
+    configs = [("Retail",1,"deDE",None),("Mists Classic",19,"enUS",None),("TBC Anniversary",5,"deDE",None),
+        ("Classic Era",2,"enUS",None),("WoW Forever",1,"enUS",FOREVER),("API fallback",999,"frFR",None)]
+    for variant, project, locale, interface in configs:
         for backdrop in [True, False]:
             for test in tests:
-                lua = runtime(project, locale, backdrop)
+                lua = runtime(project, locale, backdrop, interface)
                 try:
                     lua.execute(test.read_text(encoding="utf-8"))
                 except Exception as exc:
-                    raise RuntimeError(f"{test.name}, project={project}, locale={locale}, backdrop={backdrop}: {exc}") from exc
+                    raise RuntimeError(f"{test.name}, {variant}, project={project}, locale={locale}, backdrop={backdrop}: {exc}") from exc
                 count += 1
-        print(f"PASS project={project}, locale={locale}: native + fallback frames")
+        print(f"PASS {variant} (project={project}, locale={locale}): native + fallback frames")
     print(f"PASS {count} scenario suites; actual WoW client testing remains pending.")
 
 if __name__ == "__main__":

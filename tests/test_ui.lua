@@ -63,6 +63,9 @@ U.headers.updatedAt.button.scripts.OnClick(); assert(U.sort=="updatedAt" and U.d
 U.headers.seconds.button.scripts.OnClick(); assert(U.sort=="seconds" and U.descending)
 U:ToggleSettings(); assert(U.settings:IsShown())
 assert(U.minimapBox.kind=="CheckButton" and U.minimapBox.template=="UICheckButtonTemplate")
+-- With the Addons menu, the one-time migration starts with the minimap button hidden.
+assert(U.minimapBox:GetChecked()==(U.compartment==nil) and U.minimap:IsShown()==(U.compartment==nil))
+if U.compartment then U.minimapBox:Click(); assert(db.settings.minimap and U.minimap:IsShown()) end
 assert(U.minimapBox:GetChecked())
 U.minimapBox:Click(); assert(not db.settings.minimap and not U.minimap:IsShown() and not U.minimapBox:GetChecked())
 U.minimapBox:Click(); assert(db.settings.minimap and U.minimap:IsShown() and U.minimapBox:GetChecked())
@@ -72,9 +75,9 @@ SlashCmdList.HOURSTONE("minimap"); assert(U.minimap:IsShown() and U.minimapBox:G
 assert(U.densityToggle==nil and U.densityMenu==nil and #U.rows==8)
 for _,legacy in ipairs({false,true}) do
     db.settings.compact=legacy; U:LayoutRows()
-    assert(U.frame:GetHeight()==(H.C.Retail() and 644 or 612) and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
+    assert(U.frame:GetHeight()==(H.C.RetailProgress() and 644 or 612) and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
 end
-assert(U.frame:GetHeight()==(H.C.Retail() and 644 or 612) and U.rows[1]:GetHeight()==50)
+assert(U.frame:GetHeight()==(H.C.RetailProgress() and 644 or 612) and U.rows[1]:GetHeight()==50)
 local before=db.characters
 U.scaleSlider:SetValue(90); assert(math.abs(db.settings.scale-.9)<.001)
 U.scaleSlider:SetValue(130); assert(db.settings.scale==1.3 and db.characters==before)
@@ -121,7 +124,7 @@ advance(1); U.minimap.scripts.OnClick(); assert(U.frame:IsShown())
 -- refresh and display events, then persist the released position before layout.
 configure_display(2560,1440,.8)
 U.scaleSlider:SetValue(130)
-local views=H.C.Retail() and {"played","progress"} or {"played"}
+local views=H.C.RetailProgress() and {"played","progress"} or {"played"}
 for _,view in ipairs(views) do
     U:SetView(view)
     for _,parentScale in ipairs({.65,.8,1}) do

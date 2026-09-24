@@ -35,6 +35,19 @@ function C.SourceId()
     return "hs-" .. tostring(C.Epoch()) .. "-" .. table.concat(parts)
 end
 function C.Retail() return WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1) end
+-- WoW: Forever runs the Retail API (project MAINLINE) under interface 16xxx.
+function C.IsForever()
+    if type(GetBuildInfo) ~= "function" then return false end
+    local ok, _, _, _, interface = pcall(GetBuildInfo)
+    return ok and type(interface) == "number" and interface >= 16000 and interface < 17000
+end
+-- Retail artwork only for modern Retail; Forever keeps the Classic look.
+function C.RetailStyle() return C.Retail() and not C.IsForever() end
+-- Keystones and the Great Vault exist only in modern Retail, not in Forever.
+function C.RetailProgress() return C.Retail() and not C.IsForever() end
+function C.HasAddonCompartment()
+    return type(AddonCompartmentFrame) == "table" and type(AddonCompartmentFrame.RegisterAddon) == "function"
+end
 function C.Flavor()
     local id = WOW_PROJECT_ID
     if C.Retail() then return "retail" end
@@ -45,7 +58,7 @@ function C.Flavor()
 end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.3.2"
+    return getter and getter("Hourstone", "Version") or "0.3.3"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)

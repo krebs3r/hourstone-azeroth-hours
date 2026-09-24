@@ -13,7 +13,7 @@ Rendered Hourstone character overview with realm and client filters and example 
 - Search by character or guild, filter by realm and client, and sort the list.
 - Total and filtered playtime, displayed as decimal hours or days, hours and minutes.
 - Retail **Time played / Progress** tabs for playtime and weekly progress in the same window.
-- A movable window with **65–200% scaling in 5% steps** and an optional draggable minimap button.
+- A movable window with **65–200% scaling in 5% steps**, an entry in WoW's Addons menu where the client provides it, and an optional draggable minimap button.
 - German and English interfaces.
 
 Open with `/hourstone` or `/azerothhours`. Use the gear button for display settings and hover a character to see its full recorded details. Every character appears after its first login with Hourstone enabled. The server's total includes time played before installation; offline time is excluded. WoW saves the data per installation and account when you log out or use `/reload`. Characters you have not visited with Hourstone cannot be discovered automatically.
@@ -63,7 +63,7 @@ Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all partici
 
 ## Supported clients
 
-Retail, Mists of Pandaria Classic, TBC Anniversary and Classic Era are supported client families. Hardcore and Season of Discovery use the Era family and have not been separately verified. See each release's notes for compatibility and validation.
+Retail, Mists of Pandaria Classic, TBC Anniversary and Classic Era are supported client families, plus the WoW: Forever beta with the Classic design and playtime view. Hardcore and Season of Discovery use the Era family and have not been separately verified. See each release's notes for compatibility and validation.
 
 [Source and installation guide](https://github.com/krebs3r/hourstone-azeroth-hours) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
@@ -77,7 +77,7 @@ Also from krebs3r: [Soundstone – Azeroth Audio](https://www.curseforge.com/wow
 
 Gerenderte Hourstone-Charakterübersicht mit Realm- und Clientfiltern und Beispielcharakteren.
 
-Die Übersicht zeigt Name, Klassenfarbe, Level, Realm, zuletzt erfasste Gilde, Client, Spielzeit und letzte Aktualisierung. Suche nach Charakter oder Gilde, kombiniere Realm- und Clientfilter und sortiere die Spalten. Wähle zwischen Dezimalstunden und Tagen, Stunden und Minuten. Fensterposition, Größe und Minimap-Einstellung bleiben gespeichert.
+Die Übersicht zeigt Name, Klassenfarbe, Level, Realm, zuletzt erfasste Gilde, Client, Spielzeit und letzte Aktualisierung. Suche nach Charakter oder Gilde, kombiniere Realm- und Clientfilter und sortiere die Spalten. Wähle zwischen Dezimalstunden und Tagen, Stunden und Minuten. Fensterposition, Größe und Minimap-Einstellung bleiben gespeichert. Wo der Client ein Addons-Menü hat, öffnet Hourstone auch von dort; der Minimap-Button ist dann optional. Unterstützt werden Retail, Mists Classic, TBC Anniversary, Classic Era und die Beta von WoW: Forever.
 
 Die Fenstergröße lässt sich am Zahnrad in **5-%-Schritten von 65 bis 200 %** einstellen. Bei hoher Skalierung erscheinen weniger Zeilen; durch Scrollen erreichst du alle Charaktere. Passt die Breite oder Mindesthöhe nicht auf den Bildschirm, wird das Fenster automatisch verkleinert. Ziehe die Titelleiste zum Verschieben. Version **0.3.1** behebt das Zurückspringen beim Ziehen; beim Loslassen wird die Position gespeichert.
 

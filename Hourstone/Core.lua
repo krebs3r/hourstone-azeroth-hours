@@ -15,7 +15,7 @@ frame:SetScript("OnEvent",function(_,event,...)
         SLASH_HOURSTONE1, SLASH_HOURSTONE2 = "/hourstone", "/azerothhours"
         SlashCmdList.HOURSTONE = function(message)
             message = H.C.Lower((message or ""):match("^%s*(.-)%s*$"))
-            if message == "minimap" then db.settings.minimap = not db.settings.minimap; H.UI:UpdateMinimap()
+            if message == "minimap" then H.UI:SetMinimap(not db.settings.minimap)
             elseif message == "reset" then H.UI:Create(); H.UI:Position(true)
             else H.UI:Toggle() end
         end

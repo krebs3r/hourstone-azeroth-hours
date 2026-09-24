@@ -10,10 +10,10 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.12'
           cache: pip
@@ -23,7 +23,7 @@ jobs:
       - run: python tests/run.py
       - run: python -m unittest discover -s tests -p 'test_*.py'
       - run: python tools/package.py
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Hourstone-build
           path: dist/*

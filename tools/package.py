@@ -7,7 +7,7 @@ import struct
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPECTED_INTERFACES = {120100, 50504, 20506, 11509}
+EXPECTED_INTERFACES = {120100, 50504, 20506, 11509, 16001}
 
 def validate(root=ROOT, tag=None):
     addon = root / "Hourstone"

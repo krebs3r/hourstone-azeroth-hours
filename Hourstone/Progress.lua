@@ -78,7 +78,7 @@ local function sanitizeRecord(value, sourceId)
 end
 
 function P:Init(db)
-    self.db, self.enabled = db, C.Retail()
+    self.db, self.enabled = db, C.RetailProgress()
     self.ready, self.pending, self.wantRequest, self.delay = {}, false, false, 0
     self.vaultAfterReset = false
     self.vaultReadyAt, self.vaultResetAt = nil, nil

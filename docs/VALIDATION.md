@@ -9,7 +9,7 @@ python -m unittest discover -s tests -p 'test_*.py'
 python tools/package.py
 ```
 
-Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a limited WoW API simulator. The matrix covers supported project IDs, an unknown-project fallback, German, English and fallback localization, with and without backdrop support.
+Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a limited WoW API simulator. The matrix covers supported project IDs, WoW: Forever (project 1 with interface 16001), an unknown-project fallback, German, English and fallback localization, with and without backdrop support. Retail and Forever simulate the Addons menu; all other configurations run without it.
 
 - Tracking: delayed server answers, request intervals, retries, authoritative replacement of estimates, level and character changes, zoning, reload session carry, new-login resets and offline exclusion.
 - Guilds: delayed API information, joining/leaving, Unicode names, safe tooltip text, independent metadata merging, legacy snapshots and guild search.
@@ -17,6 +17,7 @@ Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a l
 - Model and synchronization: record validation, schema migration, server measurements versus estimates, deterministic merging, duplicate handling and imported records. Protocol fixtures contain synthetic data only.
 - Layout: retained [baseline](../tests/fixtures/layout/baseline.json) and [adjustments](../tests/fixtures/layout/adjustments.json), dynamic list height, upper realm/client filters, menu exclusivity and anchors, client sorting including unknown values, column boundaries, nowrap server timestamps, footer credits with unavailable font metrics, saved settings and native minimap references/geometry across four client families.
 - Progress: Retail API observations, completed weekly runs, keystone changes and confirmed absence, category/index-based Vault slots, unknown/protected values, reset expiry, offline reads and local identity adoption. Progress stays outside legacy protocol-3 payloads; protocol 4 carries independent progress observations.
+- Addons menu and WoW: Forever: runtime registration with logo, tooltip owner fallback, left/right click inputs as string or table, failed registration, the one-time minimap migration including later opt-in across reloads, clients without the menu, Forever detection with Classic design, Classic minimap geometry and no Retail progress view.
 - Scaling: 65%, 130%, 150%, 175% and 200% across display sizes and global UI scales; adaptive visible row capacity, complete scrolling and minimum-size fitting.
 - Assets and packaging: source hashes, exact RGBA conversion, font hashes and licenses, TOC metadata, archive structure, deterministic bytes and SHA-256.
 - Publishing: checksum verification and duplicate-upload prevention, without contacting external publishing services in tests.
@@ -27,6 +28,13 @@ Layout references are design specifications. The approved Progress mockup is kep
 The simulator's font metrics and the Lua-derived browser preview approximate native rendering. They do not prove real font appearance, combat behavior, taint safety or SavedVariables file timing.
 
 ## Native-client coverage
+
+Version 0.3.3 has 120 passing Lua scenario suites in six simulated configurations
+and 45 passing Python tests. The author reported a successful in-game test of the
+0.3.3 build in Retail, Classic and the WoW: Forever beta (build 1.60.1.69977). No
+game patch was released since 0.3.2; the CurseForge game versions 12.1.0, 5.5.4,
+2.5.6 and 1.15.9 are kept, and client families not separately tested for 0.3.3 are
+released on the author's compatibility statement. 1.60.1 is added for Forever.
 
 Release 0.3.2 proceeds on 2026-09-18 with the native-client and physical two-PC
 checks below still pending. Publication does not convert automated or simulated
@@ -68,6 +76,8 @@ Native acceptance with an owned key, completed runs, unlocked rewards, an unclai
 6. For companion sync, close every WoW client, sync two installations with synthetic or private local data, then start each client and compare the merged list. Repeat the same sync to verify no double counting and verify that settings and sessions remain local.
 7. Remove an offline character and the active character. Check the confirmation, overview totals, removed list, manual restoration and continued local tracking. Reload and change zones; both must remain removed. Make a new character login; the known removal must be restored without changing saved playtime. Repeat between two devices, including an offline removal that only reaches the character after its earlier login: synchronize, then make another actual login.
 8. Verify the companion refuses writes while WoW is running, preserves backups and reports malformed or newer-protocol data without overwriting it. Keep logs and real SavedVariables outside the repository.
-9. In Retail, open Progress and compare the owned key with the bag item and weekly best with completed runs. Compare all three Vault rows and their slot thresholds with Blizzard's UI, both with and without an unclaimed previous reward. Complete a run, obtain/change/remove a key, reload and switch characters; confirm the latest captured data and distinct unknown/empty/stale states. Check the server weekly reset and a character not visited since reset. Verify that Classic does not register Retail progress APIs or display the Progress tab.
+9. Where the client has the Addons menu: after updating from 0.3.2, verify the Hourstone entry with logo and tooltip, left click open/close, no action on right click, the minimap button hidden once, the chat hint when hiding it, and that turning it back on survives `/reload` and relog. Clients without the menu keep the button.
+10. In the WoW: Forever beta, record the build, verify the Classic design, the playtime-only view, the minimap geometry when enabled, and that characters show under the Retail client family.
+11. In Retail, open Progress and compare the owned key with the bag item and weekly best with completed runs. Compare all three Vault rows and their slot thresholds with Blizzard's UI, both with and without an unclaimed previous reward. Complete a run, obtain/change/remove a key, reload and switch characters; confirm the latest captured data and distinct unknown/empty/stale states. Check the server weekly reset and a character not visited since reset. Verify that Classic does not register Retail progress APIs or display the Progress tab.
 
 Use issue reports to describe reproducible behavior without including personal account paths, credentials or raw character databases.

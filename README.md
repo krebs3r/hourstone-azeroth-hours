@@ -27,6 +27,7 @@ Repeat for each installation. The addon runs independently without another addon
 - Decimal hours or days / hours / minutes, plus the current login session.
 - Delete entries from the overview without losing their saved playtime; restore them from a separate list.
 - Retail **Time played / Progress** tabs with the current keystone, highest completed Mythic+ level this week and nine Great Vault slots.
+- Entry in WoW's **Addons menu** below the clock where the client provides it: left click opens or closes Hourstone. On those clients the draggable minimap button is off by default after the update and can be turned back on in the settings or with `/hourstone minimap`.
 - Movable window, 65–200% size setting in 5% steps and optional draggable minimap button. Larger scales show fewer rows and scroll; the window only shrinks when its width or minimum height cannot fit.
 - `/hourstone` or `/azerothhours`: open or close; `/hourstone minimap`: show or hide the minimap button; `/hourstone reset`: reset window position.
 
@@ -81,8 +82,9 @@ Repeated observations of the same character are merged, never added. Confirmed s
 | Mists of Pandaria Classic | 50504 |
 | Burning Crusade Classic Anniversary | 20506 |
 | Classic Era | 11509 |
+| WoW: Forever (beta) | 16001 |
 
-Hardcore and Season of Discovery use the Era interface and have not been separately verified. See [validation](docs/VALIDATION.md) for current in-game coverage and automated checks.
+WoW: Forever uses the Retail API but keeps Hourstone's Classic design and playtime view; keystones and the Great Vault do not exist there. Its characters are recorded under the Retail client family, because Companion protocol 4 has no separate Forever family. Hardcore and Season of Discovery use the Era interface and have not been separately verified. See [validation](docs/VALIDATION.md) for current in-game coverage and automated checks.
 
 ## Development
 

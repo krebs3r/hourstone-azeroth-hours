@@ -120,7 +120,7 @@ local function ellipsis(label,value)
         chars[#chars]=nil; label:SetText(table.concat(chars).."…")
     until #chars==0 or label:GetUnboundedStringWidth()<=label:GetWidth()
 end
-function U:IsProgress() return C.Retail() and self.db.settings.view=="progress" end
+function U:IsProgress() return C.RetailProgress() and self.db.settings.view=="progress" end
 function U:ApplyScale(layoutOnly)
     if self.windowDragging then return end
     if self.ready and not layoutOnly then self:Refresh(); return end
@@ -175,7 +175,7 @@ function U:SettingsText()
 end
 function U:SetFormat(mode) self.db.settings.format=mode; self:Refresh() end
 function U:SetView(view)
-    if not C.Retail() or (view~="played" and view~="progress") then return end
+    if not C.RetailProgress() or (view~="played" and view~="progress") then return end
     self.viewSort=self.viewSort or {}
     self.viewSort[self.db.settings.view]={self.sort,self.descending}
     self.db.settings.view=view
@@ -192,7 +192,7 @@ end
 function U:LayoutRows(count)
     local progress=self:IsProgress()
     local rowHeight=progress and PROGRESS_HEIGHT or ROW_HEIGHT
-    local tabs=C.Retail() and TAB_HEIGHT or 0
+    local tabs=C.RetailProgress() and TAB_HEIGHT or 0
     local _,sh=GetPhysicalScreenSize()
     local base=212+tabs
     local requested=self.scaleDragging and self.dragScale or self.db.settings.scale
@@ -241,7 +241,7 @@ function U:Create()
     local f=C.Frame("Frame","HourstoneWindow",UIParent); self.frame=f
     f:SetSize(WIDTH,262); f:SetFrameStrata("DIALOG"); f:SetClampedToScreen(true)
     f:SetMovable(true); f:EnableMouse(true); f:Hide()
-    self.panelName=C.Retail() and "RetailPanel" or "ClassicPanel"
+    self.panelName=C.RetailStyle() and "RetailPanel" or "ClassicPanel"
     self.panelLayout=skin(f,self.panelName)
     self:ApplyScale(); UISpecialFrames[#UISpecialFrames+1]="HourstoneWindow"
     self.header=rect("Frame",f,10,10,700,40)
@@ -284,7 +284,7 @@ function U:Create()
     self.summary:SetScript("OnLeave",function() GameTooltip:Hide() end)
     line(self.summary,0,63,700,1,150/255,144/255,128/255,66/255)
 
-    if C.Retail() then
+    if C.RetailProgress() then
         self.tabs=rect("Frame",f,10,114,700,TAB_HEIGHT)
         self.playedTab=control(self.tabs,L.played,5,4,90,25,function() self:SetView("played") end)
         self.progressTab=control(self.tabs,L.progress,98,4,102,25,function() self:SetView("progress") end)
@@ -468,7 +468,7 @@ function U:Create()
     self.settingsClose=closeButton(settings,222,15.5,17,function() settings:Hide() end)
     self.minimapToggle=rect("Button",settings,13,35,226,27)
     local toggleMinimap=function()
-        self.db.settings.minimap=not self.db.settings.minimap; self:UpdateMinimap(); self:SettingsText()
+        self:SetMinimap(not self.db.settings.minimap); self:SettingsText()
     end
     -- Use the same native template as Soundstone. Its inset artwork occupies the
     -- old 16px square; the 24px control adds native checked, pressed and hover states.
@@ -476,8 +476,7 @@ function U:Create()
     self.minimapBox:SetPoint("TOPLEFT",self.minimapToggle,"TOPLEFT",-4,-1.5)
     self.minimapBox:SetSize(24,24)
     self.minimapBox:SetScript("OnClick",function(owner)
-        self.db.settings.minimap=owner:GetChecked() and true or false
-        self:UpdateMinimap(); self:SettingsText()
+        self:SetMinimap(owner:GetChecked() and true or false); self:SettingsText()
     end)
     text(self.minimapToggle,L.minimap,11,23,0,203,nil,27)
     self.minimapToggle:SetScript("OnClick",toggleMinimap)
@@ -489,9 +488,9 @@ function U:Create()
     line(self.scaleSlider,0,6,226,6,131/255,119/255,89/255)
     line(self.scaleSlider,1,7,224,4,39/255,38/255,31/255)
     self.scaleFill=line(self.scaleSlider,1,7,0,4,194/255,142/255,35/255)
-    self.scaleSlider:SetThumbTexture(ROOT..(C.Retail() and "GoldThumb" or "SilverThumb")..".tga")
+    self.scaleSlider:SetThumbTexture(ROOT..(C.RetailStyle() and "GoldThumb" or "SilverThumb")..".tga")
     local thumb=self.scaleSlider:GetThumbTexture(); thumb:SetSize(10,18)
-    thumb:SetTexCoord(C.Retail() and .2265625 or .2109375,C.Retail() and .765625 or .78125,.015625,.984375)
+    thumb:SetTexCoord(C.RetailStyle() and .2265625 or .2109375,C.RetailStyle() and .765625 or .78125,.015625,.984375)
     local function beginScaleDrag()
         if not self.scaleDragging then
             self.dragScale=self.db.settings.scale; self.scaleDragging=true
@@ -806,6 +805,10 @@ function U:RowTooltip(row)
     if self.removedOnly then lines[#lines+1] = L.removalHelp end
     tooltip(row,lines)
 end
+function U:SetMinimap(shown)
+    self.db.settings.minimap=shown==true; self:UpdateMinimap()
+    if not self.db.settings.minimap then print(self.compartment and L.minimapHiddenCompartment or L.minimapHidden) end
+end
 function U:UpdateMinimap()
     if self.minimapBox then self.minimapBox:SetChecked(self.db.settings.minimap) end
     if not self.minimap then return end
@@ -814,14 +817,40 @@ function U:UpdateMinimap()
     local radius=Minimap:GetWidth()/2+7
     self.minimap:ClearAllPoints(); self.minimap:SetPoint("CENTER",Minimap,"CENTER",math.cos(angle)*radius,math.sin(angle)*radius)
 end
+local function rightClick(...)
+    for i=1,select("#",...) do
+        local value=select(i,...)
+        if value=="RightButton" or (type(value)=="table" and value.buttonName=="RightButton") then return true end
+    end
+    return false
+end
+-- Clients with the Addons menu list Hourstone there. The minimap button has no
+-- right-click action, so the menu entry ignores right clicks as well.
+function U:CreateCompartment()
+    if not C.HasAddonCompartment() then return end
+    local owner=function(frame) return type(frame)=="table" and frame or AddonCompartmentFrame end
+    local ok=pcall(AddonCompartmentFrame.RegisterAddon,AddonCompartmentFrame,{
+        text="Hourstone",icon=ROOT.."Logo.tga",notCheckable=true,registerForAnyClick=true,
+        func=function(...) if not rightClick(...) then self:Toggle() end end,
+        funcOnEnter=function(frame) tooltip(owner(frame),{"Hourstone – Azeroth Hours",L.open,L.commands}) end,
+        funcOnLeave=function() GameTooltip:Hide() end,
+    })
+    self.compartment=ok or nil
+end
 function U:Init(db)
     self.db=db
+    self:CreateCompartment()
+    -- The minimap button becomes opt-in once the Addons menu entry exists.
+    -- A later opt-in through the settings or /hourstone minimap is kept.
+    if self.compartment and db.settings.compartmentMigrated~=true then
+        db.settings.minimap,db.settings.compartmentMigrated=false,true
+    end
     if not Minimap then return end
     local b=C.Frame("Button","HourstoneMinimapButton",Minimap); self.minimap=b
     b:SetSize(MINIMAP_SIZE,MINIMAP_SIZE); b:SetFrameStrata("MEDIUM"); b:SetFrameLevel(Minimap:GetFrameLevel()+8)
     -- Blizzard's tracking-button geometry, as used by LibDBIcon. The border's
     -- transparent padding differs between Retail and the Classic families.
-    local retail=C.Retail()
+    local retail=C.RetailStyle()
     b.background=b:CreateTexture(nil,"BACKGROUND"); b.background:SetTexture(136467)
     b.background:SetSize(retail and 24 or 20,retail and 24 or 20)
     if retail then b.background:SetPoint("CENTER") else b.background:SetPoint("TOPLEFT",7,-5) end

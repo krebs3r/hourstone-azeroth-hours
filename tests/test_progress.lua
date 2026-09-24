@@ -4,14 +4,14 @@ local function clone(value)
     local out = {}; for key,item in pairs(value) do out[key] = clone(item) end; return out
 end
 fire("ADDON_LOADED","Hourstone"); fire("PLAYER_ENTERING_WORLD",true,false)
-if not H.C.Retail() then
+if not H.C.RetailProgress() then
     assert(not P:Get(T.record).supported and P:Get(T.record).vault.status=="unavailable")
     assert(HourstoneDB.progress==nil and not P.frame)
     P:Schedule("open"); tick(1)
     assert(HourstoneDB.progress==nil)
     -- Exercise the data contract in every scenario runtime as well as the
     -- unsupported-client early return above.
-    WOW_PROJECT_ID=WOW_PROJECT_MAINLINE
+    WOW_PROJECT_ID,TEST_INTERFACE=WOW_PROJECT_MAINLINE,120100
 end
 local reads, mapRequests, rewardRequests = 0,0,0
 local mapID, keyLevel, season, active = 399,12,42,false

@@ -20,6 +20,9 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
 API = "https://wow.curseforge.com/api"
+# CurseForge WoW version families (gameVersionTypeID). 'forever' is WoW: Forever;
+# CurseForge resolved its 1.60.1 entry through this family for a sibling addon.
+FAMILIES = {"retail": 517, "mists": 79434, "anniversary": 73246, "era": 67408, "forever": 88568}
 PENDING = "curseforge-upload-pending.json"
 RECEIPT = "curseforge-upload.json"
 
@@ -48,8 +51,10 @@ def resolve_versions(available, names):
     if not names or len(set(names)) != len(names):
         raise ValueError("Configure a nonempty, unique game_versions list in project.json")
     ids = []
+    families = set(FAMILIES.values())
     for name in names:
-        matches = [v["id"] for v in available if v.get("name") == name]
+        # Only WoW client families count; another version type may share a name.
+        matches = [v["id"] for v in available if v.get("name") == name and v.get("gameVersionTypeID") in families]
         if len(matches) != 1 or type(matches[0]) is not int or matches[0] <= 0:
             raise ValueError(f"CurseForge game version {name!r} is missing or ambiguous")
         ids.append(matches[0])

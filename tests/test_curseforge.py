@@ -48,7 +48,8 @@ class CurseForgeUpload(unittest.TestCase):
 
     def fake_api(self, path, token, data=None, content_type=None):
         if path == "/game/versions":
-            return [{"id": 1, "name": "12.1.0"}, {"id": 2, "name": "2.5.6"}]
+            return [{"id": 1, "name": "12.1.0", "gameVersionTypeID": 517},
+                    {"id": 2, "name": "2.5.6", "gameVersionTypeID": 73246}]
         self.assertEqual(path, "/projects/1697059/upload-file")
         self.assertEqual(self.uploads, [cf.PENDING], "Persistent lock must exist before POST")
         self.assertIn(b'"gameVersions": [1, 2]', data)
@@ -120,10 +121,23 @@ class CurseForgeUpload(unittest.TestCase):
             cf.verify_package(self.archive, self.checksum, "v0.1.3", self.release["assets"])
 
     def test_unconfirmed_or_ambiguous_versions_fail(self):
-        for available in ([], [{"name": "12.1.0", "id": 1}, {"name": "12.1.0", "id": 2}]):
+        for available in ([], [{"name": "12.1.0", "id": 1, "gameVersionTypeID": 517},
+                               {"name": "12.1.0", "id": 2, "gameVersionTypeID": 517}],
+                          [{"name": "12.1.0", "id": 1}], [{"name": "12.1.0", "id": 1, "gameVersionTypeID": 1}]):
             with self.subTest(available=available):
                 with self.assertRaisesRegex(ValueError, "missing or ambiguous"):
                     cf.resolve_versions(available, ["12.1.0"])
+
+    def test_forever_resolves_only_through_its_family(self):
+        available = [{"name": "1.60.1", "id": 99, "gameVersionTypeID": 1},
+                     {"name": "1.60.1", "id": 17053, "gameVersionTypeID": 88568},
+                     {"name": "1.15.9", "id": 7, "gameVersionTypeID": 67408}]
+        self.assertEqual(cf.FAMILIES["forever"], 88568)
+        self.assertEqual(cf.resolve_versions(available, ["1.60.1", "1.15.9"]), [17053, 7])
+
+    def test_project_keeps_existing_flavors_and_adds_forever(self):
+        config = json.loads((ROOT / "docs/curseforge/project.json").read_text(encoding="utf-8"))
+        self.assertEqual(config["game_versions"], ["12.1.0", "2.5.6", "5.5.4", "1.15.9", "1.60.1"])
 
     def test_missing_token_never_creates_lock(self):
         with patch.dict(cf.os.environ, {"CF_API_TOKEN": ""}):

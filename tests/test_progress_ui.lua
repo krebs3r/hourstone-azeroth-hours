@@ -2,7 +2,7 @@ fire("ADDON_LOADED","Hourstone"); fire("PLAYER_ENTERING_WORLD",true,false)
 fire("TIME_PLAYED_MSG",100000,100)
 local U,L,db=H.UI,H.L,HourstoneDB
 U:Toggle()
-if not H.C.Retail() then
+if not H.C.RetailProgress() then
     assert(U.tabs==nil and not U:IsProgress())
     U:SetView("progress"); assert(not U:IsProgress() and db.settings.view=="played")
     return

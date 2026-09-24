@@ -16,6 +16,20 @@ function IsInGuild() return IN_GUILD end
 function GetGuildInfo(unit) assert(unit == "player"); GUILD_READS=GUILD_READS+1; return GUILD_NAME end
 function RequestTimePlayed() REQUESTS=REQUESTS+1 end
 function GetAddOnMetadata() return TEST_VERSION end
+function GetBuildInfo() return "test", "0", "Jan 1 2026", TEST_INTERFACE end
+PRINTED = {}
+function print(...) PRINTED[#PRINTED+1] = table.concat({tostringall(...)}, " ") end
+function tostringall(...)
+    local out = {}
+    for i = 1, select("#", ...) do out[i] = tostring((select(i, ...))) end
+    return unpack(out)
+end
+-- Retail's Addons menu. run.py removes it for clients without that menu.
+COMPARTMENT = {}
+AddonCompartmentFrame = {RegisterAddon=function(frame, info)
+    assert(frame == AddonCompartmentFrame and type(info) == "table")
+    COMPARTMENT[#COMPARTMENT+1] = info
+end}
 function GetPhysicalScreenSize() return SCREEN_WIDTH or 1920,SCREEN_HEIGHT or 1080 end
 if WOW_PROJECT_ID==1 then C_AddOns={GetAddOnMetadata=GetAddOnMetadata} end
 function GetCursorPosition() return 1500,800 end
@@ -159,7 +173,7 @@ end
 function methods:GetValue() return self.value end
 function methods:SetJustifyH(v) self.align=v end
 function methods:SetJustifyV(v) self.valign=v end
-function methods:SetOwner() end
+function methods:SetOwner(owner) self.owner=owner end
 function methods:ClearLines() self.lines={}; self.lineWrap={} end
 function methods:AddLine(line,_,_,_,wrap) self.lines[#self.lines+1]=line; self.lineWrap[#self.lines]=wrap end
 for _,key in ipairs({"SetFrameStrata","SetClampedToScreen","SetMovable","EnableMouse","RegisterForDrag","StartMoving","StopMovingOrSizing","SetAutoFocus","SetMaxLetters","SetTextInsets","ClearFocus","EnableMouseWheel","SetValueStep","SetObeyStepOnDrag","RegisterForClicks"}) do methods[key]=function() end end

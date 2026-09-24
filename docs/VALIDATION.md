@@ -36,6 +36,15 @@ game patch was released since 0.3.2; the CurseForge game versions 12.1.0, 5.5.4,
 2.5.6 and 1.15.9 are kept, and client families not separately tested for 0.3.3 are
 released on the author's compatibility statement. 1.60.1 is added for Forever.
 
+The v0.3.3 GitHub release ZIP matches the tested build byte for byte (SHA-256
+`151824b5c779d13aa25cba4bdb6aa4caa05c6e1bcf99d54cab43b3b266e97465`). The first
+CurseForge upload attempt ended with HTTP 500 and no file on CurseForge; after
+removing the pending marker, the rerun uploaded
+[file 8963102](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/8963102)
+with game versions 12.1.0, 2.5.6, 5.5.4, 1.15.9 and 1.60.1 (WoW: Forever, ID 17053),
+awaiting CurseForge approval. The receipt is recorded in
+[releases/v0.3.3.json](curseforge/releases/v0.3.3.json).
+
 Release 0.3.2 proceeds on 2026-09-18 with the native-client and physical two-PC
 checks below still pending. Publication does not convert automated or simulated
 results into native-client acceptance.

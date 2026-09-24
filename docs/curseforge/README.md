@@ -19,7 +19,7 @@ The existing workflow and `tools/curseforge.py` upload the release ZIP and its r
 
 ## Interrupted uploads and retries
 
-The job creates `curseforge-upload-pending.json` on the GitHub release without overwriting it before sending an upload. A completed receipt makes retries a no-op. The minimal [historical receipt](releases/v0.1.1.json) protects the first published upload from duplication.
+The job creates `curseforge-upload-pending.json` on the GitHub release without overwriting it before sending an upload. A completed receipt makes retries a no-op. The minimal [historical receipt](releases/v0.1.1.json) protects the first published upload from duplication. [releases/v0.3.3.json](releases/v0.3.3.json) records the v0.3.3 upload (file 8963102) after an HTTP 500 on the first attempt.
 
 If a token or other pre-upload check fails, correct it and re-run failed jobs. Re-running the whole release job stops at an existing GitHub release to preserve published assets.
 

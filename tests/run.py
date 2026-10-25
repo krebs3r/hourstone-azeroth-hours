@@ -22,8 +22,10 @@ def font(path,size):
 def measure(path,size,text):
     return font(path,size).getlength(re.sub(r"\|c[0-9a-fA-F]{8}|\|r","",text))/64
 
-INTERFACES = {1: 120100, 19: 50504, 5: 20506, 2: 11509}
+INTERFACES = {1: 120105, 19: 50504, 5: 20506, 2: 11509}
 FOREVER = 16001
+# WoW: Forever builds since 1.60.1.70170 report WOW_PROJECT_CAMELOT, not MAINLINE.
+CAMELOT = 18
 
 def runtime(project=1, locale="deDE", backdrop=True, interface=None, compartment=None):
     lua = LuaRuntime(unpack_returned_tuples=True)
@@ -34,8 +36,8 @@ def runtime(project=1, locale="deDE", backdrop=True, interface=None, compartment
     lua.globals().WOW_PROJECT_ID = project
     lua.globals().BackdropTemplateMixin = lua.table() if backdrop else None
     lua.execute((ROOT / "tests/wow_mock.lua").read_text(encoding="utf-8"))
-    # Only Retail and WoW: Forever (both project 1) have the Addons menu.
-    if not (project == 1 if compartment is None else compartment):
+    # Only Retail and WoW: Forever (project 1 or Camelot) have the Addons menu.
+    if not (project in (1, CAMELOT) if compartment is None else compartment):
         lua.execute("AddonCompartmentFrame=nil")
     lua.execute("H={}")
     loader = lua.eval('function(code,name) local f,e=loadstring(code,name); assert(f,e); f("Hourstone",H) end')
@@ -48,7 +50,8 @@ def main():
     tests = sorted((ROOT / "tests").glob("test_*.lua"))
     count = 0
     configs = [("Retail",1,"deDE",None),("Mists Classic",19,"enUS",None),("TBC Anniversary",5,"deDE",None),
-        ("Classic Era",2,"enUS",None),("WoW Forever",1,"enUS",FOREVER),("API fallback",999,"frFR",None)]
+        ("Classic Era",2,"enUS",None),("WoW Forever",CAMELOT,"deDE",FOREVER),("WoW Forever before 70170",1,"enUS",FOREVER),
+        ("API fallback",999,"frFR",None)]
     for variant, project, locale, interface in configs:
         for backdrop in [True, False]:
             for test in tests:

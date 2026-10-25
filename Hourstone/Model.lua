@@ -38,6 +38,28 @@ function M.Init(db)
             end
         end
     end
+    -- Hourstone 0.3.3 filed characters of Forever builds reporting WOW_PROJECT_CAMELOT
+    -- as "project-18". Companion protocol 4 keeps Forever in the Retail family.
+    if H.C.IsForever() then
+        local legacy = {}
+        for key, char in pairs(db.characters) do
+            if type(char) == "table" and char.flavor == "project-18" and type(char.guid) == "string" then legacy[#legacy + 1] = key end
+        end
+        for _, key in ipairs(legacy) do
+            local char = db.characters[key]
+            char.flavor = "retail"
+            local target = H.S.Key(char, db.sourceId)
+            local existing = db.characters[target]
+            -- Malformed saved values must not stop the addon from loading; keep such an entry as it was.
+            local ok, merged = pcall(H.S.Choose, type(existing) == "table" and existing or nil, char)
+            if ok and merged then
+                db.characters[key], db.characters[target] = nil, merged
+                if type(db.runtime) == "table" and db.runtime.key == key then db.runtime.key = target end
+            else
+                char.flavor = "project-18"
+            end
+        end
+    end
     if type(db.settings) ~= "table" then db.settings = {} end
     local s = db.settings
     if s.format ~= "hours" then s.format = "combined" end

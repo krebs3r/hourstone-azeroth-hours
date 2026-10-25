@@ -78,7 +78,7 @@ Repeated observations of the same character are merged, never added. Confirmed s
 
 | Client family | Declared interface |
 | --- | ---: |
-| Retail | 120100 |
+| Retail | 120105 |
 | Mists of Pandaria Classic | 50504 |
 | Burning Crusade Classic Anniversary | 20506 |
 | Classic Era | 11509 |

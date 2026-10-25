@@ -137,7 +137,7 @@ class CurseForgeUpload(unittest.TestCase):
 
     def test_project_keeps_existing_flavors_and_adds_forever(self):
         config = json.loads((ROOT / "docs/curseforge/project.json").read_text(encoding="utf-8"))
-        self.assertEqual(config["game_versions"], ["12.1.0", "2.5.6", "5.5.4", "1.15.9", "1.60.1"])
+        self.assertEqual(config["game_versions"], ["12.1.5", "2.5.6", "5.5.4", "1.15.9", "1.60.1"])
 
     def test_missing_token_never_creates_lock(self):
         with patch.dict(cf.os.environ, {"CF_API_TOKEN": ""}):

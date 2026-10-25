@@ -7,14 +7,14 @@
   "source": "https://github.com/krebs3r/hourstone-azeroth-hours",
   "issues": "https://github.com/krebs3r/hourstone-azeroth-hours/issues",
   "confirmed_clients": [
-    "Retail 12.1.0",
+    "Retail 12.1.5",
     "TBC Anniversary 2.5.6",
     "Mists of Pandaria Classic 5.5.4",
     "Classic Era 1.15.9",
     "WoW: Forever beta 1.60.1"
   ],
   "project_id": 1697059,
-  "game_versions": ["12.1.0", "2.5.6", "5.5.4", "1.15.9", "1.60.1"],
+  "game_versions": ["12.1.5", "2.5.6", "5.5.4", "1.15.9", "1.60.1"],
   "project_url": "https://www.curseforge.com/wow/addons/hourstone-azeroth-hours",
   "allow_third_party_distribution": true
 }

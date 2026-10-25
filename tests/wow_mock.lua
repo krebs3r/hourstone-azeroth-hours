@@ -3,6 +3,8 @@ NOW, EPOCH, REQUESTS = 1000, 1800000000, 0
 STANDARD_TEXT_FONT = "Fonts\\FRIZQT__.TTF"
 IDENTITY = {guid="Player-1-AAA",name="Elarion",realm="Blackhand",class="MAGE",level=90}
 WOW_PROJECT_MAINLINE, WOW_PROJECT_CLASSIC, WOW_PROJECT_BURNING_CRUSADE_CLASSIC, WOW_PROJECT_MISTS_CLASSIC = 1,2,5,19
+-- Only WoW: Forever (Camelot) defines its own project constant; Retail does not.
+if WOW_PROJECT_ID==18 then WOW_PROJECT_CAMELOT=18 end
 function GetTime() return NOW end
 function GetServerTime() return EPOCH end
 function GetLocale() return TEST_LOCALE end
@@ -31,7 +33,7 @@ AddonCompartmentFrame = {RegisterAddon=function(frame, info)
     COMPARTMENT[#COMPARTMENT+1] = info
 end}
 function GetPhysicalScreenSize() return SCREEN_WIDTH or 1920,SCREEN_HEIGHT or 1080 end
-if WOW_PROJECT_ID==1 then C_AddOns={GetAddOnMetadata=GetAddOnMetadata} end
+if WOW_PROJECT_ID==1 or WOW_PROJECT_ID==18 then C_AddOns={GetAddOnMetadata=GetAddOnMetadata} end
 function GetCursorPosition() return 1500,800 end
 function IsMouseButtonDown(button) return button == "LeftButton" and MOUSE_LEFT_DOWN == true end
 function date(_,v) return tostring(v) end

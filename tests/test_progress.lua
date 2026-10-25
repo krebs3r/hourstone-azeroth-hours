@@ -11,7 +11,7 @@ if not H.C.RetailProgress() then
     assert(HourstoneDB.progress==nil)
     -- Exercise the data contract in every scenario runtime as well as the
     -- unsupported-client early return above.
-    WOW_PROJECT_ID,TEST_INTERFACE=WOW_PROJECT_MAINLINE,120100
+    WOW_PROJECT_ID,TEST_INTERFACE=WOW_PROJECT_MAINLINE,120105
 end
 local reads, mapRequests, rewardRequests = 0,0,0
 local mapID, keyLevel, season, active = 399,12,42,false

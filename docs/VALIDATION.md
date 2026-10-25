@@ -45,6 +45,14 @@ and migration are covered only by the simulation. Mists Classic, TBC Anniversary
 Classic Era were not separately tested for 0.3.4; their code paths are unchanged,
 and they are released on the author's compatibility statement.
 
+The v0.3.4 GitHub release ZIP matches the tested build byte for byte (SHA-256
+`ce8819306c9e75c6bcffba6e15e08afceff1e3091e4035cc5a5c3e4c919dcf76`). The first
+CurseForge upload attempt uploaded
+[file 9326047](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/9326047)
+with game versions 12.1.5, 2.5.6, 5.5.4, 1.15.9 and 1.60.1 (Retail 12.1.5, ID 16984),
+awaiting CurseForge approval. The receipt is recorded in
+[releases/v0.3.4.json](curseforge/releases/v0.3.4.json).
+
 Version 0.3.3 has 120 passing Lua scenario suites in six simulated configurations
 and 45 passing Python tests. The author reported a successful in-game test of the
 0.3.3 build in Retail, Classic and the WoW: Forever beta (build 1.60.1.69977). No

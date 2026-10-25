@@ -31,8 +31,10 @@ schema 3 and Companion protocol 4 are unchanged. With WoW closed, extract
 
 Automated checks are described in
 [validation](https://github.com/krebs3r/hourstone-azeroth-hours/blob/v0.3.4/docs/VALIDATION.md).
-In-game testing of 0.3.4 in Retail 12.1.5 and on current WoW: Forever builds is
-pending; this release does not claim that coverage.
+The author tested the 0.3.4 build in-game in Retail 12.1.5. The WoW: Forever change
+is covered by automated checks; an in-game test on current Forever builds is still
+pending. Client families not separately tested for this version are released on the
+author's compatibility statement.
 
 ## Deutsch
 
@@ -67,5 +69,8 @@ Addons-Menü unter der Uhr anbietet, den Minimap-Button einmalig aus;
 Einstellungen und die Minimap-Position bleiben erhalten; Schema 3 und
 Companion-Protokoll 4 sind unverändert. Das ZIP bei geschlossenem WoW nach
 `Interface/AddOns` entpacken. Die automatischen Prüfungen stehen in der verlinkten
-Validierung. Ein Spieltest von 0.3.4 in Retail 12.1.5 und auf aktuellen
-Forever-Builds steht noch aus und wird nicht als bestanden ausgewiesen.
+Validierung. Der Autor hat den Build von 0.3.4 im Spiel in Retail 12.1.5 getestet.
+Die Forever-Änderung ist durch automatische Prüfungen abgedeckt; ein Spieltest auf
+aktuellen Forever-Builds steht noch aus. Clientfamilien, die für diese Version
+nicht einzeln getestet wurden, sind auf Grundlage der Kompatibilitätsaussage des
+Autors freigegeben.

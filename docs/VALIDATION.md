@@ -37,7 +37,13 @@ addon. WoW: Forever builds since 1.60.1.70170 set `WOW_PROJECT_ID` to
 `WOW_PROJECT_CAMELOT` (18), which 0.3.3 recorded as an unknown client family.
 Mists Classic 5.5.4, TBC Anniversary 2.5.6, Classic Era 1.15.9 and Forever 1.60.1
 keep their interface numbers. 140 Lua scenario suites in seven simulated
-configurations and 52 Python tests pass. In-game testing of 0.3.4 is pending.
+configurations and 52 Python tests pass. The author reported a successful in-game
+test of the 0.3.4 build in Retail 12.1.5 (build 70575) on 2026-10-25; the tested ZIP
+has SHA-256 `ce8819306c9e75c6bcffba6e15e08afceff1e3091e4035cc5a5c3e4c919dcf76`.
+The WoW: Forever client has not run 0.3.4 yet, so the Forever project-ID handling
+and migration are covered only by the simulation. Mists Classic, TBC Anniversary and
+Classic Era were not separately tested for 0.3.4; their code paths are unchanged,
+and they are released on the author's compatibility statement.
 
 Version 0.3.3 has 120 passing Lua scenario suites in six simulated configurations
 and 45 passing Python tests. The author reported a successful in-game test of the

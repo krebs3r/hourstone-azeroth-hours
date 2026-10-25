@@ -6,7 +6,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tests"))
-from run import FOREVER, runtime
+from run import CAMELOT, FOREVER, runtime
 
 
 def saved_table(value):
@@ -22,12 +22,12 @@ def load(project, interface, saved, compartment=None):
 
 
 class CompartmentMigration(unittest.TestCase):
-    CLIENTS = (("Retail", 1, None), ("WoW Forever", 1, FOREVER), ("Mists Classic", 19, None),
-               ("TBC Anniversary", 5, None), ("Classic Era", 2, None))
+    CLIENTS = (("Retail", 1, None), ("WoW Forever", CAMELOT, FOREVER), ("WoW Forever before 70170", 1, FOREVER),
+               ("Mists Classic", 19, None), ("TBC Anniversary", 5, None), ("Classic Era", 2, None))
 
     def test_menu_hides_minimap_once_and_keeps_later_opt_in(self):
         for name, project, interface in self.CLIENTS:
-            has_menu = project == 1
+            has_menu = project in (1, CAMELOT)
             with self.subTest(client=name):
                 saved = {"version": 3, "visibility": {}, "settings": {"minimap": True, "minimapAngle": 90}}
                 lua, ui, settings = load(project, interface, saved)
@@ -50,7 +50,7 @@ class CompartmentMigration(unittest.TestCase):
                     saved = saved_table(lua.globals().HourstoneDB)
 
     def test_hidden_minimap_and_first_install_stay_consistent(self):
-        for name, project, interface in self.CLIENTS[:2]:
+        for name, project, interface in self.CLIENTS[:3]:
             with self.subTest(client=name, state="hidden before update"):
                 lua, ui, settings = load(project, interface, {"settings": {"minimap": False}})
                 self.assertIs(settings.minimap, False)

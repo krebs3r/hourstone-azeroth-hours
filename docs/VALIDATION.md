@@ -9,7 +9,7 @@ python -m unittest discover -s tests -p 'test_*.py'
 python tools/package.py
 ```
 
-Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a limited WoW API simulator. The matrix covers supported project IDs, WoW: Forever (project 1 with interface 16001), an unknown-project fallback, German, English and fallback localization, with and without backdrop support. Retail and Forever simulate the Addons menu; all other configurations run without it.
+Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a limited WoW API simulator. The matrix covers supported project IDs, WoW: Forever (interface 16001, as current project 18 and as project 1 from builds before 1.60.1.70170), an unknown-project fallback, German, English and fallback localization, with and without backdrop support. Retail and Forever simulate the Addons menu; all other configurations run without it.
 
 - Tracking: delayed server answers, request intervals, retries, authoritative replacement of estimates, level and character changes, zoning, reload session carry, new-login resets and offline exclusion.
 - Guilds: delayed API information, joining/leaving, Unicode names, safe tooltip text, independent metadata merging, legacy snapshots and guild search.
@@ -17,7 +17,7 @@ Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a l
 - Model and synchronization: record validation, schema migration, server measurements versus estimates, deterministic merging, duplicate handling and imported records. Protocol fixtures contain synthetic data only.
 - Layout: retained [baseline](../tests/fixtures/layout/baseline.json) and [adjustments](../tests/fixtures/layout/adjustments.json), dynamic list height, upper realm/client filters, menu exclusivity and anchors, client sorting including unknown values, column boundaries, nowrap server timestamps, footer credits with unavailable font metrics, saved settings and native minimap references/geometry across four client families.
 - Progress: Retail API observations, completed weekly runs, keystone changes and confirmed absence, category/index-based Vault slots, unknown/protected values, reset expiry, offline reads and local identity adoption. Progress stays outside legacy protocol-3 payloads; protocol 4 carries independent progress observations.
-- Addons menu and WoW: Forever: runtime registration with logo, tooltip owner fallback, left/right click inputs as string or table, failed registration, the one-time minimap migration including later opt-in across reloads, clients without the menu, Forever detection with Classic design, Classic minimap geometry and no Retail progress view.
+- Addons menu and WoW: Forever: runtime registration with logo, tooltip owner fallback, left/right click inputs as string or table, failed registration, the one-time minimap migration including later opt-in across reloads, clients without the menu, Forever detection with Classic design, Classic minimap geometry and no Retail progress view. Forever's project-ID change keeps the Retail family. Loading on Forever migrates every entry 0.3.3 recorded as `project-18`, including characters that are not logged in and a reload session; Retail leaves such entries untouched.
 - Scaling: 65%, 130%, 150%, 175% and 200% across display sizes and global UI scales; adaptive visible row capacity, complete scrolling and minimum-size fitting.
 - Assets and packaging: source hashes, exact RGBA conversion, font hashes and licenses, TOC metadata, archive structure, deterministic bytes and SHA-256.
 - Publishing: checksum verification and duplicate-upload prevention, without contacting external publishing services in tests.
@@ -28,6 +28,16 @@ Layout references are design specifications. The approved Progress mockup is kep
 The simulator's font metrics and the Lua-derived browser preview approximate native rendering. They do not prove real font appearance, combat behavior, taint safety or SavedVariables file timing.
 
 ## Native-client coverage
+
+Version 0.3.4 declares Retail interface 120105 for WoW 12.1.5. A comparison of
+Blizzard's UI source and generated API documentation between 12.1.0 (69933) and
+12.1.5 (70575) found no change to any API, event, widget method or template that
+Hourstone uses; the outdated interface number alone kept Retail from loading the
+addon. WoW: Forever builds since 1.60.1.70170 set `WOW_PROJECT_ID` to
+`WOW_PROJECT_CAMELOT` (18), which 0.3.3 recorded as an unknown client family.
+Mists Classic 5.5.4, TBC Anniversary 2.5.6, Classic Era 1.15.9 and Forever 1.60.1
+keep their interface numbers. 140 Lua scenario suites in seven simulated
+configurations and 52 Python tests pass. In-game testing of 0.3.4 is pending.
 
 Version 0.3.3 has 120 passing Lua scenario suites in six simulated configurations
 and 45 passing Python tests. The author reported a successful in-game test of the

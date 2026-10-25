@@ -14,7 +14,7 @@
     "WoW: Forever beta 1.60.1"
   ],
   "project_id": 1697059,
-  "game_versions": ["12.1.0", "2.5.6", "5.5.4", "1.15.9", "1.60.1"],
+  "game_versions": ["12.1.5", "2.5.6", "5.5.4", "1.15.9", "1.60.1"],
   "project_url": "https://www.curseforge.com/wow/addons/hourstone-azeroth-hours",
   "allow_third_party_distribution": true
 }

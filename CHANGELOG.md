@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.3.4 — 2026-10-25
+
+- Declare Retail interface 120105 so WoW 12.1.5 no longer lists Hourstone as out of date. None of the APIs, events, widgets or templates Hourstone uses changed between 12.1.0 and 12.1.5.
+- Keep WoW: Forever characters in the Retail client family on Forever builds that report their own project (1.60.1.70170 and later). When Hourstone loads on Forever, every character that 0.3.3 recorded there as an unknown client returns to the Retail family and merges with an earlier Retail entry of the same character without double-counting playtime. Removing them from the overview works again, and Companion protocol 4 exchanges them as Retail characters.
+- Simulate current Forever builds next to earlier ones and cover the migration, including characters that are not logged in and a reload directly from 0.3.3.
+
 ## 0.3.3 — 2026-09-24
 
 - Register Hourstone in WoW's Addons menu at runtime where the client provides it. Left click opens or closes the window like the minimap button; the tooltip uses the existing helpers. Right clicks are ignored, as on the minimap button.

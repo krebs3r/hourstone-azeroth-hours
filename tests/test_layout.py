@@ -10,7 +10,7 @@ import math
 from PIL import Image
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tests"))
-from run import FOREVER, runtime
+from run import CAMELOT, FOREVER, runtime
 
 class Layout(unittest.TestCase):
     def test_baseline_geometry_and_states(self):
@@ -255,7 +255,7 @@ class Layout(unittest.TestCase):
         im=Image.open(ROOT/"Hourstone/Media/Logo.tga").convert("RGBA")
         normalized_radius=max(math.hypot((x+.5)/im.width-.5,(y+.5)/im.height-.5)
             for y in range(im.height) for x in range(im.width) if im.getpixel((x,y))[3]>0)
-        for project,interface in ((1,None),(1,FOREVER),(2,None),(5,None),(19,None),(999,None)):
+        for project,interface in ((1,None),(CAMELOT,FOREVER),(1,FOREVER),(2,None),(5,None),(19,None),(999,None)):
             with self.subTest(project=project,interface=interface):
                 lua=runtime(project,interface=interface); lua.execute('fire("ADDON_LOADED","Hourstone")')
                 u=lua.globals().H.UI; button=u.minimap; icon=button.icon

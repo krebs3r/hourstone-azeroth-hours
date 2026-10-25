@@ -34,8 +34,12 @@ function C.SourceId()
     -- Include the server epoch without changing WoW's shared random seed.
     return "hs-" .. tostring(C.Epoch()) .. "-" .. table.concat(parts)
 end
-function C.Retail() return WOW_PROJECT_ID == (WOW_PROJECT_MAINLINE or 1) end
--- WoW: Forever runs the Retail API (project MAINLINE) under interface 16xxx.
+-- WoW: Forever runs the Retail API under interface 16xxx. Builds since 1.60.1.70170
+-- report their own project (WOW_PROJECT_CAMELOT = 18) instead of MAINLINE.
+function C.Retail()
+    local id = WOW_PROJECT_ID
+    return id == (WOW_PROJECT_MAINLINE or 1) or id == (WOW_PROJECT_CAMELOT or 18)
+end
 function C.IsForever()
     if type(GetBuildInfo) ~= "function" then return false end
     local ok, _, _, _, interface = pcall(GetBuildInfo)
@@ -58,7 +62,7 @@ function C.Flavor()
 end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.3.3"
+    return getter and getter("Hourstone", "Version") or "0.3.4"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)

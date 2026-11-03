@@ -39,14 +39,16 @@ function M.Init(db)
         end
     end
     -- Hourstone 0.3.3 filed characters of Forever builds reporting WOW_PROJECT_CAMELOT
-    -- as "project-18". Companion protocol 4 keeps Forever in the Retail family.
+    -- as "project-18", and 0.3.4 would file any other new project ID the same way.
+    -- Companion protocol 4 keeps Forever in the Retail family.
     if H.C.IsForever() then
         local legacy = {}
         for key, char in pairs(db.characters) do
-            if type(char) == "table" and char.flavor == "project-18" and type(char.guid) == "string" then legacy[#legacy + 1] = key end
+            if type(char) == "table" and type(char.flavor) == "string" and char.flavor:find("^project%-") and type(char.guid) == "string" then legacy[#legacy + 1] = key end
         end
         for _, key in ipairs(legacy) do
             local char = db.characters[key]
+            local original = char.flavor
             char.flavor = "retail"
             local target = H.S.Key(char, db.sourceId)
             local existing = db.characters[target]
@@ -56,7 +58,7 @@ function M.Init(db)
                 db.characters[key], db.characters[target] = nil, merged
                 if type(db.runtime) == "table" and db.runtime.key == key then db.runtime.key = target end
             else
-                char.flavor = "project-18"
+                char.flavor = original
             end
         end
     end

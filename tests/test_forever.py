@@ -16,8 +16,10 @@ def record(flavor, seconds, updated_at):
             "realm": "Blackhand", "class": "MAGE", "level": 90, "seconds": seconds, "updatedAt": updated_at}
 
 
-def login(project, interface, characters, runtime_state=None, reload=False):
+def login(project, interface, characters, runtime_state=None, reload=False, setup=None):
     lua = runtime(project, "enUS", interface=interface)
+    if setup:
+        lua.execute(setup)
     saved = {"version": 3, "visibility": {}, "sourceId": "local-source", "characters": characters}
     if runtime_state:
         saved["runtime"] = runtime_state
@@ -42,6 +44,35 @@ class ForeverFamily(unittest.TestCase):
                 # Overview removal accepts the Retail family; "project-18" was rejected.
                 self.assertTrue(lua.globals().H.V.Remove(db, T.record))
                 self.assertTrue(lua.globals().H.V.IsRemoved(db, T.record))
+
+    def test_any_project_id_on_forever_stays_retail(self):
+        lua, db = login(20, FOREVER, {})
+        C, T = lua.globals().H.C, lua.globals().H.T
+        self.assertEqual(C.Flavor(), "retail")
+        self.assertFalse(C.RetailStyle())
+        self.assertFalse(C.RetailProgress())
+        self.assertEqual(T.key, f"{SCOPE}:retail:{GUID}")
+
+    def test_forever_adopts_characters_filed_under_any_project(self):
+        legacy = f"{SCOPE}:project-20:{GUID}"
+        lua, db = login(CAMELOT, FOREVER, {legacy: record("project-20", 5000, 1800000000 - 60)})
+        self.assertEqual(list(db.characters.keys()), [f"{SCOPE}:retail:{GUID}"])
+        self.assertEqual(db.characters[f"{SCOPE}:retail:{GUID}"].flavor, "retail")
+
+    def test_identity_never_stores_an_empty_name_or_realm(self):
+        cases = (
+            ('UnitFullName = function() return "Elarion", "" end; GetRealmName = function() return "Classic Beta PvE" end',
+             "Elarion", "Classic Beta PvE"),
+            ('UnitFullName = function() return "Elarion", nil end; GetRealmName = function() return "" end; '
+             'GetNormalizedRealmName = function() return "ClassicBetaPvE" end', "Elarion", "ClassicBetaPvE"),
+            ('UnitFullName = function() return "", nil end; GetRealmName = function() return nil end; '
+             'GetNormalizedRealmName = nil', "?", "?"),
+        )
+        for setup, name, realm in cases:
+            with self.subTest(name=name, realm=realm):
+                lua, db = login(CAMELOT, FOREVER, {}, setup=setup)
+                stored = db.characters[f"{SCOPE}:retail:{GUID}"]
+                self.assertEqual((stored.name, stored.realm), (name, realm))
 
     def test_forever_adopts_characters_filed_under_project_18(self):
         legacy = f"{SCOPE}:project-18:{GUID}"
@@ -80,9 +111,11 @@ class ForeverFamily(unittest.TestCase):
         # Equal playtime fields make the merge compare the non-numeric levels.
         legacy = dict(record("project-18", 5000, 1800000000 - 60), level=True)
         current = dict(record("retail", 5000, 1800000000 - 60), level=False)
-        lua, db = login(CAMELOT, FOREVER, {f"{SCOPE}:project-18:{GUID}": legacy, f"{SCOPE}:retail:{GUID}": current})
-        self.assertIsNotNone(lua.globals().H.UI.db)
-        self.assertEqual(db.characters[f"{SCOPE}:project-18:{GUID}"].flavor, "project-18")
+        for project in ("project-18", "project-20"):
+            with self.subTest(project=project):
+                lua, db = login(CAMELOT, FOREVER, {f"{SCOPE}:{project}:{GUID}": dict(legacy, flavor=project), f"{SCOPE}:retail:{GUID}": current})
+                self.assertIsNotNone(lua.globals().H.UI.db)
+                self.assertEqual(db.characters[f"{SCOPE}:{project}:{GUID}"].flavor, project)
 
     def test_retail_leaves_project_18_records_alone(self):
         legacy = f"{SCOPE}:project-18:{GUID}"

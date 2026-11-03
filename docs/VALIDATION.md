@@ -41,6 +41,14 @@ validation reject an empty realm. Retail and Classic clients behave as in 0.3.4.
 No Hourstone build has run in the live Forever client yet, and interface 16001 is
 confirmed only on Forever beta and test builds. In-game testing of 0.3.5 is pending.
 
+The v0.3.5 GitHub release ZIP has SHA-256
+`d523b29dd0947acc688feb9c4b19d755ddf9ee6e324677d416fdc96821aa502d`. The CurseForge
+upload created
+[file 9428480](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/9428480)
+with game versions 12.1.5, 2.5.6, 5.5.4, 1.15.9 and 1.60.1 (Retail 12.1.5, ID 16984),
+awaiting CurseForge approval. The receipt is recorded in
+[releases/v0.3.5.json](curseforge/releases/v0.3.5.json).
+
 Version 0.3.4 declares Retail interface 120105 for WoW 12.1.5. A comparison of
 Blizzard's UI source and generated API documentation between 12.1.0 (69933) and
 12.1.5 (70575) found no change to any API, event, widget method or template that

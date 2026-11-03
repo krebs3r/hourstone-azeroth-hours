@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.5 — 2026-11-03
+
+- Never record an unknown client on WoW: Forever. On a Forever interface (16xxx), every project ID the client reports counts as the Retail client family, so a further change of Forever's project ID cannot split its characters off again.
+- When Hourstone loads on Forever, return characters that an earlier version filed under any unknown client (`project-…`, such as `project-18` from 0.3.3) to the Retail family and merge them with an earlier Retail entry of the same character without double-counting playtime. A record whose merge fails keeps its original client.
+- Never save an empty realm or character name. WoW: Forever replaces realms with rulesets; if `UnitFullName` reports no realm, Hourstone uses `GetRealmName`, then `GetNormalizedRealmName`, then `?`, and an empty name becomes `?`. The Companion and Hourstone's checks for received data reject an empty realm, and in the Companion one such entry would block the whole account.
+- Retail and Classic clients, SavedVariables schema 3 and Companion protocol 4 are unchanged.
+- Cover any project ID on a Forever interface, the migration of every unknown client and the realm and name fallbacks in the simulation.
+- Stop calling WoW: Forever a beta ahead of its launch on 2026-11-04 at 23:00 UTC and refer to Companion 0.2.1, whose Hourstone_Sync data addon declares 120105 and 16001 and is therefore no longer out of date in WoW 12.1.5 and Forever.
+
 ## 0.3.4 — 2026-10-25
 
 - Declare Retail interface 120105 so WoW 12.1.5 no longer lists Hourstone as out of date. None of the APIs, events, widgets or templates Hourstone uses changed between 12.1.0 and 12.1.5.

@@ -35,10 +35,11 @@ function C.SourceId()
     return "hs-" .. tostring(C.Epoch()) .. "-" .. table.concat(parts)
 end
 -- WoW: Forever runs the Retail API under interface 16xxx. Builds since 1.60.1.70170
--- report their own project (WOW_PROJECT_CAMELOT = 18) instead of MAINLINE.
+-- report their own project (WOW_PROJECT_CAMELOT = 18) instead of MAINLINE. Any
+-- project on a Forever interface stays Retail, so a renumbering cannot split the family.
 function C.Retail()
     local id = WOW_PROJECT_ID
-    return id == (WOW_PROJECT_MAINLINE or 1) or id == (WOW_PROJECT_CAMELOT or 18)
+    return id == (WOW_PROJECT_MAINLINE or 1) or id == (WOW_PROJECT_CAMELOT or 18) or C.IsForever()
 end
 function C.IsForever()
     if type(GetBuildInfo) ~= "function" then return false end
@@ -62,12 +63,18 @@ function C.Flavor()
 end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.3.4"
+    return getter and getter("Hourstone", "Version") or "0.3.5"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)
 end
 function C.Lower(s) return (strlower or string.lower)(s) end
+local function Text(value) return type(value) == "string" and value ~= "" and value or nil end
+-- Name and realm are display data, but the Companion and received data reject empty
+-- values. Forever has rulesets instead of realms, so fall back instead of storing "".
+function C.Realm(realm)
+    return Text(realm) or Text(GetRealmName and GetRealmName()) or Text(GetNormalizedRealmName and GetNormalizedRealmName()) or "?"
+end
 function C.Identity(sourceId)
     local guid = UnitGUID("player")
     if not guid then return nil end
@@ -76,8 +83,8 @@ function C.Identity(sourceId)
     local region, flavor = C.Region(), C.Flavor()
     local scope = region == "unknown" and (region .. ":" .. (sourceId or "local")) or region
     return { key = scope .. ":" .. flavor .. ":" .. guid, guid = guid, flavor = flavor, region = region,
-        sourceId = sourceId, name = name or "?",
-        realm = realm and realm ~= "" and realm or GetRealmName(), class = class or "",
+        sourceId = sourceId, name = Text(name) or "?",
+        realm = C.Realm(realm), class = class or "",
         level = UnitLevel("player") }
 end
 function C.ClassColor(class)

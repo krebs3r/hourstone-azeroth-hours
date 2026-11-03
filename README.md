@@ -61,16 +61,17 @@ Guild membership is recorded for each character when you play it. Guild changes 
 
 ## Optional synchronization
 
-**Progress synchronization requires Companion 0.2.0 on every participating PC.**
-Companion 0.2.0 has been submitted for Microsoft Store certification and is not
-yet publicly available at this release. Existing Companion versions remain
-compatible with their playtime, guild and visibility features.
+**Progress synchronization requires Companion 0.2.0 or newer on every participating PC.**
+Use Companion 0.2.1 or newer with WoW 12.1.5 and WoW: Forever. Its data addon
+Hourstone_Sync declares their interfaces, so WoW no longer lists it as out of date.
+After updating the Companion, fully close and restart WoW once. Companion versions
+before 0.2.0 remain compatible with their playtime, guild and visibility features.
 
 Hourstone 0.3.2 supports [protocol 4](docs/sync-protocol-v4.md) with a compatible [Hourstone Companion](https://github.com/krebs3r/hourstone-companion), including Retail progress, guild membership and shared delete/restore controls. Companion 0.1.3–0.1.6 remains compatible for the existing protocol-3 features. Upgrading from the public 0.1.1 release migrates saved data to schema 3 while preserving existing characters and settings. An upgrade from 0.2.2 or later keeps SavedVariables schema 3 without another migration. Legacy protocol 1–3 input remains readable; Hourstone 0.1.x does not support the Companion. New Companions read the local progress cache from 0.3.1, but send progress back only to an addon advertising protocol-4 support.
 
 WoW first saves by logging out or using `/reload`. The Companion reads the saved observations from your selected installations and accounts, combines them and makes the shared overview available to the addon. Hourstone reads that overview on the next login or `/reload`. After the initial installation of the Companion data addon, fully close and restart WoW once. Between PCs, choose a folder that Dropbox, OneDrive or another service synchronizes and keeps available locally on each device; the Companion exchanges device snapshots through that folder.
 
-[Hourstone Companion 0.1.6 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.1.6) is available as an installer or portable package. This is an unsigned preview release. Its repository contains setup information and source code. Hourstone remains fully usable on its own.
+[Hourstone Companion 0.2.1 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.2.1) is available as an installer or portable package. This is an unsigned preview release; installations from GitHub update automatically. A Microsoft Store version is submitted separately and requires certification. Its repository contains setup information and source code. Hourstone remains fully usable on its own.
 
 Repeated observations of the same character are merged, never added. Confirmed server measurements are stored separately from local estimates. UI settings, request timing and the current session remain local. Synchronization cannot transfer `/played` between distinct characters, fetch unvisited characters or update a running client in real time. The companion's documentation explains setup, backups and limitations.
 
@@ -82,9 +83,9 @@ Repeated observations of the same character are merged, never added. Confirmed s
 | Mists of Pandaria Classic | 50504 |
 | Burning Crusade Classic Anniversary | 20506 |
 | Classic Era | 11509 |
-| WoW: Forever (beta) | 16001 |
+| WoW: Forever | 16001 |
 
-WoW: Forever uses the Retail API but keeps Hourstone's Classic design and playtime view; keystones and the Great Vault do not exist there. Its characters are recorded under the Retail client family, because Companion protocol 4 has no separate Forever family. Hardcore and Season of Discovery use the Era interface and have not been separately verified. See [validation](docs/VALIDATION.md) for current in-game coverage and automated checks.
+WoW: Forever uses the Retail API but keeps Hourstone's Classic design and playtime view; keystones and the Great Vault do not exist there. Its characters are recorded under the Retail client family, because Companion protocol 4 has no separate Forever family; Companion 0.2.1 and newer label them as WoW: Forever. Forever replaces realms with rulesets: if WoW reports a character without a realm, Hourstone saves the current realm name or `?`, never an empty value. Interface 16001 is so far confirmed only on Forever beta and test builds, and Hourstone has not yet been tested in the live Forever client. Beta characters do not carry over to the live game; if you copied the beta's `WTF` folder into `_forever_`, close WoW and move `Hourstone.lua` out of `_forever_\WTF\Account\*\SavedVariables` before your first live login, otherwise the beta characters stay in the list. Hardcore and Season of Discovery use the Era interface and have not been separately verified. See [validation](docs/VALIDATION.md) for current in-game coverage and automated checks.
 
 ## Development
 

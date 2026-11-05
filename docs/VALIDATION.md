@@ -54,6 +54,17 @@ live Forever that a character logging in shows its full name with the realm WoW
 reports. The client filter and progress exclusion in Retail and the Classic clients
 have not been separately tested in-game for 0.3.7.
 
+The v0.3.7 GitHub release ZIP has SHA-256
+`4e7bad0a8aa3a431673c5a013226901c1c452dd081d08e37d271d991a05c0f78`. It is not the
+same ZIP file as the tested build, contrary to the release commit's message: that
+build was packaged locally with Python 3.14, whose zlib-ng compresses differently.
+Both ZIPs contain the same 45 files byte for byte, in the same order and with the same
+metadata, so the tested addon is the published one, and a local rebuild with Python
+3.12 reproduces the release ZIP exactly. The CurseForge upload created
+[file 9463844](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/9463844)
+with game versions 12.1.5, 2.5.6, 5.5.4, 1.15.9 and 1.60.1, awaiting CurseForge
+approval. The receipt is recorded in [releases/v0.3.7.json](curseforge/releases/v0.3.7.json).
+
 Version 0.3.6 keeps the declared interfaces of 0.3.5 and labels WoW: Forever
 characters as WoW: Forever. In the Forever client, Hourstone marks each character it
 records with `client = "forever"` beside the Retail flavor; keys, overview removal,

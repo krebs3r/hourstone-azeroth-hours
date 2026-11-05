@@ -6,7 +6,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tests"))
-from run import runtime
+from run import CAMELOT, FOREVER, runtime
 
 
 def ordered(values):
@@ -56,6 +56,59 @@ class SyncContract(unittest.TestCase):
                         if "expectedGuilds" in case:
                             self.assertEqual(ordered(row.guild for row in selected), case["expectedGuilds"])
                             self.assertEqual(ordered(row.guildUpdatedAt for row in selected), case["expectedGuildUpdatedAts"])
+
+    def test_shared_forever_cases(self):
+        fixture = json.loads((ROOT / "tests/fixtures/sync/forever-v4.json").read_text(encoding="utf-8"))
+        self.assertEqual((fixture["formatVersion"], fixture["field"]), (4, "foreverSources"))
+
+        def labelled(case, listed, project, interface):
+            lua = runtime(project, "enUS", interface=interface)
+            local = {f"{o['region']}:{o['flavor']}:{o['guid']}": o for o in case["local"]}
+            lua.globals().SOURCE = case["localSourceId"]
+            lua.globals().LOCAL = lua.table_from(local, recursive=True)
+            lua.globals().OBSERVATIONS = lua.table_from(case["observations"], recursive=True)
+            lua.globals().LIST = lua.table_from(listed) if listed else None
+            lua.execute('''local db=H.M.Init({sourceId=SOURCE,characters=LOCAL})
+                assert(H.S.Import(db,{formatVersion=4,sources={[SOURCE]={observations=OBSERVATIONS,visibility={},progressObservations={},foreverSources=LIST}}}))
+                assert(H.S.status=="ready"); FOREVER={}
+                for _,row in pairs(H.S.Display(db).characters) do
+                    if H.M.Client(row)=="forever" then FOREVER[#FOREVER+1]=H.S.Key(row,SOURCE) end
+                end''')
+            return sorted(lua.globals().FOREVER.values())
+
+        for case in fixture["cases"]:
+            self.assertEqual(case["expectedList"], sorted(set(case["expectedList"])))
+            # The canonical list and the Companion's whole input set label the same rows.
+            for listed in (case["expectedList"], sorted(set(case["foreverSources"]))):
+                for client, project, interface in (("Retail", 1, None), ("Forever", CAMELOT, FOREVER)):
+                    with self.subTest(case=case["name"], client=client, listed=listed):
+                        self.assertEqual(labelled(case, listed, project, interface), case["expectedForever"])
+
+        # forever-data-v4.lua is the Companion's generated data for the first case.
+        golden = (ROOT / "tests/fixtures/sync/forever-data-v4.lua").read_text(encoding="utf-8")
+        first = fixture["cases"][0]
+        for client, project, interface in (("Retail", 1, None), ("Forever", CAMELOT, FOREVER)):
+            with self.subTest(golden=client):
+                lua = runtime(project, "enUS", interface=interface)
+                lua.execute(golden)
+                lua.globals().SOURCE = first["localSourceId"]
+                lua.execute('''local db=H.M.Init({sourceId=SOURCE})
+                    assert(H.S.Import(db,HourstoneSync) and H.S.status=="ready"); FOREVER={}
+                    for _,row in pairs(H.S.Display(db).characters) do
+                        if H.M.Client(row)=="forever" then FOREVER[#FOREVER+1]=H.S.Key(row,SOURCE) end
+                    end''')
+                self.assertEqual(sorted(lua.globals().FOREVER.values()), first["expectedForever"])
+
+        invalid = [(repr(value), [value]) for value in fixture["invalidSourceIds"]]
+        invalid += [(case["name"], case["value"]) for case in fixture["invalidLists"]]
+        for name, value in invalid:
+            with self.subTest(invalid=name):
+                lua = runtime()
+                lua.globals().LIST = lua.table_from(value, recursive=True) if isinstance(value, (list, dict)) else value
+                lua.execute('''local db=H.M.Init({sourceId="contract-target"})
+                    local valid={sourceId="contract-target",region="eu",flavor="retail",guid="Player-1-A",name="A",realm="R",class="MAGE",level=1,seconds=1,updatedAt=1}
+                    assert(not H.S.Import(db,{formatVersion=4,sources={[db.sourceId]={observations={valid},visibility={},progressObservations={},foreverSources=LIST}}}))
+                    assert(H.S.status=="invalid" and next(H.S.received)==nil and next(H.S.receivedForever)==nil)''')
 
     def test_shared_invalid_guild_cases(self):
         fixture = json.loads((ROOT / "tests/fixtures/sync/contract-v2.json").read_text(encoding="utf-8"))

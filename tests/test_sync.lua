@@ -60,6 +60,52 @@ assert(not S.Import(db,{formatVersion=5,sources={}}) and next(S.received)==nil)
 assert(not S.Import(db,payload(db.sourceId,{a,{}})) and next(S.received)==nil)
 assert(S.Import(db,nil) and S.status=="absent")
 
+-- Protocol 4 addendum: the Companion lists the sources whose observations come from WoW: Forever.
+local function scoped(list,rows)
+    return {formatVersion=4,sources={[db.sourceId]={observations=rows,visibility={},progressObservations={},foreverSources=list}}}
+end
+local forever=observation({sourceId="forever-source",guid="Player-1-FOR"})
+local function listed() return S.Import(db,scoped({"forever-source","unused-source"},{b,forever})) and S.status=="ready" end
+assert(listed() and S.receivedForever["forever-source"] and S.receivedForever["unused-source"])
+local shown=S.Display(db).characters
+assert(M.Client(shown["sync:"..S.Key(forever)])=="forever" and M.Client(shown["sync:"..S.Key(b)])=="retail")
+assert(M.ClientText(shown["sync:"..S.Key(forever)])==H.L.forever and shown["sync:"..S.Key(forever)].flavor=="retail")
+assert(S.received[S.Key(forever)].client==nil) -- the label never enters received observations
+local classic=observation({sourceId="forever-source",guid="Player-1-ERA",flavor="era"})
+assert(S.Import(db,scoped({"forever-source"},{classic})) and S.Display(db).characters["sync:"..S.Key(classic)].client==nil)
+-- An absent list is empty, and so is an empty one.
+for _,list in ipairs({false,{}}) do
+    assert(S.Import(db,scoped(list or nil,{b,forever})) and S.status=="ready" and next(S.receivedForever)==nil)
+    assert(M.Client(S.Display(db).characters["sync:"..S.Key(forever)])=="retail")
+end
+-- A malformed list rejects the payload like any other invalid field and clears earlier data.
+local limit=S.FOREVER_LIMIT
+for name,list in pairs({text="forever-source",number=1,keyed={["forever-source"]=true},entry={1},nested={{"forever-source"}},
+    duplicate={"forever-source","forever-source"},gap={[1]="forever-source",[3]="unused-source"},zero={[0]="forever-source"},
+    fraction={[1.5]="forever-source"},invalid={"bad id"},empty={""},long={string.rep("a",129)},control={"a\0b"},
+    limit={"forever-source","unused-source","third-source"}}) do
+    assert(listed(),name); S.FOREVER_LIMIT=name=="limit" and 2 or limit
+    assert(not S.Import(db,scoped(list,{b,forever})) and S.status=="invalid",name)
+    assert(next(S.received)==nil and next(S.receivedForever)==nil,name)
+    S.FOREVER_LIMIT=limit
+end
+assert(listed() and S.Import(db,scoped({string.rep("a",128)},{b})))
+-- Formats 1–3 have no list; a rejected, incompatible, foreign or absent payload resets it.
+assert(listed() and not S.Import(db,{formatVersion=3,sources={[db.sourceId]={observations={b},visibility={},foreverSources={}}}}))
+assert(S.status=="invalid" and next(S.receivedForever)==nil)
+assert(listed() and not S.Import(db,{formatVersion=5,sources={}}) and next(S.receivedForever)==nil)
+assert(listed() and S.Import(db,scoped({"forever-source"},{b,{}})) == false and next(S.receivedForever)==nil)
+assert(listed() and S.Import(db,payload("another-account",{b})) and next(S.receivedForever)==nil)
+assert(listed() and S.Import(db,nil) and S.status=="absent" and next(S.receivedForever)==nil)
+-- This database's own record of a character decides; the list labels only characters it has not recorded.
+local copy=M.Init({sourceId="copy-source",characters={own={sourceId="copy-source",region="eu",flavor="retail",guid="Player-1-FOR",
+    name="Synthetic",realm="Test Realm",class="MAGE",level=80,seconds=900,updatedAt=900}}})
+assert(S.Import(copy,{formatVersion=4,sources={["copy-source"]={observations={forever},visibility={},progressObservations={},foreverSources={"forever-source"}}}}))
+local function client(target) local _,row=next(S.Display(target).characters); return M.Client(row) end
+assert(client(copy)=="retail")
+copy.characters.own.client="forever"; assert(client(copy)=="forever")
+assert(S.Import(db,nil))
+
 -- The current tracker cannot pick up a received baseline, including on reload.
 if H.C.Flavor():match("^project%-") then
     assert(not S.Valid(observation({flavor=H.C.Flavor()})))

@@ -1,0 +1,277 @@
+{
+  "formatVersion": 4,
+  "field": "foreverSources",
+  "description": "Optional WoW: Forever source list of generated format 4 data. foreverSources is the Companion's input set, expectedList the canonical list it writes into each source scope, local the reading database's own characters and expectedForever the identities the addon labels WoW: Forever.",
+  "cases": [
+    {
+      "name": "Forever characters of another account and another PC",
+      "localSourceId": "hs-retail-account",
+      "foreverSources": [
+        "hs-forever-pc",
+        "hs-forever-account",
+        "hs-forever-account",
+        "hs-forever-idle"
+      ],
+      "expectedList": [
+        "hs-forever-account",
+        "hs-forever-pc"
+      ],
+      "local": [],
+      "observations": [
+        {
+          "sourceId": "hs-forever-account",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-F01",
+          "name": "Everlight",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 7200,
+          "updatedAt": 1793840000
+        },
+        {
+          "sourceId": "hs-forever-pc",
+          "region": "unknown",
+          "flavor": "retail",
+          "guid": "Player-1-F02",
+          "name": "Farwander",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 3600,
+          "updatedAt": 1793841000
+        },
+        {
+          "sourceId": "hs-retail-account",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-R01",
+          "name": "Homecoming",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 90000,
+          "updatedAt": 1793842000
+        },
+        {
+          "sourceId": "hs-retail-other",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-R02",
+          "name": "Neighbour",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 45000,
+          "updatedAt": 1793843000
+        }
+      ],
+      "expectedForever": [
+        "eu:retail:Player-1-F01",
+        "unknown:hs-forever-pc:retail:Player-1-F02"
+      ]
+    },
+    {
+      "name": "the playtime winner's source decides",
+      "localSourceId": "hs-retail-account",
+      "foreverSources": [
+        "hs-forever-account"
+      ],
+      "expectedList": [],
+      "local": [],
+      "observations": [
+        {
+          "sourceId": "hs-forever-account",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-X01",
+          "name": "Twofold",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 100,
+          "updatedAt": 1793840000
+        },
+        {
+          "sourceId": "hs-retail-other",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-X01",
+          "name": "Twofold",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 200,
+          "updatedAt": 1793850000
+        }
+      ],
+      "expectedForever": []
+    },
+    {
+      "name": "Classic families are never labelled",
+      "localSourceId": "hs-retail-account",
+      "foreverSources": [
+        "hs-forever-account"
+      ],
+      "expectedList": [
+        "hs-forever-account"
+      ],
+      "local": [],
+      "observations": [
+        {
+          "sourceId": "hs-forever-account",
+          "region": "eu",
+          "flavor": "era",
+          "guid": "Player-1-E01",
+          "name": "Oldtimer",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 500,
+          "updatedAt": 1793840000
+        }
+      ],
+      "expectedForever": []
+    },
+    {
+      "name": "no Forever source writes no list",
+      "localSourceId": "hs-retail-account",
+      "foreverSources": [],
+      "expectedList": [],
+      "local": [],
+      "observations": [
+        {
+          "sourceId": "hs-retail-other",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-R02",
+          "name": "Neighbour",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 45000,
+          "updatedAt": 1793843000
+        }
+      ],
+      "expectedForever": []
+    },
+    {
+      "name": "a character this database recorded keeps its own label",
+      "localSourceId": "hs-forever-copy",
+      "foreverSources": [
+        "hs-forever-copy"
+      ],
+      "expectedList": [
+        "hs-forever-copy"
+      ],
+      "local": [
+        {
+          "sourceId": "hs-forever-copy",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-C01",
+          "name": "Copied",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 1000,
+          "updatedAt": 1793830000
+        },
+        {
+          "sourceId": "hs-forever-copy",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-C02",
+          "name": "Marked",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 2000,
+          "updatedAt": 1793840000,
+          "client": "forever"
+        }
+      ],
+      "observations": [
+        {
+          "sourceId": "hs-forever-copy",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-C01",
+          "name": "Copied",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 1500,
+          "updatedAt": 1793845000
+        },
+        {
+          "sourceId": "hs-forever-copy",
+          "region": "eu",
+          "flavor": "retail",
+          "guid": "Player-1-C03",
+          "name": "Elsewhere",
+          "realm": "Synthetic Realm",
+          "class": "PRIEST",
+          "level": 20,
+          "seconds": 3000,
+          "updatedAt": 1793846000
+        }
+      ],
+      "expectedForever": [
+        "eu:retail:Player-1-C02",
+        "eu:retail:Player-1-C03"
+      ]
+    }
+  ],
+  "invalidSourceIds": [
+    "",
+    "two words",
+    "hs/a",
+    "hs.a",
+    "hs:a",
+    "ä",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  ],
+  "invalidLists": [
+    {
+      "name": "text",
+      "value": "hs-forever-account"
+    },
+    {
+      "name": "number",
+      "value": 1
+    },
+    {
+      "name": "boolean",
+      "value": true
+    },
+    {
+      "name": "keyed table",
+      "value": {
+        "hs-forever-account": true
+      }
+    },
+    {
+      "name": "number entry",
+      "value": [
+        1
+      ]
+    },
+    {
+      "name": "nested list",
+      "value": [
+        [
+          "hs-forever-account"
+        ]
+      ]
+    },
+    {
+      "name": "duplicate entry",
+      "value": [
+        "hs-forever-account",
+        "hs-forever-account"
+      ]
+    }
+  ]
+}

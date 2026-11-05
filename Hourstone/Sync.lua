@@ -94,8 +94,23 @@ local function copy(o)
     for _, key in ipairs(fields) do result[key] = o[key] end
     return result
 end
+S.FOREVER_LIMIT = 20000
+-- Protocol 4 addendum: the Companion lists the source IDs whose observations were recorded
+-- in WoW: Forever. An absent list is empty; a malformed one rejects the payload.
+local function foreverSources(list)
+    if list == nil then return {} end
+    if type(list) ~= "table" then return nil end
+    local result, count, last = {}, 0, 0
+    for index, id in pairs(list) do
+        count = count + 1
+        if count > S.FOREVER_LIMIT or type(index) ~= "number" or index < 1 or index % 1 ~= 0
+            or not text(id, 128) or not id:match("^[A-Za-z0-9_-]+$") or result[id] then return nil end
+        result[id], last = true, math.max(last, index)
+    end
+    return last == count and result or nil
+end
 function S.Import(db, payload)
-    S.received, S.receivedProgress, S.status = {}, {}, "absent"
+    S.received, S.receivedProgress, S.receivedForever, S.status = {}, {}, {}, "absent"
     if payload == nil then return true end
     if type(payload) ~= "table" or (payload.formatVersion ~= 1 and payload.formatVersion ~= 2 and payload.formatVersion ~= 3 and payload.formatVersion ~= S.FORMAT) or type(payload.sources) ~= "table" then
         S.status = "incompatible"; return false
@@ -105,7 +120,9 @@ function S.Import(db, payload)
     if type(scope) ~= "table" or type(scope.observations) ~= "table" then S.status = "invalid"; return false end
     if (payload.formatVersion < 3 and scope.visibility ~= nil)
         or (payload.formatVersion >= 3 and not H.V.ValidList(scope.visibility))
-        or (payload.formatVersion < 4 and scope.progressObservations ~= nil) then S.status = "invalid"; return false end
+        or (payload.formatVersion < 4 and (scope.progressObservations ~= nil or scope.foreverSources ~= nil)) then S.status = "invalid"; return false end
+    local forever = foreverSources(scope.foreverSources)
+    if not forever then S.status = "invalid"; return false end
     local visibility = H.V.Merge(db.visibility, payload.formatVersion >= 3 and scope.visibility or {})
     if not visibility then S.status = "invalid"; return false end
     local progress = {}
@@ -124,10 +141,10 @@ function S.Import(db, payload)
         imported[key] = S.Choose(imported[key], copy(o))
     end
     db.visibility = visibility
-    S.received, S.receivedProgress, S.status = imported, H.P.IndexObservations(progress), "ready"
+    S.received, S.receivedProgress, S.receivedForever, S.status = imported, H.P.IndexObservations(progress), forever, "ready"
     return true
 end
--- The Forever marker is local display data outside protocol 4. It labels a character by
+-- The Forever marker is local display data beside protocol 4. It labels a character by
 -- identity, so a received observation that wins the merge keeps the local label.
 local function labelled(row)
     local result = {}
@@ -136,7 +153,7 @@ local function labelled(row)
     return result
 end
 function S.Display(db, valueFor, removedOnly)
-    local selected, originalKeys, forever = {}, {}, {}
+    local selected, originalKeys, forever, recorded = {}, {}, {}, {}
     for key, o in pairs(db.characters) do
         if type(o) == "table" then
             local row = copy(o)
@@ -145,12 +162,17 @@ function S.Display(db, valueFor, removedOnly)
             row._local = true
             local identity = S.Key(row, db.sourceId) or key
             if o.client == "forever" then forever[identity] = true end
+            recorded[identity] = true
             local chosen, winner = S.Choose(selected[identity], row)
             if winner == row then originalKeys[identity] = key end
             selected[identity] = chosen
         end
     end
+    -- The Companion's list labels characters this database has not recorded. For its own
+    -- characters, the local marker decides, so a copied database keeps its Retail entries.
+    local listed = S.receivedForever or {}
     for key, o in pairs(S.received or {}) do
+        if not recorded[key] and o.flavor == "retail" and listed[o.sourceId] then forever[key] = true end
         local chosen, winner = S.Choose(selected[key], o)
         if winner == o then originalKeys[key] = "sync:" .. key end
         selected[key] = chosen

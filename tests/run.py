@@ -27,11 +27,14 @@ FOREVER = 16001
 # WoW: Forever builds since 1.60.1.70170 report WOW_PROJECT_CAMELOT, not MAINLINE.
 CAMELOT = 18
 
-def runtime(project=1, locale="deDE", backdrop=True, interface=None, compartment=None):
+def runtime(project=1, locale="deDE", backdrop=True, interface=None, compartment=None, read=None):
+    # read(relative path) supplies the addon's files, for example those of an earlier release.
+    read = read or (lambda relative: (ROOT / relative).read_text(encoding="utf-8"))
+    toc = read("Hourstone/Hourstone.toc")
     lua = LuaRuntime(unpack_returned_tuples=True)
     lua.globals().TEST_LOCALE = locale
     lua.globals().TEST_INTERFACE = interface or INTERFACES.get(project)
-    lua.globals().TEST_VERSION = re.search(r"## Version: (.+)",(ROOT/"Hourstone/Hourstone.toc").read_text())[1]
+    lua.globals().TEST_VERSION = re.search(r"## Version: (.+)",toc)[1].strip()
     lua.globals().MEASURE_TEXT = measure
     lua.globals().WOW_PROJECT_ID = project
     lua.globals().BackdropTemplateMixin = lua.table() if backdrop else None
@@ -41,9 +44,9 @@ def runtime(project=1, locale="deDE", backdrop=True, interface=None, compartment
         lua.execute("AddonCompartmentFrame=nil")
     lua.execute("H={}")
     loader = lua.eval('function(code,name) local f,e=loadstring(code,name); assert(f,e); f("Hourstone",H) end')
-    for line in (ROOT / "Hourstone/Hourstone.toc").read_text().splitlines():
+    for line in toc.splitlines():
         if line.endswith(".lua"):
-            loader((ROOT / "Hourstone" / line).read_text(encoding="utf-8"), line)
+            loader(read("Hourstone/" + line), line)
     return lua
 
 def main():

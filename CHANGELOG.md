@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.7 — unreleased
+
+- Label synchronized WoW: Forever characters that this account has not recorded itself, such as another account's or another PC's, as **WoW: Forever** on every client, Forever included. Companion 0.2.2 adds an optional `foreverSources` list of Forever source IDs to the generated format 4 data ([addendum](docs/sync-protocol-v4-forever.md)); Hourstone labels a received Retail-family row whose winning observation comes from a listed source. Protocol 4, the `retail` flavor, keys, merging, totals and SavedVariables schema 3 are unchanged.
+- Keep this database's own markers authoritative for the characters it has recorded, so a `WTF` folder copied from Retail into Forever keeps its Retail entries.
+- Validate the list like every other received field: a malformed list, or one in formats 1–3, rejects the payload, and every import starts without a list. Hourstone 0.3.2 to 0.3.6 ignore the list.
+- Offer WoW: Forever in the client filter on every client whenever a row of the current view is a Forever character, and keep the entry while it is selected. Retail's progress view treats labelled characters as unsupported.
+- Cover the list with fixtures shared with the Companion, including the Companion's generated data byte for byte, the labels in the Retail and the Forever client, validation and reset, the menu, and imports by the tagged releases 0.3.2 to 0.3.6.
+
 ## 0.3.6 — 2026-11-05
 
 - Show WoW: Forever characters as **WoW: Forever** instead of Retail in the client column, the row tooltip and the client sort. In the Forever client, the client filter offers WoW: Forever next to Retail. The label is a display marker (`client = "forever"`) beside the Retail flavor; character keys, overview removal, SavedVariables schema 3 and Companion protocol 4 are unchanged.

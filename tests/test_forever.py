@@ -1,5 +1,7 @@
 """WoW: Forever stays in the Retail client family and is labelled as its own client."""
 from pathlib import Path
+import re
+import subprocess
 import sys
 import unittest
 
@@ -17,10 +19,12 @@ def record(flavor, seconds, updated_at):
             "realm": "Blackhand", "class": "MAGE", "level": 90, "seconds": seconds, "updatedAt": updated_at}
 
 
-def login(project, interface, characters, runtime_state=None, reload=False, setup=None, client=None, source="local-source"):
+def login(project, interface, characters, runtime_state=None, reload=False, setup=None, client=None, source="local-source", sync=None):
     lua = runtime(project, "enUS", interface=interface)
     if setup:
         lua.execute(setup)
+    if sync is not None:
+        lua.globals().HourstoneSync = lua.table_from(sync, recursive=True)
     saved = {"version": 3, "visibility": {}, "sourceId": source, "characters": characters}
     if runtime_state:
         saved["runtime"] = runtime_state
@@ -233,20 +237,169 @@ class ForeverLabel(unittest.TestCase):
         lua.execute('FOREVER_ROW = {flavor="retail", client="forever", guid="Player-9-AAA", region="eu", sourceId="local-source"}')
         self.assertFalse(H.P.Get(H.P, lua.globals().FOREVER_ROW).supported)
 
-    def test_client_menu_offers_forever_on_forever_only(self):
+    def test_client_menu_offers_forever_where_a_row_can_match(self):
+        # Without synchronized Forever rows, only the Forever client offers the entry.
         for project, interface, forever in ((CAMELOT, FOREVER, True), (1, FOREVER, True), (1, None, False), (2, None, False)):
             with self.subTest(project=project, interface=interface):
                 lua, db = login(project, interface, {f"{SCOPE}:era:Player-1-DDD": alt("era", LIVE + 60, "Player-1-DDD")})
                 lua.execute("H.UI:Create(); H.UI:Refresh()")
                 U = lua.globals().H.UI
-                self.assertEqual(U.clientRows.forever is not None, forever)
+                self.assertEqual(bool(U.clientRows.forever.shown), forever)
                 self.assertEqual(U.clientMenu.height, 16 + (6 if forever else 5) * 25)
+                self.assertEqual(U.clientRows.era.points[1][5], -(8 + (5 if forever else 4) * 25))
                 if forever:
                     U.clientRows.forever.scripts.OnClick()
                     self.assertEqual((U.flavor, U.visibleCount), ("forever", 1))
                     self.assertEqual((U.clientButton.label.text, U.rows[1].client.text), ("WoW: Forever", "WoW: Forever"))
                     U.clientRows.retail.scripts.OnClick()
                     self.assertEqual(U.visibleCount, 0)
+
+
+OTHER = "hs-other-account"  # a Forever account whose database this client never loaded
+
+
+def observation(source, guid, name, region="eu", updated_at=LIVE + 600):
+    return {"sourceId": source, "region": region, "flavor": "retail", "guid": guid, "name": name,
+            "realm": "Ruleset", "class": "PRIEST", "level": 20, "seconds": 7200, "updatedAt": updated_at}
+
+
+def payload(local, observations, forever_sources=None, version=4):
+    scope = {"observations": observations, "visibility": {}}
+    if version >= 4:
+        scope["progressObservations"] = {}
+    if forever_sources is not None:
+        scope["foreverSources"] = forever_sources
+    return {"formatVersion": version, "sources": {local: scope}}
+
+
+SYNCED = [observation(OTHER, "Player-2-FFF", "Everlight"), observation("hs-retail-account", "Player-3-RRR", "Thrall")]
+EVERLIGHT, THRALL = "sync:eu:retail:Player-2-FFF", "sync:eu:retail:Player-3-RRR"
+
+
+class ForeverSync(unittest.TestCase):
+    """The Companion's foreverSources list labels synchronized Forever characters everywhere."""
+
+    def test_another_accounts_forever_character_is_labelled_in_retail_and_forever(self):
+        for client, project, interface in (("Retail", 1, None), ("Forever", CAMELOT, FOREVER)):
+            with self.subTest(client=client):
+                lua, db = login(project, interface, {}, sync=payload("local-source", SYNCED, [OTHER]))
+                H = lua.globals().H
+                self.assertEqual((H.S.status, H.S.receivedForever[OTHER]), ("ready", True))
+                display = H.S.Display(db)
+                everlight, thrall = display.characters[EVERLIGHT], display.characters[THRALL]
+                self.assertEqual((everlight.flavor, everlight.client, H.M.ClientText(everlight)), ("retail", "forever", "WoW: Forever"))
+                self.assertEqual(H.M.ClientText(thrall), H.L.retail)
+                self.assertIsNone(H.S.received["eu:retail:Player-2-FFF"].client)
+                self.assertFalse(H.P.Get(H.P, everlight).supported)
+                self.assertEqual(H.P.Get(H.P, thrall).supported, client == "Retail")
+
+                lua.execute("H.UI:Create(); H.UI:Refresh()")
+                U = H.UI
+                self.assertTrue(U.clientRows.forever.shown)
+                self.assertEqual(U.clientMenu.height, 16 + 6 * 25)
+                U.clientRows.forever.scripts.OnClick()
+                self.assertEqual((U.flavor, U.clientButton.label.text), ("forever", "WoW: Forever"))
+                names = {U.rows[i].name.text for i in range(1, U.visibleCount + 1)}
+                self.assertIn("Everlight", names)
+                self.assertNotIn("Thrall", names)
+                self.assertEqual(U.visibleCount, 2 if client == "Forever" else 1)  # Forever also lists the logged-in character
+
+    def test_without_a_list_synchronized_characters_stay_retail(self):
+        # Data of Companion 0.2.1 and earlier, or a PC without a Forever installation.
+        lua, db = login(1, None, {}, sync=payload("local-source", SYNCED))
+        H = lua.globals().H
+        self.assertEqual(H.S.status, "ready")
+        self.assertEqual(H.M.ClientText(H.S.Display(db).characters[EVERLIGHT]), H.L.retail)
+        lua.execute("H.UI:Create(); H.UI:Refresh()")
+        self.assertFalse(H.UI.clientRows.forever.shown)
+        self.assertEqual(H.UI.clientMenu.height, 16 + 5 * 25)
+
+    def test_the_entry_follows_the_displayed_rows(self):
+        lua, db = login(1, None, {}, sync=payload("local-source", SYNCED, [OTHER]))
+        H = lua.globals().H
+        lua.execute("H.UI:Create(); H.UI:Refresh()")
+        U = H.UI
+        self.assertTrue(U.clientRows.forever.shown)
+        U.clientRows.forever.scripts.OnClick()
+        # Removing the only Forever character keeps the selected filter in the menu.
+        self.assertTrue(H.V.Remove(db, H.S.Display(db).characters[EVERLIGHT]))
+        U.Refresh(U)
+        self.assertEqual((U.flavor, U.visibleCount, bool(U.clientRows.forever.shown)), ("forever", 0, True))
+        U.clientRows.all.scripts.OnClick()
+        self.assertFalse(U.clientRows.forever.shown)
+        self.assertEqual(U.clientMenu.height, 16 + 5 * 25)
+        # The removed view lists it again.
+        U.SetRemovedView(U, True)
+        self.assertTrue(U.clientRows.forever.shown)
+
+    def test_this_databases_own_records_decide(self):
+        # A WTF folder copied from Retail into Forever keeps its Retail entries; a character that only
+        # another PC with a copy of this database recorded gets the Companion's label.
+        old = source(LIVE - 1)
+        stale = dict(alt("retail", LIVE - 3600, "Player-1-BBB"), region="eu", sourceId=old)
+        relayed = [dict(stale, seconds=4100, updatedAt=LIVE + 60), observation(old, "Player-1-CCC", "Elsewhere")]
+        lua, db = login(CAMELOT, FOREVER, {"eu:retail:Player-1-BBB": stale}, source=old, sync=payload(old, relayed, [old]))
+        H = lua.globals().H
+        display = H.S.Display(db).characters
+        self.assertEqual(H.M.ClientText(display["sync:eu:retail:Player-1-BBB"]), H.L.retail)
+        self.assertEqual(H.M.ClientText(display["sync:eu:retail:Player-1-CCC"]), H.L.forever)
+        self.assertEqual(H.M.ClientText(display[H.T.key]), H.L.forever)
+
+    def test_a_rejected_payload_drops_the_list(self):
+        for broken in (payload("local-source", SYNCED, ["bad id"]), payload("local-source", SYNCED, [OTHER, OTHER]),
+                       payload("local-source", [SYNCED[0]], [OTHER], version=3)):
+            with self.subTest(broken=broken):
+                lua, db = login(1, None, {}, sync=broken)
+                H = lua.globals().H
+                self.assertEqual(H.S.status, "invalid")
+                self.assertIsNone(next(iter(H.S.receivedForever.keys()), None))
+                self.assertEqual(list(H.S.Display(db).characters.keys()), [H.T.key])  # only the logged-in character
+
+
+def git(*args):
+    return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True, encoding="utf-8", check=True).stdout
+
+
+def releases():
+    """Tagged releases that read protocol 4: 0.3.2 up to the version before this one."""
+    try:
+        tags = git("tag", "--list", "v0.3.*").split()
+    except (OSError, subprocess.CalledProcessError):
+        return []
+    toc = (ROOT / "Hourstone/Hourstone.toc").read_text(encoding="utf-8")
+    current = tuple(int(part) for part in re.search(r"^## Version: (\d+\.\d+\.\d+)", toc, re.M)[1].split("."))
+    versions = sorted(tuple(int(part) for part in tag[1:].split(".")) for tag in tags if re.fullmatch(r"v0\.3\.\d+", tag))
+    return [f"v{'.'.join(map(str, v))}" for v in versions if (0, 3, 2) <= v < current]
+
+
+class OlderAddons(unittest.TestCase):
+    def test_released_addons_ignore_the_forever_list(self):
+        tags = releases()
+        if not tags:
+            self.skipTest("release tags are not available in this checkout")
+        self.assertIn("v0.3.5", tags)  # 0.3.6's import is unchanged from 0.3.5
+        for tag in tags:
+            results = []
+            for listed in (None, [OTHER, "hs-retail-account"]):
+                with self.subTest(release=tag, listed=listed is not None):
+                    lua = runtime(1, "enUS", read=lambda relative, tag=tag: git("show", f"{tag}:{relative}"))
+                    self.assertEqual(lua.globals().TEST_VERSION, tag[1:])
+                    lua.globals().PAYLOAD = lua.table_from(payload("hs-local", SYNCED, listed), recursive=True)
+                    lua.execute('''local db=H.M.Init({sourceId="hs-local"})
+                        OK=H.S.Import(db,PAYLOAD); STATUS=H.S.status; ROWS={}
+                        for key,row in pairs(H.S.Display(db).characters) do ROWS[#ROWS+1]=key.."="..row.name.."/"..row.seconds.."/"..tostring(row.client) end''')
+                    self.assertEqual((lua.globals().OK, lua.globals().STATUS), (True, "ready"))
+                    results.append(sorted(lua.globals().ROWS.values()))
+            self.assertEqual(results[0], results[1])
+            self.assertEqual(len(results[0]), 2)
+            # The Companion's generated data with the list, as Hourstone_Sync loads it.
+            with self.subTest(release=tag, golden=True):
+                lua = runtime(1, "enUS", read=lambda relative, tag=tag: git("show", f"{tag}:{relative}"))
+                lua.execute((ROOT / "tests/fixtures/sync/forever-data-v4.lua").read_text(encoding="utf-8"))
+                lua.execute('''local db=H.M.Init({sourceId="hs-retail-account"})
+                    OK=H.S.Import(db,HourstoneSync); STATUS=H.S.status; COUNT=0
+                    for _,row in pairs(H.S.Display(db).characters) do assert(row.client==nil); COUNT=COUNT+1 end''')
+                self.assertEqual((lua.globals().OK, lua.globals().STATUS, lua.globals().COUNT), (True, "ready", 4))
 
 
 if __name__ == "__main__":

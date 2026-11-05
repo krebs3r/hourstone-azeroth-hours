@@ -82,6 +82,13 @@ function C.Identity(sourceId)
     local guid = UnitGUID("player")
     if not guid then return nil end
     local name, realm = UnitFullName("player")
+    -- WoW: Forever reports a character's surname where other clients report the realm:
+    -- UnitFullName returns "Magni", "Wildschuss", GetUnitName("player", true) "Magni
+    -- Wildschuss", and only GetRealmName() names the realm ("CAMWOW EU4 Realm 10 RP").
+    if C.IsForever() then
+        if Text(name) and Text(realm) then name = name .. " " .. realm end
+        realm = nil
+    end
     local _, class = UnitClass("player")
     local region, flavor = C.Region(), C.Flavor()
     local scope = region == "unknown" and (region .. ":" .. (sourceId or "local")) or region

@@ -127,8 +127,16 @@ function S.Import(db, payload)
     S.received, S.receivedProgress, S.status = imported, H.P.IndexObservations(progress), "ready"
     return true
 end
+-- The Forever marker is local display data outside protocol 4. It labels a character by
+-- identity, so a received observation that wins the merge keeps the local label.
+local function labelled(row)
+    local result = {}
+    for key, value in pairs(row) do result[key] = value end
+    result.client = "forever"
+    return result
+end
 function S.Display(db, valueFor, removedOnly)
-    local selected, originalKeys = {}, {}
+    local selected, originalKeys, forever = {}, {}, {}
     for key, o in pairs(db.characters) do
         if type(o) == "table" then
             local row = copy(o)
@@ -136,6 +144,7 @@ function S.Display(db, valueFor, removedOnly)
             if H.T.started and key == H.T.key and row.seconds ~= nil then row.updatedAt = H.C.Epoch() end
             row._local = true
             local identity = S.Key(row, db.sourceId) or key
+            if o.client == "forever" then forever[identity] = true end
             local chosen, winner = S.Choose(selected[identity], row)
             if winner == row then originalKeys[identity] = key end
             selected[identity] = chosen
@@ -149,6 +158,7 @@ function S.Display(db, valueFor, removedOnly)
     local characters, hidden = {}, {}
     for _, state in ipairs(db.visibility or {}) do hidden[S.Key(state)] = H.V.Hidden(state) end
     for key, row in pairs(selected) do
+        if forever[key] then row = labelled(row) end
         if (hidden[key] == true) == (removedOnly == true) then characters[originalKeys[key] or ("sync:" .. key)] = row end
     end
     return {characters=characters}

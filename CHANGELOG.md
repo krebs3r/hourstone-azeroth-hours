@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.6 — 2026-11-05
+
+- Show WoW: Forever characters as **WoW: Forever** instead of Retail in the client column, the row tooltip and the client sort. In the Forever client, the client filter offers WoW: Forever next to Retail. The label is a display marker (`client = "forever"`) beside the Retail flavor; character keys, overview removal, SavedVariables schema 3 and Companion protocol 4 are unchanged.
+- Mark every character Hourstone records in Forever. On the first load of this version in Forever, also mark every Retail-family entry of a database that Hourstone created after the Forever launch (2026-11-04 23:00 UTC, read from the source ID), and entries returned from a `project-` client. An older database, such as a `WTF` folder copied from Retail, keeps Retail; its Forever characters switch at their next login. Each database now records the client that last loaded it, so one copied from another client running 0.3.6 or later is never marked.
+- Keep the label when a synchronized observation of a Forever character wins the merge. Retail's progress view treats Forever characters as unsupported. Protocol 4 carries no client marker, so every client, Forever included, still lists synchronized Forever characters that this account's own database has not recorded, such as another account's or another PC's, under Retail.
+- Record that 0.3.5 ran in the live Forever client (build 1.60.1.70790) and saved its characters with a non-empty realm and the eu region, and the author's in-game test of this build there.
+- Cover the marking, the one-time update of earlier entries, copied databases, synchronized observations, the client filter and sort, the progress exclusion and the menu in the simulation.
+
 ## 0.3.5 — 2026-11-03
 
 - Never record an unknown client on WoW: Forever. On a Forever interface (16xxx), every project ID the client reports counts as the Retail client family, so a further change of Forever's project ID cannot split its characters off again.

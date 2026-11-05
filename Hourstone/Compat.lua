@@ -61,9 +61,12 @@ function C.Flavor()
     if id == (WOW_PROJECT_MISTS_CLASSIC or 19) then return "mists" end
     return "project-" .. tostring(id or "unknown")
 end
+-- The client a character is recorded on. Forever stays in the Retail family for keys,
+-- visibility and Companion protocol 4; "forever" is a display marker beside the flavor.
+function C.Client() return C.IsForever() and "forever" or C.Flavor() end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.3.5"
+    return getter and getter("Hourstone", "Version") or "0.3.6"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)
@@ -83,7 +86,7 @@ function C.Identity(sourceId)
     local region, flavor = C.Region(), C.Flavor()
     local scope = region == "unknown" and (region .. ":" .. (sourceId or "local")) or region
     return { key = scope .. ":" .. flavor .. ":" .. guid, guid = guid, flavor = flavor, region = region,
-        sourceId = sourceId, name = Text(name) or "?",
+        client = C.IsForever() and "forever" or nil, sourceId = sourceId, name = Text(name) or "?",
         realm = C.Realm(realm), class = class or "",
         level = UnitLevel("player") }
 end

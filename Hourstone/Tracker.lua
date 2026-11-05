@@ -24,6 +24,8 @@ function T:UpdateIdentity(level)
     if type(record) ~= "table" then record = {} end
     self.db.characters[self.key] = record
     for k, v in pairs(identity) do if k ~= "key" then record[k] = v end end
+    -- Display marker of the client this character was last recorded on; nil outside Forever.
+    record.client = identity.client
     if M.Number(level) then record.level = level end
     self.record = record
     return true

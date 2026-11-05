@@ -17,7 +17,7 @@ Lua tests execute the actual TOC-ordered addon modules through Lua 5.1, with a l
 - Model and synchronization: record validation, schema migration, server measurements versus estimates, deterministic merging, duplicate handling and imported records. Protocol fixtures contain synthetic data only.
 - Layout: retained [baseline](../tests/fixtures/layout/baseline.json) and [adjustments](../tests/fixtures/layout/adjustments.json), dynamic list height, upper realm/client filters, menu exclusivity and anchors, client sorting including unknown values, column boundaries, nowrap server timestamps, footer credits with unavailable font metrics, saved settings and native minimap references/geometry across four client families.
 - Progress: Retail API observations, completed weekly runs, keystone changes and confirmed absence, category/index-based Vault slots, unknown/protected values, reset expiry, offline reads and local identity adoption. Progress stays outside legacy protocol-3 payloads; protocol 4 carries independent progress observations.
-- Addons menu and WoW: Forever: runtime registration with logo, tooltip owner fallback, left/right click inputs as string or table, failed registration, the one-time minimap migration including later opt-in across reloads, clients without the menu, Forever detection with Classic design, Classic minimap geometry and no Retail progress view. Forever's project-ID change keeps the Retail family, and so does any other project ID reported on a Forever interface. Loading on Forever migrates every entry recorded under a `project-` client, including `project-18` from 0.3.3, characters that are not logged in and a reload session; Retail leaves such entries untouched. An empty realm from `UnitFullName` falls back to `GetRealmName`, then `GetNormalizedRealmName`, then `?`; an empty name is stored as `?`.
+- Addons menu and WoW: Forever: runtime registration with logo, tooltip owner fallback, left/right click inputs as string or table, failed registration, the one-time minimap migration including later opt-in across reloads, clients without the menu, Forever detection with Classic design, Classic minimap geometry and no Retail progress view. Forever's project-ID change keeps the Retail family, and so does any other project ID reported on a Forever interface. Loading on Forever migrates every entry recorded under a `project-` client, including `project-18` from 0.3.3, characters that are not logged in and a reload session; Retail leaves such entries untouched. An empty realm from `UnitFullName` falls back to `GetRealmName`, then `GetNormalizedRealmName`, then `?`; an empty name is stored as `?`. Forever marks the characters it records and labels them WoW: Forever without changing flavor or key; the first load marks every Retail-family entry, including one saved without playtime, of an unstamped database created from the launch second on, and migrated `project-` entries; it leaves databases created earlier, without a creation time or with a replaced source ID, and databases stamped by any client untouched, other clients stamp their database without marking, and a login outside Forever clears a stale marker. A synchronized observation that wins the merge keeps the label without changing the received data; the client filter, client sort, Retail progress support and the Forever-only menu entry follow the label.
 - Scaling: 65%, 130%, 150%, 175% and 200% across display sizes and global UI scales; adaptive visible row capacity, complete scrolling and minimum-size fitting.
 - Assets and packaging: source hashes, exact RGBA conversion, font hashes and licenses, TOC metadata, archive structure, deterministic bytes and SHA-256.
 - Publishing: checksum verification and duplicate-upload prevention, without contacting external publishing services in tests.
@@ -28,6 +28,34 @@ Layout references are design specifications. The approved Progress mockup is kep
 The simulator's font metrics and the Lua-derived browser preview approximate native rendering. They do not prove real font appearance, combat behavior, taint safety or SavedVariables file timing.
 
 ## Native-client coverage
+
+Version 0.3.6 keeps the declared interfaces of 0.3.5 and labels WoW: Forever
+characters as WoW: Forever. In the Forever client, Hourstone marks each character it
+records with `client = "forever"` beside the Retail flavor; keys, overview removal,
+SavedVariables schema 3 and Companion protocol 4 are unchanged. The first load of
+0.3.6 in Forever also marks the Retail-family entries of a database that Hourstone
+created after the launch (2026-11-04 23:00 UTC, the time at the start of its source
+ID) and entries migrated from a `project-` client. An older database, such as a
+copied `WTF` folder, keeps Retail until each Forever character logs in again, and a
+database that any client running 0.3.6 has stamped is not marked again. Synchronized
+Forever characters that the account has not recorded itself stay under Retail,
+because protocol 4 carries no client marker. 140 Lua scenario suites in seven
+simulated configurations and 64 Python tests pass.
+
+Hourstone 0.3.5 ran in the live WoW: Forever client (build 1.60.1.70790) on the
+author's installation on 2026-11-05. It saved characters under the Retail family with
+the eu region, a non-empty realm and a confirmed `/played` value, and the client
+column showed Retail, which 0.3.6 changes. The live client's interface number was not
+recorded.
+
+The author tested the 0.3.6 build in the same live Forever client on 2026-11-05; the
+tested ZIP has SHA-256
+`5d05f60f5ad178abb8af5bd4dc68402d40b54a41c9c129e55a46894bac38d0f1`. After a full
+restart the footer showed v0.3.6, and the client column showed WoW: Forever for two
+characters that 0.3.5 had recorded in a database created after the launch and for a
+new character recorded by 0.3.6. The client filter, tooltip and sort, copied
+databases, synchronization and the Retail and Classic clients were not separately
+tested in-game for 0.3.6; they are covered by the simulation.
 
 Version 0.3.5 keeps the declared interfaces of 0.3.4 and prepares for the WoW: Forever
 launch on 2026-11-04 at 23:00 UTC. On a Forever interface (16xxx), every project ID
@@ -130,7 +158,7 @@ Native acceptance with an owned key, completed runs, unlocked rewards, an unclai
 7. Remove an offline character and the active character. Check the confirmation, overview totals, removed list, manual restoration and continued local tracking. Reload and change zones; both must remain removed. Make a new character login; the known removal must be restored without changing saved playtime. Repeat between two devices, including an offline removal that only reaches the character after its earlier login: synchronize, then make another actual login.
 8. Verify the companion refuses writes while WoW is running, preserves backups and reports malformed or newer-protocol data without overwriting it. Keep logs and real SavedVariables outside the repository.
 9. Where the client has the Addons menu: after updating from 0.3.2, verify the Hourstone entry with logo and tooltip, left click open/close, no action on right click, the minimap button hidden once, the chat hint when hiding it, and that turning it back on survives `/reload` and relog. Clients without the menu keep the button.
-10. In WoW: Forever, record the build and interface, verify the Classic design, the playtime-only view, the minimap geometry when enabled, that characters show under the Retail client family with a non-empty realm and name, and that entries an earlier version recorded under a `project-` client return to Retail.
+10. In WoW: Forever, record the build and interface, verify the Classic design, the playtime-only view, the minimap geometry when enabled, that characters show as WoW: Forever in the client column, tooltip and filter with a non-empty realm and name, that entries an earlier version recorded in a database created after the launch or under a `project-` client show as WoW: Forever after the update, and that characters from a `WTF` folder copied from Retail stay under Retail.
 11. In Retail, open Progress and compare the owned key with the bag item and weekly best with completed runs. Compare all three Vault rows and their slot thresholds with Blizzard's UI, both with and without an unclaimed previous reward. Complete a run, obtain/change/remove a key, reload and switch characters; confirm the latest captured data and distinct unknown/empty/stale states. Check the server weekly reset and a character not visited since reset. Verify that Classic does not register Retail progress APIs or display the Progress tab.
 
 Use issue reports to describe reproducible behavior without including personal account paths, credentials or raw character databases.

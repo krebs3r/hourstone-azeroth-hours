@@ -364,7 +364,8 @@ local function status(value, now)
     return "known"
 end
 function P:Get(char)
-    local supported = self.enabled == true and type(char) == "table" and char.flavor == "retail"
+    -- Forever shares the Retail family but has no keystones or Great Vault.
+    local supported = self.enabled == true and type(char) == "table" and char.flavor == "retail" and char.client ~= "forever"
     local empty = supported and "unknown" or "unavailable"
     local result = {supported=supported, keystone={status=empty, expired=false}, weekly={status=empty, expired=false}, vault={status=empty, rows={}}}
     local key = supported and H.S.Key(char, self.db.sourceId) or nil

@@ -2,6 +2,8 @@ local _, H = ...
 local M, L = {}, H.L
 H.M = M
 M.SCHEMA = 3
+-- WoW: Forever's worldwide live launch, 2026-11-04 23:00 UTC.
+M.FOREVER_LIVE = 1793833200
 M.SCALE_MIN, M.SCALE_MAX, M.SCALE_STEP = .65, 2, .05
 function M.Scale(value)
     if not M.Number(value) then return 1 end
@@ -22,9 +24,11 @@ function M.Init(db)
     if not visibility then return nil, "invalid" end
     db.visibility = visibility
     db.version = M.SCHEMA
+    -- C.SourceId starts with the server time at which Hourstone created this database.
+    local created
     if type(db.sourceId) ~= "string" or not db.sourceId:match("^[A-Za-z0-9_-]+$") or #db.sourceId > 128 then
         db.sourceId = H.C.SourceId()
-    end
+    else created = tonumber(db.sourceId:match("^hs%-(%d+)%-")) end
     if type(db.characters) ~= "table" then db.characters = {} end
     for _, char in pairs(db.characters) do
         if type(char) == "table" then
@@ -55,6 +59,8 @@ function M.Init(db)
             -- Malformed saved values must not stop the addon from loading; keep such an entry as it was.
             local ok, merged = pcall(H.S.Choose, type(existing) == "table" and existing or nil, char)
             if ok and merged then
+                -- Both entries share a GUID that was recorded on a Forever build.
+                merged.client = "forever"
                 db.characters[key], db.characters[target] = nil, merged
                 if type(db.runtime) == "table" and db.runtime.key == key then db.runtime.key = target end
             else
@@ -62,6 +68,18 @@ function M.Init(db)
             end
         end
     end
+    -- Hourstone 0.3.5 and earlier did not mark Forever characters. On Forever, a database
+    -- without a client stamp has not been loaded by a marking version; if Hourstone created
+    -- it after the live launch, it holds only characters recorded there, so its Retail-family
+    -- entries are marked once. An older database, such as a WTF folder copied from Retail,
+    -- keeps Retail and marks its Forever characters at their next login. A database that
+    -- another client has stamped is a copy and is never marked.
+    if H.C.IsForever() and type(db.client) ~= "string" and created and created >= M.FOREVER_LIVE then
+        for _, char in pairs(db.characters) do
+            if type(char) == "table" and char.flavor == "retail" and char.client == nil then char.client = "forever" end
+        end
+    end
+    db.client = H.C.Client()
     if type(db.settings) ~= "table" then db.settings = {} end
     local s = db.settings
     if s.format ~= "hours" then s.format = "combined" end
@@ -109,9 +127,14 @@ function M.GuildText(char)
     return L.guild .. ": " .. H.C.Escape(value)
 end
 local CLIENTS={retail=true,mists=true,tbc=true,era=true}
+-- The client a row is labelled and filtered under. WoW: Forever shares the Retail family.
+function M.Client(char)
+    if char.flavor == "retail" and char.client == "forever" then return "forever" end
+    return CLIENTS[char.flavor] and char.flavor or nil
+end
 function M.ClientText(char)
-    if CLIENTS[char.flavor] then return L[char.flavor] end
-    return L.unknownClient
+    local client = M.Client(char)
+    return client and L[client] or L.unknownClient
 end
 function M.List(db, search, realm, sort, descending, valueFor, flavor)
     local rows, total, visible, missing, visibleMissing, count, realms = {}, 0, 0, 0, 0, 0, {}
@@ -123,7 +146,7 @@ function M.List(db, search, realm, sort, descending, valueFor, flavor)
             realms[char.realm] = true
             local seconds = valueFor and valueFor(key, char) or char.seconds
             if not M.Number(seconds) then seconds = nil; missing = missing + 1 else total = total + seconds end
-            if (not realm or char.realm == realm) and (not flavor or char.flavor == flavor)
+            if (not realm or char.realm == realm) and (not flavor or M.Client(char) == flavor)
                 and (H.C.Lower(char.name):find(search, 1, true)
                     or (H.S.KnownGuild(char) and H.C.Lower(char.guild):find(search, 1, true))) then
                 rows[#rows + 1] = { key = key, char = char, seconds = seconds }
@@ -133,7 +156,7 @@ function M.List(db, search, realm, sort, descending, valueFor, flavor)
     end
     local function field(row)
         if sort == "seconds" then return row.seconds end
-        if sort == "flavor" then return CLIENTS[row.char.flavor] and H.C.Lower(M.ClientText(row.char)) or nil end
+        if sort == "flavor" then return M.Client(row.char) and H.C.Lower(M.ClientText(row.char)) or nil end
         if sort == "level" or sort == "updatedAt" then
             return M.Number(row.char[sort]) and row.char[sort] or nil
         end

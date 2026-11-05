@@ -57,6 +57,14 @@ new character recorded by 0.3.6. The client filter, tooltip and sort, copied
 databases, synchronization and the Retail and Classic clients were not separately
 tested in-game for 0.3.6; they are covered by the simulation.
 
+The v0.3.6 GitHub release ZIP matches the tested build byte for byte (SHA-256
+`5d05f60f5ad178abb8af5bd4dc68402d40b54a41c9c129e55a46894bac38d0f1`). The CurseForge
+upload created
+[file 9458425](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/9458425)
+with game versions 12.1.5, 2.5.6, 5.5.4, 1.15.9 and 1.60.1 (Retail 12.1.5, ID 16984),
+awaiting CurseForge approval. The receipt is recorded in
+[releases/v0.3.6.json](curseforge/releases/v0.3.6.json).
+
 Version 0.3.5 keeps the declared interfaces of 0.3.4 and prepares for the WoW: Forever
 launch on 2026-11-04 at 23:00 UTC. On a Forever interface (16xxx), every project ID
 counts as the Retail client family, and loading on Forever returns every entry

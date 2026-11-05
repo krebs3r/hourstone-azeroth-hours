@@ -423,10 +423,13 @@ function U:Create()
     self.footerFrame:EnableMouse(true)
     self.footerFrame:SetScript("OnEnter",function(owner) tooltip(owner,{self.footer:GetText(),self:IsProgress() and L.progressHint or L.hint}) end)
     self.footerFrame:SetScript("OnLeave",function() GameTooltip:Hide() end)
-    self.clientMenu=rect("Frame",self.clientButton,0,29,168,141)
+    -- Only Forever records the marker. Protocol 4 carries no client, so other clients
+    -- receive synchronized Forever characters under Retail and a Forever filter would stay empty.
+    local clients=C.IsForever() and {"all","retail","forever","mists","tbc","era"} or {"all","retail","mists","tbc","era"}
+    self.clientMenu=rect("Frame",self.clientButton,0,29,168,16+#clients*25)
     self.clientMenu:SetFrameLevel(f:GetFrameLevel()+30); skin(self.clientMenu,self.panelName)
     self.clientMenu:EnableMouse(true); self.clientMenu:Hide(); self.clientRows={}
-    for i,flavor in ipairs({"all","retail","mists","tbc","era"}) do
+    for i,flavor in ipairs(clients) do
         local b=rect("Button",self.clientMenu,8,8+(i-1)*25,152,25)
         b.label=text(b,flavor=="all" and L.allClients or L[flavor],11,7,0,140,nil,25)
         local glow=solid(b,"HIGHLIGHT",187/255,161/255,102/255,37/255); glow:SetAllPoints()

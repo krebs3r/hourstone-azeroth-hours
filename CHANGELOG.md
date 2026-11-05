@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.7 — unreleased
+## 0.3.7 — 2026-11-05
 
 - Label synchronized WoW: Forever characters that this account has not recorded itself, such as another account's or another PC's, as **WoW: Forever** on every client, Forever included. Companion 0.2.2 adds an optional `foreverSources` list of Forever source IDs to the generated format 4 data ([addendum](docs/sync-protocol-v4-forever.md)); Hourstone labels a received Retail-family row whose winning observation comes from a listed source. Protocol 4, the `retail` flavor, keys, merging, totals and SavedVariables schema 3 are unchanged.
 - Keep this database's own markers authoritative for the characters it has recorded, so a `WTF` folder copied from Retail into Forever keeps its Retail entries.

@@ -1,4 +1,4 @@
-# Hourstone 0.3.7 — unreleased
+# Hourstone 0.3.7 — 2026-11-05
 
 Hourstone 0.3.7 shows synchronized **WoW: Forever** characters as **WoW: Forever**
 on every client. Until now, Hourstone labelled only the Forever characters that the

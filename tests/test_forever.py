@@ -255,6 +255,44 @@ class ForeverLabel(unittest.TestCase):
                     self.assertEqual(U.visibleCount, 0)
 
 
+# Live Forever, build 1.60.1.70790: UnitFullName("player") returns "Magni", "Wildschuss",
+# GetUnitName("player", true) "Magni Wildschuss" and GetRealmName() the realm.
+SURNAME = 'IDENTITY.name = "Magni"; IDENTITY.surname = "Wildschuss"; GetRealmName = function() return "CAMWOW EU4 Realm 10 RP" end'
+
+
+class ForeverNames(unittest.TestCase):
+    def test_forever_saves_the_surname_with_the_name_and_the_actual_realm(self):
+        # 0.3.6 saved the surname as the realm; the logged-in character is corrected at login.
+        stale = dict(record("retail", 5000, LIVE + 60), name="Magni", realm="Wildschuss", client="forever")
+        other = dict(alt("retail", LIVE + 60, "Player-1-BBB"), name="Morkar", realm="Erdbrecher", client="forever")
+        lua, db = login(CAMELOT, FOREVER, {f"{SCOPE}:retail:{GUID}": stale, "b": other}, setup=SURNAME)
+        H = lua.globals().H
+        self.assertEqual((H.T.record.name, H.T.record.realm), ("Magni Wildschuss", "CAMWOW EU4 Realm 10 RP"))
+        self.assertEqual(H.T.record.seconds, 5000)
+        # Characters that are not logged in keep the earlier split until their next login.
+        self.assertEqual((by_guid(db, "Player-1-BBB").name, by_guid(db, "Player-1-BBB").realm), ("Morkar", "Erdbrecher"))
+        rows, stats = H.M.List(H.S.Display(db), "wildschuss", None, "name", False, None, None)
+        self.assertEqual([rows[i].char.name for i in range(1, len(rows) + 1)], ["Magni Wildschuss"])
+        self.assertIn("CAMWOW EU4 Realm 10 RP", list(stats.realms.values()))
+        lua.execute("H.UI:Create(); H.UI:Refresh()")
+        self.assertIn("Magni Wildschuss", {H.UI.rows[i].name.text for i in range(1, H.UI.visibleCount + 1)})
+
+    def test_forever_without_a_surname_keeps_the_name(self):
+        for second in ("nil", '""'):
+            with self.subTest(second=second):
+                lua, db = login(CAMELOT, FOREVER, {}, setup=f'UnitFullName = function() return "Magni", {second} end; '
+                                'GetRealmName = function() return "CAMWOW EU4 Realm 10 RP" end')
+                T = lua.globals().H.T
+                self.assertEqual((T.record.name, T.record.realm), ("Magni", "CAMWOW EU4 Realm 10 RP"))
+
+    def test_other_clients_keep_name_and_realm(self):
+        for project in (1, 19, 5, 2):
+            with self.subTest(project=project):
+                lua, db = login(project, None, {}, setup='IDENTITY.surname = "Wildschuss"')
+                T = lua.globals().H.T
+                self.assertEqual((T.record.name, T.record.realm), ("Elarion", "Blackhand"))
+
+
 OTHER = "hs-other-account"  # a Forever account whose database this client never loaded
 
 

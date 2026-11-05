@@ -6,6 +6,7 @@
 - Keep this database's own markers authoritative for the characters it has recorded, so a `WTF` folder copied from Retail into Forever keeps its Retail entries.
 - Validate the list like every other received field: a malformed list, or one in formats 1–3, rejects the payload, and every import starts without a list. Hourstone 0.3.2 to 0.3.6 ignore the list.
 - Offer WoW: Forever in the client filter on every client whenever a row of the current view is a Forever character, and keep the entry while it is selected. Retail's progress view treats labelled characters as unsupported.
+- Save WoW: Forever surnames as part of the name. Live Forever returns the surname where other clients return the realm (`UnitFullName` gives "Magni", "Wildschuss"), so 0.3.5 and 0.3.6 showed "Magni" with the realm "Wildschuss" and listed surnames in the realm filter. Hourstone now saves "Magni Wildschuss" and the realm from `GetRealmName()`, such as "CAMWOW EU4 Realm 10 RP". Each character is corrected at its next login in Forever; other clients are unchanged.
 - Cover the list with fixtures shared with the Companion, including the Companion's generated data byte for byte, the labels in the Retail and the Forever client, validation and reset, the menu, and imports by the tagged releases 0.3.2 to 0.3.6.
 
 ## 0.3.6 — 2026-11-05

@@ -10,7 +10,11 @@ function GetServerTime() return EPOCH end
 function GetLocale() return TEST_LOCALE end
 function GetRealmName() return IDENTITY.realm end
 function UnitGUID() return IDENTITY.guid end
-function UnitFullName() return IDENTITY.name, IDENTITY.realm end
+-- WoW: Forever (interface 16xxx) reports the character's surname in the realm slot.
+function UnitFullName()
+    if TEST_INTERFACE and TEST_INTERFACE >= 16000 and TEST_INTERFACE < 17000 then return IDENTITY.name, IDENTITY.surname end
+    return IDENTITY.name, IDENTITY.realm
+end
 function UnitClass() return IDENTITY.class, IDENTITY.class end
 function UnitLevel() return IDENTITY.level end
 GUILD_READS = 0

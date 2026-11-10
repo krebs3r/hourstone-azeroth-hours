@@ -161,3 +161,28 @@ assert(db.settings.position==hiddenPosition)
 U:Toggle(); tick(1.1)
 local _,_,_,reopenedX,reopenedY=U.frame:GetPoint()
 assert(math.abs(reopenedX-60)<.0001 and math.abs(reopenedY-20)<.0001)
+
+-- Class colors: the client's own color first; Death Knight, Monk and Demon Hunter take Blizzard's
+-- Classic colors where the client's table lacks them (Forever's has no Death Knight or Demon Hunter);
+-- any other unknown class keeps the neutral color.
+local function classColor(class,r,g,b)
+    local cr,cg,cb=H.C.ClassColor(class)
+    return math.abs(cr-r)<1e-9 and math.abs(cg-g)<1e-9 and math.abs(cb-b)<1e-9
+end
+local clientColors=RAID_CLASS_COLORS
+RAID_CLASS_COLORS={WARRIOR={r=.1,g=.2,b=.3},DEMONHUNTER={r=.4,g=.5,b=.6}}
+assert(classColor("WARRIOR",.1,.2,.3) and classColor("DEMONHUNTER",.4,.5,.6))
+assert(classColor("DEATHKNIGHT",.77,.12,.23) and classColor("MONK",0,1,.59))
+assert(classColor("EVOKER",.94,.9,.8) and classColor("MAGE",.94,.9,.8))
+RAID_CLASS_COLORS=nil
+assert(classColor("DEMONHUNTER",.64,.19,.79) and classColor("WARRIOR",.94,.9,.8))
+RAID_CLASS_COLORS=clientColors
+-- A synchronized Death Knight in the list, on a client whose table has no Death Knight.
+assert(RAID_CLASS_COLORS.DEATHKNIGHT==nil)
+db.characters["test:knight"]={name="ExampleKnight",realm="Example Realm",class="DEATHKNIGHT",level=80,seconds=4200,
+    flavor="retail",guid="Player-1-KNIGHT",region="eu",updatedAt=EPOCH,guild="",guildUpdatedAt=EPOCH}
+U.search:SetText("ExampleKnight")
+local knight
+for _,row in ipairs(U.rows) do if row.entry and row.entry.char.name=="ExampleKnight" then knight=row end end
+assert(knight and math.abs(knight.name.color[1]-.77)<1e-9 and math.abs(knight.name.color[2]-.12)<1e-9 and math.abs(knight.name.color[3]-.23)<1e-9)
+U.search:SetText(""); db.characters["test:knight"]=nil

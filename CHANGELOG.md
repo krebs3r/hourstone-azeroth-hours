@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Show Death Knights, Monks and Demon Hunters in their class colors on clients whose class table lacks them, such as WoW: Forever for characters synchronized from Retail. Hourstone takes Blizzard's own colors for these classes from the Classic clients' class color table; the client's own colors still come first.
+
 ## 0.4.0 — 2026-11-10
 
 - Give the window WoW: Forever's own look on Forever, as Soundstone 0.4.0 wears it: the client's bronze window frame with its rock ground and title strip, a red gear button and Blizzard's red close button in the strip, and the title in the client's `NORMAL_FONT_COLOR`. The settings and the delete dialog wear the same frame; the realm and client buttons and their menus take Forever's dropdown art, the format toggle one dropdown field divided between Combined and Hours, the search field the same field, Reset position, Done, Deleted characters, Cancel and Delete Blizzard's red buttons, the size slider Forever's track and copper diamond, and the character table Blizzard's inset over the window's rock, darkened. Inside the frame the window is 20 units shorter, and its top edge stays where it was. Class colors, the current character's marker, Vault states and the heart are unchanged. The plan and the measurements it rests on are in the [theme document](docs/FOREVER-THEME.md).

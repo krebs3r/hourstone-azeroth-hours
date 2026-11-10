@@ -245,7 +245,8 @@ class ForeverLabel(unittest.TestCase):
                 lua.execute("H.UI:Create(); H.UI:Refresh()")
                 U = lua.globals().H.UI
                 self.assertEqual(bool(U.clientRows.forever.shown), forever)
-                self.assertEqual(U.clientMenu.height, 16 + (6 if forever else 5) * 25)
+                # Forever's dropdown list keeps Blizzard's bottom inset of 15 units instead of 8.
+                self.assertEqual(U.clientMenu.height, (23 if forever else 16) + (6 if forever else 5) * 25)
                 self.assertEqual(U.clientRows.era.points[1][5], -(8 + (5 if forever else 4) * 25))
                 if forever:
                     U.clientRows.forever.scripts.OnClick()
@@ -334,7 +335,8 @@ class ForeverSync(unittest.TestCase):
                 lua.execute("H.UI:Create(); H.UI:Refresh()")
                 U = H.UI
                 self.assertTrue(U.clientRows.forever.shown)
-                self.assertEqual(U.clientMenu.height, 16 + 6 * 25)
+                # Forever's dropdown list keeps Blizzard's bottom inset of 15 units instead of 8.
+                self.assertEqual(U.clientMenu.height, (23 if client == "Forever" else 16) + 6 * 25)
                 U.clientRows.forever.scripts.OnClick()
                 self.assertEqual((U.flavor, U.clientButton.label.text), ("forever", "WoW: Forever"))
                 names = {U.rows[i].name.text for i in range(1, U.visibleCount + 1)}
@@ -399,7 +401,8 @@ def git(*args):
 
 
 def releases():
-    """Tagged releases that read protocol 4: 0.3.2 up to the version before this one."""
+    """Tagged releases that read protocol 4 but predate the Forever list: 0.3.2 up to 0.3.6, or the
+    version before this one if that is older. 0.3.7 introduced the list and reads it."""
     try:
         tags = git("tag", "--list", "v0.3.*").split()
     except (OSError, subprocess.CalledProcessError):
@@ -407,7 +410,7 @@ def releases():
     toc = (ROOT / "Hourstone/Hourstone.toc").read_text(encoding="utf-8")
     current = tuple(int(part) for part in re.search(r"^## Version: (\d+\.\d+\.\d+)", toc, re.M)[1].split("."))
     versions = sorted(tuple(int(part) for part in tag[1:].split(".")) for tag in tags if re.fullmatch(r"v0\.3\.\d+", tag))
-    return [f"v{'.'.join(map(str, v))}" for v in versions if (0, 3, 2) <= v < current]
+    return [f"v{'.'.join(map(str, v))}" for v in versions if (0, 3, 2) <= v < min(current, (0, 3, 7))]
 
 
 class OlderAddons(unittest.TestCase):

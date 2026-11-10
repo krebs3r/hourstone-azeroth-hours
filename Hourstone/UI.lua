@@ -1,9 +1,11 @@
 local _, H = ...
-local U, C, M, T, L = {}, H.C, H.M, H.T, H.L
+local U, C, M, T, L, Th = {}, H.C, H.M, H.T, H.L, H.Theme
 H.UI = U
 local ROOT = "Interface\\AddOns\\Hourstone\\Media\\"
 local FONT = STANDARD_TEXT_FONT or "Fonts\\FRIZQT__.TTF"
-local GOLD, MUTED = {243/255,206/255,112/255}, {169/255,170/255,162/255}
+-- Interface colors come from the theme's palette (Theme.lua) by key. These colors carry
+-- information and stay the same under every theme.
+local INFO_MUTED = {169/255,170/255,162/255}
 local WIDTH, ROW_HEIGHT, CAPACITY = 720, 50, 8
 local PROGRESS_HEIGHT, TAB_HEIGHT, PROGRESS_NAME = 64, 32, 230
 local PROGRESS_COLUMNS = {230,164,122,184}
@@ -19,12 +21,15 @@ local function rect(kind,parent,x,y,w,h,name)
     f:SetPoint("TOPLEFT",parent,"TOPLEFT",x,-y); f:SetSize(w,h)
     return f
 end
-local function solid(parent,layer,r,g,b,a)
+-- solid and line paint from the palette by key; a table of numbers is an information
+-- color, painted as it is and never repainted by a theme.
+local function solid(parent,layer,color)
     local t=parent:CreateTexture(nil,layer or "BACKGROUND")
-    t:SetColorTexture(r,g,b,a or 1); return t
+    if type(color)=="table" then Th.Raw(t,nil,color[1],color[2],color[3],color[4] or 1) else Th.Paint(t,color) end
+    return t
 end
-local function line(parent,x,y,w,h,r,g,b,a)
-    local t=solid(parent,"BORDER",r,g,b,a)
+local function line(parent,x,y,w,h,color)
+    local t=solid(parent,"BORDER",color)
     t:SetPoint("TOPLEFT",x,-y); t:SetSize(w,h); return t
 end
 local function text(parent,value,size,x,y,width,color,height,align)
@@ -34,7 +39,8 @@ local function text(parent,value,size,x,y,width,color,height,align)
     -- Never size a title or label from a font metric that may not be ready yet.
     f:SetSize(width,height or size*1.2)
     f:SetJustifyH(align or "LEFT"); f:SetJustifyV("MIDDLE"); f:SetWordWrap(false)
-    f:SetTextColor(unpack(color or {238/255,233/255,218/255})); f:SetText(value or "")
+    if type(color)=="table" then Th.Raw(f,"text",unpack(color)) else Th.Paint(f,color or "text","text") end
+    f:SetText(value or "")
     return f
 end
 local function artwork(parent,name,w,h,x,y,layer)
@@ -49,7 +55,9 @@ local SKINS={
     Toggle={{.015625,.984375,.2421875,.7578125},155,82,14,4},
     ToggleRed={{.015625,.984375,.2578125,.7421875},159,80,14,4},
 }
-local function skin(frame,name)
+-- The standard skin: one of Soundstone's sprites as nine regions. Th.Plate adds the flat
+-- skin beside it ("panel", "control" or "field"); the theme shows one of the two.
+local function skin(frame,name,kind)
     local spec=SKINS[name]; local uv,sw,sh,sc,corner=unpack(spec)
     local du,dv=(uv[2]-uv[1])*sc/sw,(uv[4]-uv[3])*sc/sh
     local xs,ys={uv[1],uv[1]+du,uv[2]-du,uv[2]},{uv[3],uv[3]+dv,uv[4]-dv,uv[4]}
@@ -68,36 +76,207 @@ local function skin(frame,name)
             t:ClearAllPoints(); t:SetPoint("TOPLEFT",lefts[c],-tops[r]); t:SetSize(widths[c],heights[r])
         end
     end
-    layout(); return layout,textures
+    layout()
+    Th.Plate(frame,kind or ((name=="Toggle" or name=="ToggleRed") and "control" or "panel"),textures)
+    return layout,textures
 end
+-- A control's label rests in the color of its state; under a flat theme it turns to
+-- the accent while the pointer is over it, also when a Refresh repaints its state.
+-- `tip` adds a tooltip to the same hover.
+local function restLabel(b) Th.Paint(b.label,(Th.flat and b.hovered) and "hover" or b.rest,"text") end
 local function control(parent,label,x,y,w,h,action,style)
     local b=rect("Button",parent,x,y,w,h)
     local _,textures=skin(b,style or "ToggleRed"); b.background=textures
-    b.label=text(b,label,11,8,0,w-16,GOLD,h,"CENTER")
-    local glow=solid(b,"HIGHLIGHT",1,.9,.6,.12); glow:SetAllPoints()
-    b:SetScript("OnClick",action); return b
+    b.label=text(b,label,11,8,0,w-16,"label",h,"CENTER"); b.rest="label"
+    local glow=solid(b,"HIGHLIGHT","hoverControl"); glow:SetAllPoints(); b.glow=glow
+    b:SetScript("OnClick",action)
+    b:SetScript("OnEnter",function(owner) owner.hovered=true; restLabel(owner); if owner.tip then owner.tip(owner) end end)
+    b:SetScript("OnLeave",function(owner) owner.hovered=nil; restLabel(owner); if owner.tip then GameTooltip:Hide() end end)
+    return b
 end
 local function selected(b,on)
+    b.chosen=on
     for _,t in ipairs(b.background) do
         t:SetDesaturated(not on); t:SetVertexColor(on and 1 or .65,on and 1 or .58,on and 1 or .48)
     end
-    b.label:SetTextColor(unpack(on and {1,227/255,156/255} or {184/255,175/255,160/255}))
+    b.rest=on and (b.chosenKey or "chosenLabel") or "unchosenLabel"; restLabel(b); Th.Update(b)
 end
+-- The confirming button of a pair: accent label and underline under a flat theme.
+local function primary(b) b.primary=true; b.rest="primaryLabel"; restLabel(b); Th.Update(b) end
 local function arrow(parent,x,y,w,h)
     local t=artwork(parent,"Arrow",w or 5,h or 3,x,y)
-    t:SetVertexColor(197/255,191/255,171/255); return t
+    Th.Paint(t,"arrow","vertex"); return t
 end
 local function closeButton(parent,x,y,size,action)
     local b=rect("Button",parent,x,y,size,size)
     b:SetNormalTexture(ROOT.."HeaderClose.tga")
     b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square","ADD")
-    b:SetScript("OnClick",action); return b
+    Th.Mute(b:GetNormalTexture()); Th.Mute(b:GetHighlightTexture())
+    -- Flat: a ground square with a muted cross that turns to the accent on hover. Built only
+    -- where the forever look is applied.
+    Th.Plate(b,"square")
+    Th.Later(function() b.glyph=Th.Flat(text(b,"×",math.floor(size*.75+.5),0,0,size,"muted",size,"CENTER")) end)
+    b:SetScript("OnClick",action)
+    b:SetScript("OnEnter",function(owner) if owner.glyph then Th.Paint(owner.glyph,"hover","text") end end)
+    b:SetScript("OnLeave",function(owner) if owner.glyph then Th.Paint(owner.glyph,"muted","text") end end)
+    return b
+end
+
+-- WoW: Forever's own art, built the first time the forever look finds it (U:BuildArt), never on
+-- the other clients. The window frame is Blizzard's ButtonFrameTemplateNoPortrait nine-slice over
+-- the content, with the client's ground and the streaks under the title strip, as Soundstone 0.4.0
+-- wears it. The border is anchored so its opaque metal ends flush with the frame (Soundstone's
+-- measurement at 1.3125 pixels per unit): the art starts 4.4 units inside its box on the left and
+-- 3.35 above it. Its sizes are Hourstone's units, so it scales with the Hourstone size.
+local BORDER={left=-4.4,top=-3.35,right=.5,bottom=.35}
+-- Inside the frame the header moves into the title strip and the content 20 units up.
+local LIFT=20
+-- Forever's red button art sits 0.8 units below its rectangle's centre; a symbol takes the art's centre.
+local SYMBOL_DROP=.8
+local function frameWindow(frame,art)
+    local A,w=Th.ART.window,{}
+    local border=C.Frame("Frame",nil,frame); w.border=border
+    border:SetPoint("TOPLEFT",BORDER.left,BORDER.top); border:SetPoint("BOTTOMRIGHT",BORDER.right,BORDER.bottom)
+    -- Above the content, as Blizzard's NineSlice is; the header controls sit above it in turn.
+    border:SetFrameLevel(frame:GetFrameLevel()+10); border:EnableMouse(false)
+    NineSliceUtil.ApplyLayoutByName(border,A.layout)
+    w.ground=frame:CreateTexture(nil,"BACKGROUND",nil,-6); w.ground:SetTexture(A.ground,"REPEAT","REPEAT")
+    w.ground:SetHorizTile(true); w.ground:SetVertTile(true)
+    w.ground:SetPoint("TOPLEFT",border,"TOPLEFT",7,-21); w.ground:SetPoint("BOTTOMRIGHT",border,"BOTTOMRIGHT",-2,2)
+    if art.streaks then
+        w.streaks=frame:CreateTexture(nil,"BACKGROUND",nil,-5); w.streaks:SetAtlas(Th.ART.streaks); w.streaks:SetHeight(43); w.streaks:SetHorizTile(true)
+        w.streaks:SetPoint("TOPLEFT",border,"TOPLEFT",6,-21); w.streaks:SetPoint("TOPRIGHT",border,"TOPRIGHT",-2,-21)
+    end
+    -- Titles and header controls of the popups ride above the border.
+    w.top=C.Frame("Frame",nil,frame); w.top:SetAllPoints(border); w.top:SetFrameLevel(frame:GetFrameLevel()+12); w.top:EnableMouse(false)
+    frame.window=w
+    return w
+end
+-- Forever crops the bottom corners of short frames so they cannot overlap the top ones (only
+-- Forever has it). Called again whenever the frame's height changes.
+local function crop(frame)
+    local w=frame.window
+    if not w or type(NineSliceUtil)~="table" or type(NineSliceUtil.UpdateCornerCropping)~="function" then return end
+    pcall(NineSliceUtil.UpdateCornerCropping,{NineSlice=w.border,layoutType=Th.ART.window.layout},frame:GetHeight()+BORDER.top-BORDER.bottom)
+end
+-- Blizzard's window title: size 12 in NORMAL_FONT_COLOR, centred, 6 units below the border's top.
+local function frameTitle(parent,border,value,key,width)
+    local t=parent:CreateFontString(nil,"OVERLAY")
+    t:SetFont(FONT,12,""); t:SetPoint("TOP",border,"TOP",0,-6); t:SetWidth(width)
+    t:SetJustifyH("CENTER"); t:SetJustifyV("MIDDLE"); t:SetWordWrap(false)
+    Th.Paint(t,key,"text"); t:SetText(value)
+    return t
+end
+-- Forever's close button: Blizzard's art and place (28 x 28 at the border's TOPRIGHT 0,3) with
+-- Hourstone's own action; the stock OnClick would hide the frame through HideUIPanel.
+local function frameClose(parent,border,action)
+    local A=Th.ART.window.close
+    local b=C.Frame("Button",nil,parent); b:SetSize(28,28); b:SetPoint("TOPRIGHT",border,"TOPRIGHT",0,3)
+    b:SetNormalAtlas(A.normal); b:SetPushedAtlas(A.pushed); b:SetHighlightAtlas(A.highlight,"ADD")
+    b:RegisterForClicks("LeftButtonUp"); b:SetScript("OnClick",action)
+    return b
+end
+-- A header button as Baganator's and Soundstone's on Forever: UIPanelButtonTemplate at 32 x 22 with
+-- a gold symbol on the art's centre.
+local function frameButton(parent,border,file,size,action)
+    local b=CreateFrame("Button",nil,parent,"UIPanelButtonTemplate"); b:SetSize(32,22); b:SetText("")
+    b:SetPoint("TOPLEFT",border,"TOPLEFT",8,1)
+    b.symbol=b:CreateTexture(nil,"ARTWORK"); b.symbol:SetTexture(file); b.symbol:SetSize(size,size)
+    b.symbol:SetPoint("CENTER",0,-SYMBOL_DROP); Th.Paint(b.symbol,"buttonIcon","vertex")
+    b:RegisterForClicks("LeftButtonUp"); b:SetScript("OnClick",action)
+    return b
+end
+-- Forever's push button over a flat control: UIPanelButtonTemplate at the control's rectangle,
+-- with its label. A click is the control's click, its tooltip the control's tooltip; the
+-- template keeps its own label colors (gold, white under the pointer).
+local function pushButton(parent,owner)
+    local b=CreateFrame("Button",nil,parent,"UIPanelButtonTemplate")
+    b:SetPoint(owner:GetPoint(1)); b:SetSize(owner:GetWidth(),owner:GetHeight())
+    b:SetText(owner.label:GetText())
+    local label=b:GetFontString(); label:ClearAllPoints(); label:SetPoint("CENTER")
+    label:SetFont(FONT,owner.labelSize or 11,""); label:SetWordWrap(false)
+    -- The control is hidden meanwhile, so its action is called directly.
+    b:RegisterForClicks("LeftButtonUp")
+    b:SetScript("OnClick",function(_,mouse) local action=owner:GetScript("OnClick"); if action then action(owner,mouse) end end)
+    b:HookScript("OnEnter",function(self) if owner.tip then owner.tip(self) end end)
+    b:HookScript("OnLeave",function() if owner.tip then GameTooltip:Hide() end end)
+    owner.twin=b
+    return b
+end
+local function setLabel(b,value) b.label:SetText(value); if b.twin then b.twin:SetText(value) end end
+-- Forever's dropdown field and arrow (WowStyle1DropdownTemplate's art) on a filter button. The
+-- arrow follows Blizzard's states: pressed, hovered, its menu open, or at rest.
+local function dropArrow(b)
+    local d=b.dropdown; if not d then return end
+    local A=Th.ART.dropdown
+    local atlas=(b.down and (b.hovered and A.pressedHover or A.pressed)) or (b.hovered and A.hover) or (d.menu:IsShown() and A.open) or A.normal
+    d.arrow:SetAtlas(atlas,true)
+end
+local function dropdownArt(b,menu)
+    local d={menu=menu}
+    d.field=b:CreateTexture(nil,"BACKGROUND",nil,1); d.field:SetAtlas(Th.ART.dropdown.field,true)
+    d.field:ClearAllPoints(); d.field:SetPoint("TOPLEFT",-8,7); d.field:SetPoint("BOTTOMRIGHT",8,-9)
+    d.arrow=b:CreateTexture(nil,"OVERLAY"); d.arrow:SetPoint("RIGHT",b,"RIGHT",1,-3)
+    b.dropdown=d
+    b:HookScript("OnEnter",dropArrow); b:HookScript("OnLeave",dropArrow)
+    b:HookScript("OnMouseDown",function(owner) owner.down=true; dropArrow(owner) end)
+    b:HookScript("OnMouseUp",function(owner) owner.down=nil; dropArrow(owner) end)
+    menu:HookScript("OnShow",function() dropArrow(b) end); menu:HookScript("OnHide",function() dropArrow(b) end)
+    dropArrow(b)
+end
+-- The format toggle on Forever: one dropdown field (the filter buttons' art, without an arrow) over
+-- both halves, where the filter fields lie in the toolbar, and a one-pixel divider in the gap
+-- between the halves, 15 units high on the field's middle, in the flat look's outline color.
+local function formatArt(format,split)
+    local a={}
+    a.field=format:CreateTexture(nil,"BACKGROUND",nil,1); a.field:SetAtlas(Th.ART.dropdown.field,true)
+    a.field:ClearAllPoints(); a.field:SetPoint("TOPLEFT",-8,7.5); a.field:SetPoint("BOTTOMRIGHT",8,-9.5)
+    a.divider=format:CreateTexture(nil,"ARTWORK"); Th.Paint(a.divider,"outline")
+    a.divider:SetPoint("TOP",format,"TOPLEFT",split,-5); a.divider:SetHeight(15)
+    format.art=a
+end
+-- The search field in the same field, placed as on the filter buttons (it has their height and row).
+local function searchArt(search)
+    local t=search:CreateTexture(nil,"BACKGROUND",nil,1); t:SetAtlas(Th.ART.dropdown.field,true)
+    t:ClearAllPoints(); t:SetPoint("TOPLEFT",-8,7); t:SetPoint("BOTTOMRIGHT",8,-9)
+    search.field=t
+end
+-- The divider is one physical pixel wide, measured again with the flat skin's lines.
+local function sizeDivider(format) if format and format.art then format.art.divider:SetWidth(Th.Pixel(format)) end end
+-- Forever's dropdown list (MenuStyle1Mixin's art): 10 beyond the sides, 3 above and below, alpha .925.
+local function menuArt(menu)
+    local t=menu:CreateTexture(nil,"BACKGROUND",nil,1); t:SetAtlas(Th.ART.menu)
+    t:SetPoint("TOPLEFT",-10,3); t:SetPoint("BOTTOMRIGHT",10,-3); t:SetAlpha(.925)
+    menu.art=t
+end
+-- Forever's settings-slider track (MinimalSliderTemplate's three pieces at their atlas size),
+-- under the fill.
+local function trackArt(s)
+    local A,a=Th.ART.track,{}
+    a.left=s:CreateTexture(nil,"BACKGROUND",nil,1); a.left:SetAtlas(A.left,true); a.left:SetPoint("LEFT")
+    a.right=s:CreateTexture(nil,"BACKGROUND",nil,1); a.right:SetAtlas(A.right,true); a.right:SetPoint("RIGHT")
+    a.middle=s:CreateTexture(nil,"BACKGROUND",nil,1); a.middle:SetAtlas(A.middle,true)
+    a.middle:SetPoint("TOPLEFT",a.left,"TOPRIGHT"); a.middle:SetPoint("TOPRIGHT",a.right,"TOPLEFT")
+    s.track=a
+end
+-- Blizzard's inset (InsetFrameTemplate's inner nine-slice) under the character table, at the
+-- window's own level, as the template sets it. In place of the template's cool marble, the window's
+-- own rock runs on under the table, darkened to 45 % by black at 0.55 where the template has its
+-- ground (BACKGROUND -5, above the window's rock at -6).
+local function insetArt(frame,anchor)
+    local A=Th.ART.inset
+    local inset=C.Frame("Frame",nil,frame); inset:SetFrameLevel(frame:GetFrameLevel()); inset:EnableMouse(false)
+    inset:SetPoint("TOPLEFT",anchor,"TOPLEFT",0,0); inset:SetPoint("BOTTOMRIGHT",anchor,"BOTTOMRIGHT",0,0)
+    inset.ground=inset:CreateTexture(nil,"BACKGROUND",nil,-5); Th.Paint(inset.ground,"insetShade"); inset.ground:SetAllPoints(inset)
+    NineSliceUtil.ApplyLayoutByName(inset,A.layout)
+    return inset
 end
 local function tooltip(owner,lines)
     GameTooltip:SetOwner(owner,"ANCHOR_RIGHT"); GameTooltip:ClearLines()
+    local r,g,b=Th.Color("tooltipText")
     for _,value in ipairs(lines) do
-        if type(value)=="table" then GameTooltip:AddLine(value.text,.94,.91,.84,value.wrap~=false)
-        else GameTooltip:AddLine(value,.94,.91,.84,true) end
+        if type(value)=="table" then GameTooltip:AddLine(value.text,r,g,b,value.wrap~=false)
+        else GameTooltip:AddLine(value,r,g,b,true) end
     end
     GameTooltip:Show()
 end
@@ -130,6 +309,8 @@ function U:ApplyScale(layoutOnly)
     local fitting=math.min((sw-20)/WIDTH,(sh-20)/self.frame:GetHeight())
     local requested=self.scaleDragging and self.dragScale or self.db.settings.scale
     self.frame:SetScale(math.min(requested,fitting)*(768/sh)/UIParent:GetEffectiveScale())
+    -- One physical pixel is 1 / size here, so the flat skin's lines are measured again.
+    Th.SizeAll(); sizeDivider(self.format); if self.scaleFill then self:SizeScaleFill() end
     self:Position()
 end
 function U:Position(reset)
@@ -137,7 +318,7 @@ function U:Position(reset)
     local f,p=self.frame,self.db.settings.position
     if reset then self.db.settings.position=nil; p=nil; self.anchorHeight=f:GetHeight() end
     local height=p and tonumber(p.height) or self.anchorHeight or 262
-    if not M.Number(height) or height<248 or height>244+CAPACITY*PROGRESS_HEIGHT then height=262 end
+    if not M.Number(height) or height<(self.framed and 242 or 248) or height>244+CAPACITY*PROGRESS_HEIGHT then height=262 end
     -- Stored center offsets remain compatible. Remember the height at placement
     -- so filtering grows downward from the same header instead of making it jump.
     local x,y=p and p.x or 0,(p and p.y or 0)+(height-f:GetHeight())/2
@@ -169,11 +350,134 @@ function U:ToggleSettings()
     self.settings:SetShown(not shown); self:SettingsText()
 end
 function U:SettingsText()
-    self.removedToggle.label:SetText(self.removedOnly and L.showTracked or L.removedCharacters)
+    setLabel(self.removedToggle,self.removedOnly and L.showTracked or L.removedCharacters)
     self.minimapBox:SetChecked(self.db.settings.minimap)
     self.scaleLabel:SetText(math.floor(self.db.settings.scale*100+.5).." %")
     self.updatingScale=true; self.scaleSlider:SetValue(self.db.settings.scale*100); self.updatingScale=false
-    self.scaleFill:SetWidth(224*(self.db.settings.scale-M.SCALE_MIN)/(M.SCALE_MAX-M.SCALE_MIN))
+    self:SizeScaleFill()
+end
+-- The fill lies inside the track's outline: one unit under the sprites, one physical pixel under
+-- the flat skin. On Forever's track it keeps clear of the rounded ends, 4 units in, 3 units high on
+-- the track's middle, as Soundstone's.
+function U:SizeScaleFill()
+    local fraction=(self.db.settings.scale-M.SCALE_MIN)/(M.SCALE_MAX-M.SCALE_MIN)
+    if self.trackShown then place(self.scaleFill,4,7.5,218*fraction,3); return end
+    local inset=Th.flat and Th.Pixel(self.scaleSlider) or 1
+    place(self.scaleFill,inset,6+inset,(226-2*inset)*fraction,6-2*inset)
+end
+-- The slider thumb is one texture, so a look swaps its art rather than hiding it: Forever's copper
+-- diamond at its atlas size (resetTexCoords drops the sprite's sub-rectangle), the flat square, or
+-- the sprite exactly as 0.3.7 set it.
+function U:ApplyThumb(atlas)
+    local thumb=self.scaleSlider:GetThumbTexture()
+    if atlas and pcall(thumb.SetAtlas,thumb,Th.ART.thumb,true,nil,true) then
+        self.thumbAtlas=true; thumb:SetDrawLayer("OVERLAY",7); thumb:SetBlendMode("BLEND"); Th.Raw(thumb,"vertex",1,1,1,1)
+        return
+    end
+    if self.thumbAtlas then
+        self.thumbAtlas=nil; thumb:SetSize(10,18); thumb:SetDrawLayer("ARTWORK"); thumb:SetBlendMode("BLEND")
+    end
+    Th.Paint(thumb,"sliderThumb","vertex")
+    if Th.flat then thumb:SetTexture("Interface\\Buttons\\WHITE8X8"); thumb:SetTexCoord(0,1,0,1); return end
+    local retail=C.RetailStyle()
+    thumb:SetTexture(ROOT..(retail and "GoldThumb" or "SilverThumb")..".tga")
+    thumb:SetTexCoord(retail and .2265625 or .2109375,retail and .765625 or .78125,.015625,.984375)
+end
+-- Builds the pieces of Forever's art the client can draw, each group once.
+function U:BuildArt(art)
+    local f=self.frame
+    if art.window and not f.window then
+        for _,frame in ipairs({f,self.settings,self.removeDialog}) do frameWindow(frame,art) end
+        crop(self.settings); crop(self.removeDialog)
+        local border=f.window.border
+        self.frameGear=frameButton(f,border,"Interface\\WorldMap\\GEAR_64GREY",17,function() self:ToggleSettings() end)
+        self.frameClose=frameClose(f,border,function() f:Hide() end)
+        self.frameTitle=frameTitle(self.header,border,"Hourstone – Azeroth Hours","title",560)
+        for _,b in ipairs({self.frameGear,self.frameClose}) do b:SetFrameLevel(f:GetFrameLevel()+12) end
+        local s,d=self.settings.window,self.removeDialog.window
+        self.settingsFrameTitle=frameTitle(s.top,s.border,L.settings,"heading",190)
+        self.settingsFrameClose=frameClose(s.top,s.border,function() self.settings:Hide() end)
+        self.removeFrameTitle=frameTitle(d.top,d.border,L.removeTitle,"heading",440)
+        self.pushButtons={}
+        for _,b in ipairs({self.reset,self.done,self.removedToggle}) do self.pushButtons[#self.pushButtons+1]=pushButton(self.settings,b) end
+        for _,b in ipairs({self.removeCancel,self.removeConfirm}) do self.pushButtons[#self.pushButtons+1]=pushButton(self.removeDialog,b) end
+    end
+    if art.inset and not self.inset then self.inset=insetArt(f,self.table) end
+    if art.dropdown and not self.realmButton.dropdown then
+        dropdownArt(self.realmButton,self.menu); dropdownArt(self.clientButton,self.clientMenu)
+        formatArt(self.format,COMBINED_WIDTH+1.5); searchArt(self.search)
+    end
+    if art.menu and not self.menu.art then for _,menu in ipairs({self.menu,self.clientMenu,self.sortMenu}) do menuArt(menu) end end
+    if art.track and not self.scaleSlider.track then trackArt(self.scaleSlider) end
+end
+-- Applies the look in force to what is built: Forever's art where the client has it, the flat look
+-- where it does not, the sprites under the standard look. Nothing moves on the other clients; inside
+-- Forever's frame the header moves into the title strip and the content 20 units up.
+function U:ApplyLook()
+    local art,forever=Th.art,Th.flat
+    if forever then self:BuildArt(art) end
+    local framed=forever and art.window==true
+    self.framed=framed
+    for _,frame in ipairs({self.frame,self.settings,self.removeDialog}) do
+        Th.Cover(frame,framed)
+        if frame.window then
+            for key,piece in pairs(frame.window) do piece:SetShown(framed and (key~="streaks" or art.streaks==true)) end
+        end
+    end
+    -- The header: 0.3.7's, or the frame's title strip between gear and close button, which drags the window.
+    local header=self.header
+    if framed then
+        header:ClearAllPoints(); header:SetPoint("TOPLEFT",self.frame.window.border,"TOPLEFT",40,1)
+        header:SetSize(WIDTH+BORDER.right-BORDER.left-40-28,22); header:SetFrameLevel(self.frame:GetFrameLevel()+12)
+    else place(header,10,10,700,40); header:SetFrameLevel(self.headerLevel) end
+    for _,region in ipairs({self.gear,self.logo,self.title,self.close,self.headerRule}) do region:SetShown(not framed) end
+    for _,region in ipairs({self.settingsHeading,self.settingsClose,self.removeHeading,
+        self.reset,self.done,self.removedToggle,self.removeCancel,self.removeConfirm}) do region:SetShown(not framed) end
+    if self.frameGear then
+        for _,region in ipairs({self.frameGear,self.frameClose,self.frameTitle,self.settingsFrameClose}) do region:SetShown(framed) end
+        for _,b in ipairs(self.pushButtons) do b:SetShown(framed) end
+    end
+    place(self.summary,10,framed and 50-LIFT or 50)
+    place(self.settings,framed and 10 or 24,framed and 28 or 47)
+    if self.inset then self.inset:SetShown(framed and art.inset==true) end
+    -- Filter buttons, menus and the slider: Forever's art, each where the client has it.
+    local dropdown=forever and art.dropdown==true
+    for _,b in ipairs({self.realmButton,self.clientButton}) do
+        Th.Cover(b,dropdown); b.arrow:SetShown(not dropdown)
+        if b.dropdown then
+            b.dropdown.field:SetShown(dropdown); b.dropdown.arrow:SetShown(dropdown); b.glow:SetAlpha(dropdown and 0 or 1)
+        end
+    end
+    Th.Cover(self.search,dropdown); if self.search.field then self.search.field:SetShown(dropdown) end
+    -- The format toggle in the same field: the chosen half bright, the other muted (Refresh paints them).
+    if self.format.art then
+        for _,t in pairs(self.format.art) do t:SetShown(dropdown) end
+        for _,b in ipairs({self.combined,self.hours}) do
+            Th.Cover(b,dropdown); b.glow:SetAlpha(dropdown and 0 or 1); b.chosenKey=dropdown and "text" or nil
+        end
+    end
+    local menu=forever and art.menu==true
+    self.menuBottom=menu and 15 or 8
+    for _,frame in ipairs({self.menu,self.clientMenu,self.sortMenu}) do
+        Th.Cover(frame,menu); if frame.art then frame.art:SetShown(menu) end
+    end
+    self.sortMenu:SetHeight(83+self.menuBottom)
+    if self.clientForever~=nil then local shown=self.clientForever; self.clientForever=nil; self:LayoutClients(shown) end
+    if self.realmChoices then self:RenderRealms() end
+    self.trackShown=forever and art.track==true
+    Th.Cover(self.scaleSlider,self.trackShown)
+    if self.scaleSlider.track then for _,t in pairs(self.scaleSlider.track) do t:SetShown(self.trackShown) end end
+    Th.Paint(self.scaleFill,self.trackShown and "trackFill" or "sliderFill")
+    self:ApplyThumb(forever and art.thumb==true)
+    Th.SizeAll(); sizeDivider(self.format); self:SizeScaleFill()
+end
+-- Applies a look where the window stands: the client's by default; the tests also apply the other
+-- one and back. Nothing new is created after a look's pieces exist, and the saved position stays.
+-- State colors come back through Refresh after the repaint.
+function U:ApplyTheme(name)
+    Th.Apply(name)
+    if not self.frame then return end
+    self:ApplyLook(); self:SettingsText(); self:Refresh()
 end
 function U:SetFormat(mode) self.db.settings.format=mode; self:Refresh() end
 function U:SetView(view)
@@ -196,14 +500,16 @@ function U:LayoutRows(count)
     local rowHeight=progress and PROGRESS_HEIGHT or ROW_HEIGHT
     local tabs=C.RetailProgress() and TAB_HEIGHT or 0
     local _,sh=GetPhysicalScreenSize()
-    local base=212+tabs
+    -- Inside Forever's frame everything below the header sits 20 units higher.
+    local lift=self.framed and LIFT or 0
+    local base=212+tabs-lift
     local requested=self.scaleDragging and self.dragScale or self.db.settings.scale
     local fittingRows=math.floor(((sh-20)/requested-base)/rowHeight)
     local slots=math.max(1,math.min(CAPACITY,fittingRows,count or self.visibleCount or 0))
     self.slots,self.rowHeight=slots,rowHeight; local h=slots*rowHeight
-    self.frame:SetHeight(base+h); self.panelLayout()
-    place(self.toolbar,10,114+tabs)
-    place(self.table,10,152+tabs)
+    self.frame:SetHeight(base+h); self.panelLayout(); if self.framed then crop(self.frame) end
+    place(self.toolbar,10,114+tabs-lift)
+    place(self.table,10,152+tabs-lift)
     self.table:SetHeight(24+h); self.list:SetHeight(h); self.scroll:SetHeight(h-4)
     place(self.scroll,progress and 684 or 695,progress and 18 or 2,progress and 14 or 5,progress and h-36 or h-4)
     self.scroll:GetThumbTexture():SetWidth(progress and 11 or 4)
@@ -212,8 +518,8 @@ function U:LayoutRows(count)
     self.scroll:GetThumbTexture():SetHeight(math.min(28,self.scroll:GetHeight()/2))
     place(self.scrollDown,684,h-17)
     for _,divider in ipairs(self.headerDividers) do divider:SetShown(progress) end
-    place(self.sortMenu,10,177+tabs)
-    place(self.footerFrame,10,176+tabs+h)
+    place(self.sortMenu,10,177+tabs-lift)
+    place(self.footerFrame,10,176+tabs+h-lift)
     self.format:SetShown(not progress)
     if self.tabs then selected(self.playedTab,not progress); selected(self.progressTab,progress) end
     local fields={"name","flavor","seconds","updatedAt"}
@@ -252,39 +558,40 @@ function U:Create()
         self:CloseMenus(); self.windowDragging=true; f:StartMoving()
     end)
     self.header:SetScript("OnDragStop",function() self:FinishWindowDrag() end)
+    self.headerLevel=self.header:GetFrameLevel()
     for y=0,2 do for x=0,1 do
         local rivet=artwork(self.header,"Rivet",3,3,3.5+x*6,12+y*6)
-        rivet:SetTexCoord(.03125,.96875,.03125,.96875); rivet:SetAlpha(.75)
+        rivet:SetTexCoord(.03125,.96875,.03125,.96875); rivet:SetAlpha(.75); Th.Sprite(rivet)
     end end
     self.gear=rect("Button",self.header,20,9.5,20,20)
     self.gear:SetNormalTexture("Interface\\WorldMap\\GEAR_64GREY")
-    self.gear:GetNormalTexture():SetVertexColor(.9,.8,.57)
-    self.gear:SetScript("OnEnter",function(b) b:GetNormalTexture():SetVertexColor(1,1,1) end)
-    self.gear:SetScript("OnLeave",function(b) b:GetNormalTexture():SetVertexColor(.9,.8,.57) end)
+    Th.Paint(self.gear:GetNormalTexture(),"gear","vertex")
+    self.gear:SetScript("OnEnter",function(b) Th.Paint(b:GetNormalTexture(),"gearHover","vertex") end)
+    self.gear:SetScript("OnLeave",function(b) Th.Paint(b:GetNormalTexture(),"gear","vertex") end)
     self.gear:SetScript("OnClick",function() self:ToggleSettings() end)
     self.logo=artwork(self.header,"Logo",28,28,48,5.5)
-    self.title=text(self.header,"Hourstone – Azeroth Hours",17,84,7.5,588,{1,213/255,116/255},24)
+    self.title=text(self.header,"Hourstone – Azeroth Hours",17,84,7.5,588,"title",24)
     self.close=closeButton(self.header,678,9.5,20,function() f:Hide() end)
-    line(self.header,0,39,700,1,166/255,162/255,148/255,128/255)
+    self.headerRule=line(self.header,0,39,700,1,"ruleHeader")
 
     self.summary=rect("Frame",f,10,50,700,64)
     self.statLabels={}
     local starts,widths={5,280.2,432},{250.2,126.8,251}
     for i,key in ipairs({"total","characters","session"}) do
-        self.statLabels[i]=text(self.summary,L[key],11,starts[i],11.5,widths[i],{196/255,192/255,178/255},15)
+        self.statLabels[i]=text(self.summary,L[key],11,starts[i],11.5,widths[i],"statLabel",15)
     end
-    for _,x in ipairs({267.2,419}) do line(self.summary,x,10,1,43,146/255,137/255,120/255,66/255) end
-    self.total=text(self.summary,"",20,5,26.5,250.2,GOLD,25)
-    self.count=text(self.summary,"",20,280.2,26.5,50,GOLD,25)
-    self.realms=text(self.summary,"",11,308.2,35.5,96,MUTED,13.2)
-    self.session=text(self.summary,"",20,432,26.5,251,GOLD,25)
+    for _,x in ipairs({267.2,419}) do line(self.summary,x,10,1,43,"ruleSummary") end
+    self.total=text(self.summary,"",20,5,26.5,250.2,"value",25)
+    self.count=text(self.summary,"",20,280.2,26.5,50,"value",25)
+    self.realms=text(self.summary,"",11,308.2,35.5,96,"muted",13.2)
+    self.session=text(self.summary,"",20,432,26.5,251,"value",25)
     self.summary:EnableMouse(true)
     self.summary:SetScript("OnEnter",function(owner)
         local stats=self.overviewStats
         if stats then tooltip(owner,{L.total,M.SumText(stats.total,stats.missing,stats.count,self.db.settings.format)}) end
     end)
     self.summary:SetScript("OnLeave",function() GameTooltip:Hide() end)
-    line(self.summary,0,63,700,1,150/255,144/255,128/255,66/255)
+    line(self.summary,0,63,700,1,"ruleSummaryBottom")
 
     if C.RetailProgress() then
         self.tabs=rect("Frame",f,10,114,700,TAB_HEIGHT)
@@ -294,11 +601,11 @@ function U:Create()
 
     self.toolbar=rect("Frame",f,10,114,700,38)
     local search=rect("EditBox",self.toolbar,0,6,SEARCH_WIDTH,26); self.search=search
-    skin(search,"Toggle"); search:SetFont(FONT,11,""); search:SetTextColor(231/255,225/255,206/255)
+    skin(search,"Toggle","field"); search:SetFont(FONT,11,""); Th.Paint(search,"searchText","text")
     search:SetAutoFocus(false); search:SetMaxLetters(80); search:SetTextInsets(9,25,0,0)
-    search.hint=text(search,L.search,11,9,0,SEARCH_WIDTH-34,{.56,.55,.51},26)
+    search.hint=text(search,L.search,11,9,0,SEARCH_WIDTH-34,"hint",26)
     self.clearSearch=rect("Button",search,SEARCH_WIDTH-23,4,18,18)
-    text(self.clearSearch,"×",12,0,0,18,MUTED,18,"CENTER")
+    text(self.clearSearch,"×",12,0,0,18,"muted",18,"CENTER")
     self.clearSearch:SetScript("OnClick",function() search:SetText(""); search:ClearFocus() end)
     self.clearSearch:Hide()
     search:SetScript("OnTextChanged",function(edit)
@@ -311,10 +618,10 @@ function U:Create()
     search:SetScript("OnLeave",function() GameTooltip:Hide() end)
     self.realmButton=control(self.toolbar,L.allRealms,SEARCH_WIDTH+7,6,FILTER_WIDTH,26,function() self:ToggleRealms() end,"Toggle")
     self.realmButton.label:SetJustifyH("LEFT"); self.realmButton.label:SetWidth(107)
-    arrow(self.realmButton,124,11,6,4)
+    self.realmButton.arrow=arrow(self.realmButton,124,11,6,4)
     self.clientButton=control(self.toolbar,L.allClients,SEARCH_WIDTH+FILTER_WIDTH+14,6,FILTER_WIDTH,26,function() self:ToggleClients() end,"Toggle")
     self.clientButton.label:SetJustifyH("LEFT"); self.clientButton.label:SetWidth(107)
-    arrow(self.clientButton,124,11,6,4)
+    self.clientButton.arrow=arrow(self.clientButton,124,11,6,4)
     self.format=rect("Frame",self.toolbar,700-FORMAT_WIDTH,6.5,FORMAT_WIDTH,25)
     self.combined=control(self.format,L.combined,0,0,COMBINED_WIDTH,25,function() self:SetFormat("combined") end)
     self.hours=control(self.format,L.hours,COMBINED_WIDTH+3,0,FORMAT_WIDTH-COMBINED_WIDTH-3,25,function() self:SetFormat("hours") end)
@@ -325,7 +632,7 @@ function U:Create()
         {"seconds","played",NAME_WIDTH+CLIENT_WIDTH,PLAYED_WIDTH},{"updatedAt","updated",NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH,UPDATED_WIDTH}}) do
         local field,title,x,w=spec[1],L[spec[2]],spec[3],spec[4]
         local b=rect("Button",self.table,x,0,w,24)
-        b.label=text(b,title,11,8,0,w-24,{197/255,191/255,171/255},24,field=="seconds" and "RIGHT" or "LEFT")
+        b.label=text(b,title,11,8,0,w-24,"header",24,field=="seconds" and "RIGHT" or "LEFT")
         if field=="seconds" then b.label:SetWidth(w-32) end
         b.arrow=arrow(b,field=="seconds" and w-19 or 80,10.5)
         b:SetScript("OnClick",function()
@@ -336,33 +643,33 @@ function U:Create()
         end)
         self.headers[field]={button=b,width=w,title=title}
     end
-    line(self.table,0,23,700,1,169/255,160/255,139/255,101/255)
+    line(self.table,0,23,700,1,"ruleTable")
     self.headerDividers={}
-    for _,x in ipairs({230,394,516}) do self.headerDividers[#self.headerDividers+1]=line(self.table,x,2,1,19,.43,.46,.43,.4) end
+    for _,x in ipairs({230,394,516}) do self.headerDividers[#self.headerDividers+1]=line(self.table,x,2,1,19,"ruleColumnHeader") end
     self.list=rect("Frame",self.table,0,24,700,ROW_HEIGHT); self.list:EnableMouseWheel(true)
     self.list:SetScript("OnMouseWheel",function(_,delta) self:Scroll(-delta*3) end)
     self.rows={}
     for i=1,CAPACITY do
         local row=rect("Button",self.list,0,(i-1)*ROW_HEIGHT,700,ROW_HEIGHT); self.rows[i]=row
-        row.bg=solid(row,"BACKGROUND",1,1,1,0); row.bg:SetAllPoints()
-        row.active=line(row,0,0,2,ROW_HEIGHT-1,104/255,202/255,232/255)
-        row.separator=line(row,0,ROW_HEIGHT-1,700,1,141/255,138/255,114/255,59/255)
+        row.bg=solid(row,"BACKGROUND",{1,1,1,0}); row.bg:SetAllPoints()
+        row.active=line(row,0,0,2,ROW_HEIGHT-1,{104/255,202/255,232/255})
+        row.separator=line(row,0,ROW_HEIGHT-1,700,1,"ruleRow")
         row.dividers={}
-        for _,x in ipairs({230,394,516}) do row.dividers[#row.dividers+1]=line(row,x,0,1,ROW_HEIGHT-1,.43,.46,.43,.3) end
+        for _,x in ipairs({230,394,516}) do row.dividers[#row.dividers+1]=line(row,x,0,1,ROW_HEIGHT-1,"ruleColumn") end
         row.dot=artwork(row,"LiveDot",5,5,8,8.5)
         row.name=text(row,"",13,8,3,NAME_WIDTH-77,nil,16)
-        row.level=text(row,"",10,NAME_WIDTH-62,5,54,{196/255,184/255,154/255},12)
-        row.realm=text(row,"",11,8,19,NAME_WIDTH-16,{168/255,170/255,165/255},13)
-        row.guild=text(row,"",10,8,33,NAME_WIDTH-16,{150/255,165/255,156/255},13)
-        row.client=text(row,"",11,NAME_WIDTH+8,0,CLIENT_WIDTH-16,{168/255,170/255,165/255},ROW_HEIGHT-1)
-        row.played=text(row,"",12,NAME_WIDTH+CLIENT_WIDTH+5,0,PLAYED_WIDTH-19,{238/255,225/255,187/255},ROW_HEIGHT-1,"RIGHT")
-        row.updated=text(row,"",11,NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,{167/255,171/255,165/255},ROW_HEIGHT-1)
+        row.level=text(row,"",10,NAME_WIDTH-62,5,54,"level",12)
+        row.realm=text(row,"",11,8,19,NAME_WIDTH-16,"secondary",13)
+        row.guild=text(row,"",10,8,33,NAME_WIDTH-16,"guild",13)
+        row.client=text(row,"",11,NAME_WIDTH+8,0,CLIENT_WIDTH-16,"secondary",ROW_HEIGHT-1)
+        row.played=text(row,"",12,NAME_WIDTH+CLIENT_WIDTH+5,0,PLAYED_WIDTH-19,"played",ROW_HEIGHT-1,"RIGHT")
+        row.updated=text(row,"",11,NAME_WIDTH+CLIENT_WIDTH+PLAYED_WIDTH+8,0,UPDATED_WIDTH-24,"updated",ROW_HEIGHT-1)
         row.progress=rect("Frame",row,PROGRESS_NAME,0,470,PROGRESS_HEIGHT)
-        row.keyText=text(row.progress,"",12,12,11,140,GOLD,18)
-        row.keyLevel=text(row.progress,"",12,120,11,34,GOLD,18,"RIGHT")
-        row.keyNote=text(row.progress,"",10,12,31,140,MUTED,17)
-        row.weekText=text(row.progress,"",15,176,11,98,GOLD,19)
-        row.weekNote=text(row.progress,"",10,176,33,98,MUTED,16)
+        row.keyText=text(row.progress,"",12,12,11,140,"value",18)
+        row.keyLevel=text(row.progress,"",12,120,11,34,"value",18,"RIGHT")
+        row.keyNote=text(row.progress,"",10,12,31,140,"muted",17)
+        row.weekText=text(row.progress,"",15,176,11,98,"value",19)
+        row.weekNote=text(row.progress,"",10,176,33,98,"muted",16)
         row.keyHover=rect("Frame",row.progress,0,0,164,PROGRESS_HEIGHT)
         row.keyHover:EnableMouse(true)
         row.keyHover:SetScript("OnEnter",function() self:ProgressTooltip(row,"keystone") end)
@@ -372,24 +679,24 @@ function U:Create()
         row.vault={}
         for j,category in ipairs(CATEGORIES) do
             local group=rect("Frame",row.progress,286,5+(j-1)*18,174,18)
-            group.label=text(group,L[category],10,12,0,62,{.78,.8,.8},18)
+            group.label=text(group,L[category],10,12,0,62,"vaultLabel",18)
             group:EnableMouse(true)
             group:SetScript("OnEnter",function() self:ProgressTooltip(row,category) end)
             group:SetScript("OnLeave",function() self:HideProgressTooltip() end)
             group.slots={}
             for slot=1,3 do
                 local box=rect("Frame",group,80+(slot-1)*23,1,16,16)
-                box.edge=solid(box,"BACKGROUND",.5,.43,.25,1); box.edge:SetAllPoints()
-                box.fill=line(box,1,1,14,14,.035,.06,.065,1)
+                box.edge=solid(box,"BACKGROUND",{.5,.43,.25,1}); box.edge:SetAllPoints()
+                box.fill=line(box,1,1,14,14,{.035,.06,.065,1})
                 box.check=artwork(box,"Check",14,14,1,1,"OVERLAY")
-                box.unknown=text(box,"?",11,0,0,16,MUTED,16,"CENTER")
+                box.unknown=text(box,"?",11,0,0,16,INFO_MUTED,16,"CENTER")
                 group.slots[slot]=box
             end
             row.vault[category]=group
         end
         row.keyHover:SetScript("OnLeave",function() self:HideProgressTooltip() end)
         row.weekHover:SetScript("OnLeave",function() self:HideProgressTooltip() end)
-        local glow=solid(row,"HIGHLIGHT",203/255,184/255,130/255,12/255); glow:SetAllPoints()
+        local glow=solid(row,"HIGHLIGHT","hoverRow"); glow:SetAllPoints()
         row:SetScript("OnEnter",function(owner) self:RowTooltip(owner) end)
         row:SetScript("OnLeave",function() GameTooltip:Hide(); self:HideProgressTooltip() end)
         row:RegisterForClicks("RightButtonUp")
@@ -405,12 +712,12 @@ function U:Create()
         row.weekHover:SetScript("OnMouseUp",function(_,button) rowClick(row,button) end)
         for _,group in pairs(row.vault) do group:SetScript("OnMouseUp",function(_,button) rowClick(row,button) end) end
     end
-    self.empty=text(self.list,L.empty,11,8,0,684,MUTED,ROW_HEIGHT,"CENTER")
+    self.empty=text(self.list,L.empty,11,8,0,684,"muted",ROW_HEIGHT,"CENTER")
     self.scroll=rect("Slider",self.list,695,2,5,ROW_HEIGHT-4)
     self.scroll:SetOrientation("VERTICAL"); self.scroll:SetMinMaxValues(0,0); self.scroll:SetValueStep(1)
     if self.scroll.SetObeyStepOnDrag then self.scroll:SetObeyStepOnDrag(true) end
     self.scroll:SetThumbTexture("Interface\\Buttons\\WHITE8X8")
-    self.scroll:GetThumbTexture():SetSize(4,28); self.scroll:GetThumbTexture():SetVertexColor(.55,.5,.38,.9)
+    self.scroll:GetThumbTexture():SetSize(4,28); Th.Paint(self.scroll:GetThumbTexture(),"scrollThumb","vertex")
     self.scroll:SetScript("OnValueChanged",function(_,v)
         if not self.refreshing then self.offset=math.floor(v+.5); self:Refresh() end
     end)
@@ -421,7 +728,7 @@ function U:Create()
     local up=arrow(self.scrollUp,3,6,8,5); up:SetTexCoord(0,1,1,0)
     arrow(self.scrollDown,3,6,8,5)
     self.footerFrame=rect("Frame",f,10,176+ROW_HEIGHT,700,26)
-    self.footer=text(self.footerFrame,"",10,5,2,540,{166/255,166/255,155/255},24)
+    self.footer=text(self.footerFrame,"",10,5,2,540,"footer",24)
     self.footerFrame:EnableMouse(true)
     self.footerFrame:SetScript("OnEnter",function(owner) tooltip(owner,{self.footer:GetText(),self:IsProgress() and L.progressHint or L.hint}) end)
     self.footerFrame:SetScript("OnLeave",function() GameTooltip:Hide() end)
@@ -431,18 +738,17 @@ function U:Create()
     for i,flavor in ipairs(CLIENT_CHOICES) do
         local b=rect("Button",self.clientMenu,8,8+(i-1)*25,152,25)
         b.label=text(b,flavor=="all" and L.allClients or L[flavor],11,7,0,140,nil,25)
-        local glow=solid(b,"HIGHLIGHT",187/255,161/255,102/255,37/255); glow:SetAllPoints()
+        local glow=solid(b,"HIGHLIGHT","hoverMenu"); glow:SetAllPoints()
         b:SetScript("OnClick",function()
             self.flavor,self.offset=flavor~="all" and flavor or nil,0; self:CloseMenus(); self:Refresh()
         end)
         self.clientRows[flavor]=b
     end
     self:LayoutClients(C.IsForever())
-    local creditColor={156/255,158/255,146/255,.85}
-    self.creditVersion=text(self.footerFrame,"v"..C.Version(),10,555,2,36,creditColor,24,"RIGHT")
-    self.creditWith=text(self.footerFrame,"with",10,596,2,24,creditColor,24)
+    self.creditVersion=text(self.footerFrame,"v"..C.Version(),10,555,2,36,"credit",24,"RIGHT")
+    self.creditWith=text(self.footerFrame,"with",10,596,2,24,"credit",24)
     self.creditHeart=artwork(self.footerFrame,"Heart",9,9,625,9.5)
-    self.creditAuthor=text(self.footerFrame,"by krebs3r",10,639,2,56,creditColor,24)
+    self.creditAuthor=text(self.footerFrame,"by krebs3r",10,639,2,56,"credit",24)
 
     self.menu=rect("Frame",self.realmButton,0,29,218,41); self.menu:SetFrameLevel(f:GetFrameLevel()+30)
     self.menuLayout=skin(self.menu,self.panelName); self.menu:EnableMouse(true); self.menu:EnableMouseWheel(true); self.menu:Hide()
@@ -450,7 +756,7 @@ function U:Create()
     for i=1,6 do
         local b=rect("Button",self.menu,8,8+(i-1)*25,202,25)
         b.label=text(b,"",11,7,0,177,nil,25)
-        local glow=solid(b,"HIGHLIGHT",187/255,161/255,102/255,37/255); glow:SetAllPoints()
+        local glow=solid(b,"HIGHLIGHT","hoverMenu"); glow:SetAllPoints()
         b:SetScript("OnClick",function(owner) self.realm,self.offset=owner.realm,0; self.menu:Hide(); self:Refresh() end)
         self.realmRows[i]=b
     end
@@ -462,12 +768,12 @@ function U:Create()
     for i,field in ipairs({"name","level","realm"}) do
         local b=rect("Button",self.sortMenu,8,8+(i-1)*25,164,25)
         b.label=text(b,L[field],11,7,0,140,nil,25)
-        local glow=solid(b,"HIGHLIGHT",187/255,161/255,102/255,37/255); glow:SetAllPoints()
+        local glow=solid(b,"HIGHLIGHT","hoverMenu"); glow:SetAllPoints()
         b:SetScript("OnClick",function() self:SetSort(field) end); self.sortRows[field]=b
     end
     self.settings=rect("Frame",f,24,47,252,214); local settings=self.settings
     settings:SetFrameLevel(f:GetFrameLevel()+35); settings:EnableMouse(true); settings:Hide(); skin(settings,self.panelName)
-    text(settings,L.settings,15,13,13,202,GOLD,22)
+    self.settingsHeading=text(settings,L.settings,15,13,13,202,"heading",22)
     self.settingsClose=closeButton(settings,222,15.5,17,function() settings:Hide() end)
     self.minimapToggle=rect("Button",settings,13,35,226,27)
     local toggleMinimap=function()
@@ -483,17 +789,21 @@ function U:Create()
     end)
     text(self.minimapToggle,L.minimap,11,23,0,203,nil,27)
     self.minimapToggle:SetScript("OnClick",toggleMinimap)
-    text(settings,L.scale,11,13,68,177,{215/255,201/255,157/255},13.2)
-    self.scaleLabel=text(settings,"",11,190,68,49,{215/255,201/255,157/255},13.2,"RIGHT")
+    text(settings,L.scale,11,13,68,177,"settingsLabel",13.2)
+    self.scaleLabel=text(settings,"",11,190,68,49,"settingsLabel",13.2,"RIGHT")
     self.scaleSlider=rect("Slider",settings,13,87.2,226,18)
     self.scaleSlider:SetOrientation("HORIZONTAL"); self.scaleSlider:SetMinMaxValues(M.SCALE_MIN*100,M.SCALE_MAX*100); self.scaleSlider:SetValueStep(M.SCALE_STEP*100)
     if self.scaleSlider.SetObeyStepOnDrag then self.scaleSlider:SetObeyStepOnDrag(true) end
-    line(self.scaleSlider,0,6,226,6,131/255,119/255,89/255)
-    line(self.scaleSlider,1,7,224,4,39/255,38/255,31/255)
-    self.scaleFill=line(self.scaleSlider,1,7,0,4,194/255,142/255,35/255)
+    self.scaleEdge=line(self.scaleSlider,0,6,226,6,"sliderEdge")
+    self.scaleTrack=line(self.scaleSlider,1,7,224,4,"sliderTrack")
+    self.scaleFill=line(self.scaleSlider,1,7,0,4,"sliderFill")
+    -- Flat: the track is a control plate on the edge's rectangle, its outline one physical
+    -- pixel; the fill is inset by that pixel (U:SizeScaleFill).
+    Th.Plate(self.scaleSlider,"control",{self.scaleEdge,self.scaleTrack},self.scaleEdge)
     self.scaleSlider:SetThumbTexture(ROOT..(C.RetailStyle() and "GoldThumb" or "SilverThumb")..".tga")
     local thumb=self.scaleSlider:GetThumbTexture(); thumb:SetSize(10,18)
     thumb:SetTexCoord(C.RetailStyle() and .2265625 or .2109375,C.RetailStyle() and .765625 or .78125,.015625,.984375)
+    Th.Paint(thumb,"sliderThumb","vertex")
     local function beginScaleDrag()
         if not self.scaleDragging then
             self.dragScale=self.db.settings.scale; self.scaleDragging=true
@@ -519,20 +829,19 @@ function U:Create()
     end
     self.scaleSlider:SetScript("OnMouseUp",finishScaleDrag)
     settings:SetScript("OnHide",finishScaleDrag)
-    self.scaleMin=text(settings,math.floor(M.SCALE_MIN*100).." %",10,13,108,70,MUTED,15)
-    self.scaleMax=text(settings,math.floor(M.SCALE_MAX*100).." %",10,169,108,70,MUTED,15,"RIGHT")
+    self.scaleMin=text(settings,math.floor(M.SCALE_MIN*100).." %",10,13,108,70,"muted",15)
+    self.scaleMax=text(settings,math.floor(M.SCALE_MAX*100).." %",10,169,108,70,"muted",15,"RIGHT")
     self.reset=control(settings,L.reset,13,136,137,25,function() self:Position(true) end,"Toggle")
-    self.reset.label:SetFont(FONT,10,""); place(self.reset.label,5,0,127,25)
-    self.done=control(settings,L.done,157,136,82,25,function() settings:Hide() end)
+    self.reset.label:SetFont(FONT,10,""); place(self.reset.label,5,0,127,25); self.reset.labelSize=10
+    self.done=control(settings,L.done,157,136,82,25,function() settings:Hide() end); primary(self.done)
     self.removedToggle=control(settings,L.removedCharacters,13,177,226,25,function()
         self:SetRemovedView(not self.removedOnly)
     end,"Toggle")
-    self.removedToggle:SetScript("OnEnter",function(owner) tooltip(owner,{L.removedCharacters,L.removalHelp}) end)
-    self.removedToggle:SetScript("OnLeave",function() GameTooltip:Hide() end)
+    self.removedToggle.tip=function(owner) tooltip(owner,{L.removedCharacters,L.removalHelp}) end
     self.removeDialog=rect("Frame",f,110,30,500,205)
     self.removeDialog:SetFrameLevel(f:GetFrameLevel()+50); self.removeDialog:EnableMouse(true)
     skin(self.removeDialog,self.panelName); self.removeDialog:Hide()
-    text(self.removeDialog,L.removeTitle,14,18,14,464,GOLD,28)
+    self.removeHeading=text(self.removeDialog,L.removeTitle,14,18,14,464,"heading",28)
     self.removeBody=text(self.removeDialog,"",12,18,49,464,nil,96)
     self.removeBody:SetWordWrap(true)
     self.removeCancel=control(self.removeDialog,L.cancel,230,162,118,27,function() self:CloseMenus() end,"Toggle")
@@ -541,18 +850,19 @@ function U:Create()
         if identity and not H.V.Remove(self.db,identity) then print(L.visibilityError) end
         self:CloseMenus(); self:Refresh()
     end)
+    primary(self.removeConfirm)
     self.progressTip=rect("Frame",f,WIDTH+12,26,310,180)
     self.progressTip:SetFrameLevel(f:GetFrameLevel()+45); self.progressTip:SetClampedToScreen(true)
     self.tipLayout=skin(self.progressTip,self.panelName); self.progressTip:Hide(); self.tipLines={}; self.tipMarks={}
-    self.tipTitle=text(self.progressTip,"",16,16,12,278,GOLD,40); self.tipTitle:SetWordWrap(true)
-    self.tipDivider=line(self.progressTip,16,57,278,1,.6,.5,.28,.7)
-    self.tipFooterDivider=line(self.progressTip,16,150,278,1,.6,.5,.28,.7)
+    self.tipTitle=text(self.progressTip,"",16,16,12,278,"tipTitle",40); self.tipTitle:SetWordWrap(true)
+    self.tipDivider=line(self.progressTip,16,57,278,1,"tipRule")
+    self.tipFooterDivider=line(self.progressTip,16,150,278,1,"tipRule")
     self.ready=true
     f:SetScript("OnHide",function()
         self:FinishWindowDrag(); search:ClearFocus(); self:CloseMenus(); GameTooltip:Hide()
     end)
     f:SetScript("OnMouseDown",function() self:CloseMenus(); search:ClearFocus() end)
-    self:LayoutRows(0); self:SettingsText()
+    self:ApplyLook(); self:LayoutRows(0); self:SettingsText()
 end
 function U:SetRemovedView(removedOnly)
     self.removedOnly=removedOnly == true
@@ -587,17 +897,17 @@ function U:LayoutClients(forever)
         b:SetShown(shown)
         if shown then place(b,8,y); y=y+25 end
     end
-    self.clientMenu:SetHeight(y+8); self.clientMenuLayout()
+    self.clientMenu:SetHeight(y+(self.menuBottom or 8)); self.clientMenuLayout()
 end
 function U:RenderRealms()
     for i,b in ipairs(self.realmRows) do
         local entry=self.realmChoices[i+self.realmOffset]; b:SetShown(entry~=nil)
         if entry then
             b.realm=entry.realm; b.label:SetText(entry.label)
-            b.label:SetTextColor(unpack(entry.realm==self.realm and GOLD or {228/255,215/255,180/255}))
+            Th.Paint(b.label,entry.realm==self.realm and "value" or "menuText","text")
         end
     end
-    self.menu:SetHeight(math.min(6,#self.realmChoices)*25+16); self.menuLayout()
+    self.menu:SetHeight(math.min(6,#self.realmChoices)*25+8+(self.menuBottom or 8)); self.menuLayout()
 end
 function U:Scroll(delta)
     self.offset=math.max(0,math.min(self.maxOffset or 0,self.offset+delta)); self:Refresh()
@@ -617,11 +927,11 @@ function U:RenderProgress(row)
     ellipsis(row.keyText,info.supported and C.Escape(keyLabel) or L.progressUnavailable)
     row.keyNote:SetText(not info.supported and "" or (stale and L.stale or
         (key.status=="known" and (hasKey and M.Age(key.updatedAt) or L.confirmed) or L.noProgressData)))
-    row.keyText:SetTextColor(unpack(stale and MUTED or (hasKey and GOLD or {.84,.86,.86})))
-    row.keyLevel:SetTextColor(unpack(stale and MUTED or GOLD))
+    Th.Paint(row.keyText,stale and "muted" or (hasKey and "value" or "noKey"),"text")
+    Th.Paint(row.keyLevel,stale and "muted" or "value","text")
     local recorded=week.status=="known" or week.status=="stale"
     row.weekText:SetText(recorded and week.level and week.level>0 and ("+"..week.level) or "–")
-    row.weekText:SetTextColor(unpack(week.status=="stale" and MUTED or GOLD))
+    Th.Paint(row.weekText,week.status=="stale" and "muted" or "value","text")
     row.weekNote:SetText(week.status=="stale" and (week.expired and L.previousWeek or L.stale) or (recorded and week.level and week.level>0 and L.completed or ""))
     for _,category in ipairs(CATEGORIES) do
         local group=row.vault[category]
@@ -632,8 +942,8 @@ function U:RenderProgress(row)
             local unlocked=known and value.unlocked==true
             box.check:SetShown(unlocked)
             box.unknown:SetShown(info.supported and not known)
-            box.fill:SetColorTexture(unlocked and .32 or .035,unlocked and .22 or .06,unlocked and .035 or .065,1)
-            box.edge:SetColorTexture(unlocked and .95 or .5,unlocked and .7 or .43,unlocked and .25 or .25,1)
+            Th.Raw(box.fill,nil,unlocked and .32 or .035,unlocked and .22 or .06,unlocked and .035 or .065,1)
+            Th.Raw(box.edge,nil,unlocked and .95 or .5,unlocked and .7 or .43,unlocked and .25 or .25,1)
             box:SetAlpha(data.status=="stale" and .38 or (info.supported and 1 or .25))
         end
     end
@@ -708,15 +1018,15 @@ function U:ProgressTooltip(row,category)
             local icon=self.tipMarks[i]
             if not icon then
                 icon=rect("Frame",self.progressTip,16,y+5,14,14)
-                icon.edge=solid(icon,"BACKGROUND",.5,.43,.25,1); icon.edge:SetAllPoints()
-                icon.fill=line(icon,1,1,12,12,.035,.06,.065,1)
+                icon.edge=solid(icon,"BACKGROUND",{.5,.43,.25,1}); icon.edge:SetAllPoints()
+                icon.fill=line(icon,1,1,12,12,{.035,.06,.065,1})
                 icon.check=artwork(icon,"Check",14,14,0,0,"OVERLAY")
                 self.tipMarks[i]=icon
             end
             place(icon,16,y+5); icon:Show(); icon.check:SetShown(mark.unlocked==true)
             icon:SetAlpha(mark.stale and .38 or 1)
         elseif self.tipMarks[i] then self.tipMarks[i]:Hide() end
-        label:SetTextColor(unpack(i>=footerStart and GOLD or {.85,.87,.89})); y=y+height+2
+        Th.Paint(label,i>=footerStart and "value" or "tipText","text"); y=y+height+2
     end
     for i=#lines+1,#self.tipLines do self.tipLines[i]:Hide() end
     for i,mark in pairs(self.tipMarks) do if not marks[i] then mark:Hide() end end
@@ -752,13 +1062,13 @@ function U:Refresh()
         local on=(not self:IsProgress() or field=="name") and (self.sort==field or (field=="name" and (self.sort=="level" or self.sort=="realm")))
         local title=field=="name" and self.removedOnly and L.removedCharacters or header.title
         b.label:SetText(title..(field=="name" and self.sort~="name" and on and " · "..L[self.sort] or ""))
-        b.label:SetTextColor(unpack(on and GOLD or {197/255,191/255,171/255}))
+        Th.Paint(b.label,on and "value" or "header","text")
         b.arrow:SetShown(on or field=="name")
         b.arrow:SetTexCoord(0,1,on and not self.descending and 1 or 0,on and not self.descending and 0 or 1)
         b.arrow:ClearAllPoints(); b.arrow:SetPoint("TOPLEFT",field=="seconds" and PLAYED_WIDTH-19 or 13+occupied(b.label),-10.5)
-        b.arrow:SetVertexColor(unpack(on and GOLD or MUTED))
+        Th.Paint(b.arrow,on and "value" or "muted","vertex")
     end
-    for field,b in pairs(self.sortRows) do b.label:SetTextColor(unpack(self.sort==field and GOLD or {228/255,215/255,180/255})) end
+    for field,b in pairs(self.sortRows) do Th.Paint(b.label,self.sort==field and "value" or "menuText","text") end
     self.maxOffset=math.max(0,#entries-self.slots); self.offset=math.min(self.offset,self.maxOffset)
     self.scroll:SetMinMaxValues(0,self.maxOffset); self.scroll:SetValue(self.offset); self.scroll:SetShown(self.maxOffset>0)
     self.scrollUp:SetShown(self:IsProgress() and self.maxOffset>0); self.scrollDown:SetShown(self:IsProgress() and self.maxOffset>0)
@@ -767,14 +1077,14 @@ function U:Refresh()
         if entry then
             local char,active=entry.char,entry.key==T.key and entry.char._local
             row.active:SetShown(active); row.dot:SetShown(active)
-            if active then row.bg:SetColorTexture(104/255,184/255,208/255,18/255)
-            else row.bg:SetColorTexture(1,1,1,(i+self.offset)%2==0 and 3/255 or 0) end
+            if active then Th.Raw(row.bg,nil,104/255,184/255,208/255,18/255)
+            else Th.Raw(row.bg,nil,1,1,1,(i+self.offset)%2==0 and 3/255 or 0) end
             local progress=self:IsProgress()
             local nameWidth=progress and PROGRESS_NAME or NAME_WIDTH
             local x=active and 20 or 8
             local nameY,realmY,guildY=progress and 7 or 3,progress and 25 or 19,progress and 42 or 33
             place(row.name,x,nameY,nameWidth-69-x)
-            ellipsis(row.name,C.Escape(char.name)); row.name:SetTextColor(C.ClassColor(char.class))
+            ellipsis(row.name,C.Escape(char.name)); Th.Raw(row.name,"text",C.ClassColor(char.class))
             row.level:SetText(L.level.." "..(M.Number(char.level) and tostring(char.level) or "?"))
             place(row.level,x+occupied(row.name)+7,nameY+2)
             place(row.dot,8,nameY+5.5)
@@ -785,7 +1095,7 @@ function U:Refresh()
             row.guild:SetText(M.GuildText(char))
             row.played:SetText(M.Format(entry.seconds,mode))
             row.updated:SetText(active and entry.seconds and L.now or M.Age(char.updatedAt))
-            row.updated:SetTextColor(unpack(active and {156/255,194/255,176/255} or {167/255,171/255,165/255}))
+            if active then Th.Raw(row.updated,"text",156/255,194/255,176/255) else Th.Paint(row.updated,"updated","text") end
             if progress then self:RenderProgress(row) end
         end
     end
@@ -859,6 +1169,7 @@ function U:CreateCompartment()
 end
 function U:Init(db)
     self.db=db
+    Th.Apply()
     self:CreateCompartment()
     -- The minimap button becomes opt-in once the Addons menu entry exists.
     -- A later opt-in through the settings or /hourstone minimap is kept.

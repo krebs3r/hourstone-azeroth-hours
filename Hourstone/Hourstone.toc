@@ -11,6 +11,7 @@
 
 Locale.lua
 Compat.lua
+Theme.lua
 Model.lua
 Sync.lua
 Visibility.lua

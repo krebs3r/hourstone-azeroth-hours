@@ -67,7 +67,7 @@ end
 function C.Client() return C.IsForever() and "forever" or C.Flavor() end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.3.7"
+    return getter and getter("Hourstone", "Version") or "0.4.0"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)

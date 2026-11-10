@@ -32,6 +32,15 @@ The simulator's font metrics and the Lua-derived browser preview approximate nat
 
 Version 0.4.0 keeps the declared interfaces of 0.3.7 and gives the window WoW: Forever's own window frame on the Forever client ([theme document](FOREVER-THEME.md)). 154 Lua scenario suites in seven simulated configurations and 77 Python tests pass; on Retail, Mists Classic, TBC Anniversary and Classic Era every visible region matches the tagged 0.3.7 release in the simulation. On 2026-11-10 the author installed the build in the live Forever client, asked for changes to the format toggle, the search field and the ground under the table, and accepted the frame after a `/reload` with those changes. The positions of the frame are computed from Soundstone 0.4.0's measurements; nothing of it was measured on screenshots, and the theme document's in-game checklist has not been worked through. The tested build differed from the release only in its version number. Its flat fallback, the look first built for Forever and shown in 0.4.0 only where a piece of Forever's art is missing, was measured in the live Forever client on 9 November 2026 at 135 % Hourstone size on lossless screenshots: every plate line, the control outlines and each inner-shadow step one physical pixel in the planned colors and window titles exactly `#FFD200`. Retail, Mists, the Anniversary realms and Classic Era were not tested in-game for 0.4.0.
 
+The v0.4.0 GitHub release ZIP has SHA-256
+`46de0b02eb88775c36f618fc1f9641af37c889f9fff92093faa9f5ac65d51f11`, the same bytes as
+a local build with Python 3.12 before the tag. Its 46 files are those of the build the
+author accepted in live Forever, byte for byte, except `Hourstone.toc` and
+`Compat.lua`, which carry the version. The CurseForge upload created
+[file 9547402](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/9547402)
+with game versions 12.1.5, 2.5.6, 5.5.4, 1.15.9 and 1.60.1, awaiting CurseForge
+approval. The receipt is recorded in [releases/v0.4.0.json](curseforge/releases/v0.4.0.json).
+
 Version 0.3.7 keeps the declared interfaces of 0.3.6 and closes its synchronization
 gap: with Companion 0.2.2, synchronized WoW: Forever characters that the account has
 not recorded itself show as WoW: Forever on every client, Forever included. The

@@ -67,6 +67,10 @@ Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all partici
 
 Retail, Mists of Pandaria Classic, TBC Anniversary and Classic Era are supported client families, plus WoW: Forever with the playtime view in Forever's own window frame. In the Forever client, Hourstone shows its characters as WoW: Forever and offers a WoW: Forever client filter; Companion 0.2.1 and newer label them the same way. Since Hourstone 0.3.7 and Companion 0.2.2, synchronized Forever characters of other accounts or PCs show as WoW: Forever on every client; with an older Companion they stay under Retail. Hourstone has been tested in the live Forever client. Beta characters do not carry over to the live game: if you copied the beta's `WTF` folder into `_forever_`, close WoW and move `Hourstone.lua` out of `_forever_\WTF\Account\*\SavedVariables` before your first live login. Hardcore and Season of Discovery use the Era family. See each release's notes for compatibility and validation.
 
+![Hourstone in WoW: Forever's own window frame, with search field, filters and format toggle in Forever's dropdown style](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/3e3de26b6b08fb355593804f215615cc3dc52912/docs/assets/addon-forever-en.png)
+
+In-game screenshot from WoW: Forever with example characters and the author's own character.
+
 [Source and installation guide](https://github.com/krebs3r/hourstone-azeroth-hours) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
 Also from krebs3r: [Soundstone – Azeroth Audio](https://www.curseforge.com/wow/addons/soundstone-azeroth-audio).
@@ -80,6 +84,10 @@ Also from krebs3r: [Soundstone – Azeroth Audio](https://www.curseforge.com/wow
 Gerenderte Hourstone-Charakterübersicht mit Realm- und Clientfiltern und Beispielcharakteren.
 
 Die Übersicht zeigt Name, Klassenfarbe, Level, Realm, zuletzt erfasste Gilde, Client, Spielzeit und letzte Aktualisierung. Suche nach Charakter oder Gilde, kombiniere Realm- und Clientfilter und sortiere die Spalten. Wähle zwischen Dezimalstunden und Tagen, Stunden und Minuten. Fensterposition, Größe und Minimap-Einstellung bleiben gespeichert. Wo der Client ein Addons-Menü hat, öffnet Hourstone auch von dort; der Minimap-Button ist dann optional. Unterstützt werden Retail, Mists Classic, TBC Anniversary, Classic Era und WoW: Forever. Im Forever-Client zeigt Hourstone seine Charaktere als WoW: Forever an und bietet einen Clientfilter für WoW: Forever; Companion ab 0.2.1 kennzeichnet sie ebenso. Seit Hourstone 0.3.7 und Companion 0.2.2 erscheinen synchronisierte Forever-Charaktere anderer Accounts oder PCs auf jedem Client als WoW: Forever; mit einem älteren Companion bleiben sie unter Retail. Hourstone wurde im Live-Client von Forever getestet. Beta-Charaktere werden nicht ins Live-Spiel übernommen: Falls der `WTF`-Ordner der Beta nach `_forever_` kopiert wurde, WoW schließen und vor dem ersten Live-Login `Hourstone.lua` aus `_forever_\WTF\Account\*\SavedVariables` herausverschieben.
+
+![Hourstone im eigenen Fensterrahmen von WoW: Forever, mit Suchfeld, Filtern und Formatumschalter im Dropdown-Stil von Forever](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/3e3de26b6b08fb355593804f215615cc3dc52912/docs/assets/addon-forever-de.png)
+
+Screenshot aus WoW: Forever mit Beispielcharakteren und dem eigenen Charakter des Autors.
 
 Die Fenstergröße lässt sich am Zahnrad in **5-%-Schritten von 65 bis 200 %** einstellen. Bei hoher Skalierung erscheinen weniger Zeilen; durch Scrollen erreichst du alle Charaktere. Passt die Breite oder Mindesthöhe nicht auf den Bildschirm, wird das Fenster automatisch verkleinert. Ziehe die Titelleiste zum Verschieben. Version **0.3.1** behebt das Zurückspringen beim Ziehen; beim Loslassen wird die Position gespeichert.
 

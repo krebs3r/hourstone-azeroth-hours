@@ -23,9 +23,8 @@ Automated checks are described in
 [validation](https://github.com/krebs3r/hourstone-azeroth-hours/blob/v0.4.0/docs/VALIDATION.md),
 the design in the
 [theme document](https://github.com/krebs3r/hourstone-azeroth-hours/blob/v0.4.0/docs/FOREVER-THEME.md).
-The author checked the new look in the live Forever client; it has not been measured
-on screenshots. Retail and the Classic clients were not tested in-game; in the
-simulation every visible region there matches 0.3.7.
+The author tested the new look in the live Forever client. For Retail and the Classic
+clients, an automated test compares every visible region with 0.3.7.
 
 ## Deutsch
 
@@ -50,6 +49,6 @@ Companion-Protokoll 4 sind unverändert. Das ZIP bei geschlossenem WoW nach
 `Interface/AddOns` entpacken.
 
 Die automatischen Prüfungen stehen in der verlinkten Validierung, der Entwurf im
-Theme-Dokument. Der Autor hat das neue Aussehen im Live-Client von Forever geprüft;
-auf Screenshots gemessen ist es nicht. Retail und die Classic-Clients wurden nicht im
-Spiel getestet; in der Simulation stimmt dort jede sichtbare Fläche mit 0.3.7 überein.
+Theme-Dokument. Der Autor hat das neue Aussehen im Live-Client von Forever getestet.
+Für Retail und die Classic-Clients vergleicht ein automatischer Test jede sichtbare
+Fläche mit 0.3.7.

@@ -3,7 +3,7 @@
 ## Notes: Your characters. Your time. Account-wide character playtime tracker.
 ## Notes-deDE: Deine Charaktere. Deine Spielzeit. Spielzeit aller erfassten Charaktere.
 ## Author: krebs3r
-## Version: 0.3.7
+## Version: 0.4.0
 ## X-Hourstone-Sync-Protocol: 4
 ## SavedVariables: HourstoneDB
 ## OptionalDeps: Hourstone_Sync
@@ -11,6 +11,7 @@
 
 Locale.lua
 Compat.lua
+Theme.lua
 Model.lua
 Sync.lua
 Visibility.lua

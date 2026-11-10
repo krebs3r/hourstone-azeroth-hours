@@ -46,7 +46,8 @@ function C.IsForever()
     local ok, _, _, _, interface = pcall(GetBuildInfo)
     return ok and type(interface) == "number" and interface >= 16000 and interface < 17000
 end
--- Retail artwork only for modern Retail; Forever keeps the Classic look.
+-- Retail sprites only for modern Retail. Forever wears its own look (Theme.lua); the Classic
+-- sprites stay beneath it as its standard skin.
 function C.RetailStyle() return C.Retail() and not C.IsForever() end
 -- Keystones and the Great Vault exist only in modern Retail, not in Forever.
 function C.RetailProgress() return C.Retail() and not C.IsForever() end
@@ -66,7 +67,7 @@ end
 function C.Client() return C.IsForever() and "forever" or C.Flavor() end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.3.7"
+    return getter and getter("Hourstone", "Version") or "0.4.0"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)

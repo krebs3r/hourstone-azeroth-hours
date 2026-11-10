@@ -8,6 +8,7 @@ import html
 from pathlib import Path
 import sys
 import re
+import subprocess
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/"tests"))
@@ -16,8 +17,10 @@ from run import runtime
 ANCHORS={"TOPLEFT":(0,0),"TOP":(.5,0),"TOPRIGHT":(1,0),"LEFT":(0,.5),"CENTER":(.5,.5),"RIGHT":(1,.5),"BOTTOMLEFT":(0,1),"BOTTOM":(.5,1),"BOTTOMRIGHT":(1,1)}
 
 def render(project,locale,settings=False,mode='combined',population=8,addon_scale=1,minimap=False,
-           view='played',screen=(2560,1440),setup=None,tooltip=None):
-    lua=runtime(project,locale)
+           view='played',screen=(2560,1440),setup=None,tooltip=None,interface=None,after=None,read=None,raw=False):
+    # read supplies the addon's files (for example a release's); raw returns every visible
+    # region as a tuple instead of HTML, for tests that compare two builds region by region.
+    lua=runtime(project,locale,interface=interface,read=read)
     lua.globals().PREVIEW_COUNT=population
     lua.execute('''fire("ADDON_LOADED","Hourstone"); fire("PLAYER_ENTERING_WORLD",true,false)
         local chars={{"ExampleDruid","Example Realm A",90,3042900,"DRUID",2},{"ExampleWarrior","Example Realm B",90,1923600,"WARRIOR",1},
@@ -51,6 +54,7 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     u.LayoutRows(u); u.Refresh(u)
     if settings: u.ToggleSettings(u)
     if tooltip: u.ProgressTooltip(u,u.rows[1],tooltip)
+    if after: lua.execute(after)
     frames=list(lua.globals().ALL_FRAMES.values())
     target=u.minimap if minimap else u.frame
     root=target.id
@@ -88,7 +92,7 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
     pieces=[]
     for idx,f in records.items():
         if not visible(idx) or f["kind"] not in ("Texture","FontString"): continue
-        if f.get("layer")=="HIGHLIGHT": continue
+        if f.get("layer")=="HIGHLIGHT" and not raw: continue
         x,y,w,h=pos(idx)
         parent=f.get("parent"); level=0
         while parent is not None and parent.id!=root:
@@ -105,6 +109,13 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
         rgba=list(color.values()) if color is not None else [1,1,1,1]
         if len(rgba)==3: rgba.append(1)
         css=f"rgba({int(rgba[0]*255)},{int(rgba[1]*255)},{int(rgba[2]*255)},{rgba[3]})"
+        if raw:
+            uv=tuple(round(v,6) for v in f["uv"].values()) if f.get("uv") is not None else None
+            texture=f.get("texture"); texture=None if texture is None else str(texture)
+            pieces.append((f["kind"],f.get("layer"),round(x,3),round(y,3),round(w,3),round(h,3),z,round(opacity,6),
+                tuple(round(c,6) for c in rgba),texture,f.get("atlas"),uv,bool(f.get("desaturated")),
+                f.get("text") if f["kind"]=="FontString" else None,f.get("fontSize"),f.get("align")))
+            continue
         if f["kind"]=="FontString":
             value=html.escape(f.get("text",""))
             value=re.sub(r"\|c[0-9a-fA-F]{2}([0-9a-fA-F]{6})(.*?)\|r",r'<i style="color:#\1;font-style:normal">\2</i>',value)
@@ -144,6 +155,7 @@ def render(project,locale,settings=False,mode='combined',population=8,addon_scal
                 # transparent padding; compare its actual shape inside WoW.
                 pieces.append(f'<div style="{style}"><div style="width:31px;height:31px;box-sizing:border-box;border-radius:50%;border:3px solid #9b8b70;box-shadow:inset 0 0 1px #ede2c2,0 0 1px #000"></div></div>')
         elif color is not None: pieces.append(f'<div style="{style}background:{css}"></div>')
+    if raw: return pieces
     # Project native UI coordinates into physical pixels; do not assume effectiveScale=1.
     screen_h=lua.globals().GetPhysicalScreenSize()[1]
     factor=target.GetEffectiveScale(target)*screen_h/768
@@ -193,6 +205,74 @@ def progress_pages():
             path=destination/f'{name}-{language}.html'; path.write_text(page,encoding='utf-8'); print(path)
 
 
+FOREVER_SAMPLE='''
+-- Forever has no demon hunters. Besides the current character, which Forever
+-- marks itself, two more rows carry the WoW: Forever label.
+RAID_CLASS_COLORS.WARLOCK={r=.53,g=.53,b=.93}
+for key,char in pairs(HourstoneDB.characters) do
+    if char.class=="DEMONHUNTER" then char.class="WARLOCK" end
+    if key=="test:1" or key=="test:5" then char.client="forever" end
+end
+'''
+# The browser cannot draw the client's atlases, so the sheet shows WoW: Forever's fallback: the
+# look applied again as if the client had none of Forever's art.
+FOREVER_FALLBACK='ATLAS_MISSING=setmetatable({},{__index=function() return true end}); H.UI:ApplyTheme()'
+
+def release(tag):
+    """The addon's files as a tagged release has them, for render(read=...)."""
+    def read(relative):
+        return subprocess.run(["git","-C",str(ROOT),"show",f"{tag}:{relative}"],check=True,capture_output=True).stdout.decode("utf-8")
+    return read
+
+def forever_pages(before="v0.3.7"):
+    """Lay WoW: Forever as a release drew it, WoW: Forever now and Retail now side by side.
+
+    The first column runs the release's own files, the others the working tree, each with
+    the look of its client; the browser cannot draw Forever's atlases, so the Forever column
+    shows the flat fallback, not the window frame. Writes two HTML pages to dist/design: the full windows, and
+    the top of each state. Lossless browser captures of them, the full sheet at a device
+    pixel ratio of 1 and the detail sheet at 2 (Chromium: --headless --screenshot
+    --disable-lcd-text --force-device-scale-factor=N), stay local and are not part of the
+    repository (docs/FOREVER-THEME.md, decision 7).
+    """
+    previous=release(before)
+    states=(("Overview: eight synthetic characters, combined format",{},330),
+            ("Settings and the client filter, drawn together for the sheet (the addon shows one at a time)",{"settings":True,"after":"H.UI.clientMenu:Show()"},330),
+            ("Delete confirmation",{"after":"H.UI:ConfirmRemoval(HourstoneDB.characters['test:2'])"},250))
+    columns=((f"WoW: Forever, {before[1:]}","Soundstone's Classic sprites"),
+             ("WoW: Forever, this version","the flat fallback, where Forever's art is missing"),
+             ("Retail, this version","the standard look"))
+    css=('body{margin:0;background:#2b3036;color:#e8e4da;font-family:Segoe UI,sans-serif}'
+         '.sheet{display:grid;grid-template-columns:repeat(3,max-content);gap:18px 24px;padding:24px;width:max-content}'
+         '.head{font-size:14px;font-weight:600;color:#f2efe8}.head small{display:block;font-weight:400;color:#b9b4aa;font-size:12px}'
+         '.row,.foot{grid-column:1/-1;width:0;min-width:100%;font-size:12px;line-height:1.5;color:#b9b4aa}.row{margin-top:6px}'
+         '.window,.canvas{position:relative}.canvas{transform-origin:top left}'
+         '.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}')
+    note=(f'Synthetic characters. Rendered from the Lua frames by tools/preview.py, the first column from the {before} files. '
+          'Browser approximation, not an in-game capture: Georgia stands in for the client font, no code tint reaches a '
+          'picture (the sort and dropdown arrows are white and the gear is one fixed picture in every column), the checkbox '
+          'is a stand-in and the dimmed toggle a gray filter. The browser cannot draw the client\'s atlases, so the middle '
+          'column shows the flat look Forever falls back to, not Forever\'s window frame. At 100 % Hourstone size one UI unit '
+          'is one physical pixel')
+    rows=[]
+    for label,options,cut in states:
+        cells=[render(18,'enUS',setup=FOREVER_SAMPLE,interface=16001,read=previous,**options),
+               render(18,'enUS',setup=FOREVER_SAMPLE+FOREVER_FALLBACK,interface=16001,**options),
+               render(1,'enUS',**options)]
+        rows.append((label,cells,cut))
+    destination=ROOT/'dist/design'; destination.mkdir(exist_ok=True,parents=True)
+    for name,detail in (('forever-theme-preview',False),('forever-theme-preview-detail',True)):
+        body=''.join(f'<div class="head">{title}<small>{sub}</small></div>' for title,sub in columns)
+        for label,cells,cut in rows:
+            body+=f'<div class="row">{label}'+(f' (top {cut} units)' if detail else '')+'</div>'
+            body+=''.join(f'<div style="height:{cut}px;overflow:hidden">{cell}</div>' if detail else f'<div>{cell}</div>' for cell in cells)
+        page=(f'<!doctype html><html lang="en"><meta charset="utf-8"><title>Hourstone · WoW: Forever theme preview</title>'
+              f'<style>{css}</style><div class="sheet">{body}<div class="foot">{note}'
+              +('; this sheet is meant to be captured at twice the size, one unit to two image pixels.' if detail else '.')
+              +'</div></div></html>')
+        path=destination/f'{name}.html'; path.write_text(page,encoding='utf-8'); print(path)
+
+
 def main():
     page='<!doctype html><html lang="de"><meta charset="utf-8"><title>Hourstone · Lua-Vorschau</title><style>body{background:#171c22;color:#eee;font-family:Segoe UI,sans-serif;padding:24px;max-width:900px;margin:auto}h1{font-size:22px}h2{font-size:16px;color:#aaa}p{font-size:13px;color:#aaa;line-height:1.6}.window{position:relative;margin-bottom:32px}.canvas{position:relative;transform-origin:top left}.canvas>span,.canvas>div{position:absolute;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:Georgia,serif}</style><h1>Hourstone · Lua-Vorschau</h1><p>Layoutvorschau mit synthetischen Charakterdaten aller vier Clientfamilien. 100 % ist die Standardgröße. Größenvergleich aus dem Lua-Simulator bei 1440p und 80 % globaler UI-Skalierung. Fiktive Daten; Georgia, Zahnrad, Checkbox und Minimaprahmen sind Browser-Näherungen an WoW-eigene Ressourcen. Keine Ingame-Aufnahmen.</p>'
     families={1:"Retail",19:"Mists Classic",5:"TBC Anniversary",2:"Classic Era"}
@@ -210,6 +290,8 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--product-pages",action="store_true",help="Also write clean documentation views of the implemented UI with sample data")
     parser.add_argument("--progress-pages",action="store_true",help="Also render the real progress UI, tooltip and scaling states")
+    parser.add_argument("--forever-theme",action="store_true",help="Also render Forever as 0.3.7 drew it, Forever's fallback now and Retail now side by side")
     args=parser.parse_args(); main()
     if args.product_pages: product_pages()
+    if args.forever_theme: forever_pages()
     if args.progress_pages: progress_pages()

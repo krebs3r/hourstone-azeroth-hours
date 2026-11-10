@@ -73,15 +73,20 @@ U.minimapToggle.scripts.OnClick(); assert(not db.settings.minimap and not U.mini
 assert(not U.minimapBox:GetChecked())
 SlashCmdList.HOURSTONE("minimap"); assert(U.minimap:IsShown() and U.minimapBox:GetChecked())
 assert(U.densityToggle==nil and U.densityMenu==nil and #U.rows==8)
+-- Inside WoW: Forever's window frame the window is 20 units shorter.
 for _,legacy in ipairs({false,true}) do
     db.settings.compact=legacy; U:LayoutRows()
-    assert(U.frame:GetHeight()==(H.C.RetailProgress() and 644 or 612) and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
+    assert(U.frame:GetHeight()==(H.C.RetailProgress() and 644 or (U.framed and 592 or 612)) and U.rows[1]:GetHeight()==50 and db.settings.compact==legacy)
 end
-assert(U.frame:GetHeight()==(H.C.RetailProgress() and 644 or 612) and U.rows[1]:GetHeight()==50)
+assert(U.frame:GetHeight()==(H.C.RetailProgress() and 644 or (U.framed and 592 or 612)) and U.rows[1]:GetHeight()==50)
 local before=db.characters
 U.scaleSlider:SetValue(90); assert(math.abs(db.settings.scale-.9)<.001)
 U.scaleSlider:SetValue(130); assert(db.settings.scale==1.3 and db.characters==before)
-U.scaleSlider:SetValue(200); assert(db.settings.scale==2 and db.characters==before and U.scaleFill:GetWidth()==224)
+U.scaleSlider:SetValue(200)
+-- The fill lies inside the track's outline: one unit, or one physical pixel under the flat skin;
+-- on Forever's own track 4 units in from each end.
+local inset=U.trackShown and 4 or (H.Theme.flat and H.Theme.Pixel(U.scaleSlider) or 1)
+assert(db.settings.scale==2 and db.characters==before and math.abs(U.scaleFill:GetWidth()-(226-2*inset))<1e-6)
 assert(U.slots<8 and U.maxOffset==U.visibleCount-U.slots)
 U:Scroll(999); assert(U.rows[U.slots].entry and not U.rows[U.slots+1]:IsShown())
 U.scaleSlider:SetValue(65); assert(db.settings.scale==.65 and U.scaleFill:GetWidth()==0)

@@ -85,6 +85,8 @@ function M.Init(db)
     if s.format ~= "hours" then s.format = "combined" end
     s.scale = M.Scale(s.scale)
     if s.view ~= "progress" then s.view = "played" end
+    -- The look follows the client; only development builds ever saved a choice.
+    s.theme = nil
     s.minimap = s.minimap ~= false
     s.minimapAngle = M.Number(s.minimapAngle) and s.minimapAngle % 360 or 225
     if type(s.position) ~= "table" or not M.Number(math.abs(tonumber(s.position.x) or math.huge))

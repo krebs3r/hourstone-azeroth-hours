@@ -6,10 +6,13 @@ local forever=TEST_INTERFACE==16001
 assert(C.IsForever()==forever)
 assert(C.RetailStyle()==(WOW_PROJECT_ID==1 and not forever) and C.RetailProgress()==C.RetailStyle())
 if forever then
-    -- Retail API, but Classic artwork and no keystone/Great Vault view.
+    -- Retail API, Forever's own look (the Classic sprite set beneath it), and no keystone/Great Vault view.
     assert(C.Retail() and C.Flavor()=="retail" and not H.P.enabled)
     U:Toggle(); assert(U.panelName=="ClassicPanel" and U.tabs==nil and not U:IsProgress())
-    assert(U.scaleSlider:GetThumbTexture().texture:find("SilverThumb",1,true))
+    assert(db.settings.theme==nil and H.Theme.name=="forever" and U.framed)
+    assert(U.scaleSlider:GetThumbTexture().atlas=="Minimal_SliderBar_Button")
+    U:ApplyTheme("standard"); assert(U.scaleSlider:GetThumbTexture().texture:find("SilverThumb",1,true))
+    U:ApplyTheme(); assert(U.scaleSlider:GetThumbTexture().atlas=="Minimal_SliderBar_Button")
     assert(U.minimap.border.width==53)
     U:SetView("progress"); assert(not U:IsProgress() and db.settings.view=="played")
     U:Toggle()

@@ -67,7 +67,7 @@ end
 function C.Client() return C.IsForever() and "forever" or C.Flavor() end
 function C.Version()
     local getter = C_AddOns and C_AddOns.GetAddOnMetadata or GetAddOnMetadata
-    return getter and getter("Hourstone", "Version") or "0.4.0"
+    return getter and getter("Hourstone", "Version") or "0.4.1"
 end
 function C.Frame(kind, name, parent, backdrop)
     return CreateFrame(kind or "Frame", name, parent, backdrop and BackdropTemplateMixin and "BackdropTemplate" or nil)
@@ -98,8 +98,15 @@ function C.Identity(sourceId)
         realm = C.Realm(realm), class = class or "",
         level = UnitLevel("player") }
 end
+-- Retail and WoW: Forever fill RAID_CLASS_COLORS from the client's class database
+-- (Blizzard_SharedXML/ClassColors.lua); Forever's has no Death Knight or Demon Hunter, so a
+-- character synchronized from Retail found no color. Such classes take Blizzard's own color from
+-- the Classic clients' table (Blizzard_SharedXML/TBC/ClassColors.lua). The client's color wins.
+local CLASS_COLORS = {DEATHKNIGHT = {.77, .12, .23}, MONK = {0, 1, .59}, DEMONHUNTER = {.64, .19, .79}}
 function C.ClassColor(class)
     local color = RAID_CLASS_COLORS and RAID_CLASS_COLORS[class]
     if color then return color.r, color.g, color.b end
+    local blizzard = CLASS_COLORS[class]
+    if blizzard then return blizzard[1], blizzard[2], blizzard[3] end
     return .94, .9, .8
 end

@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/assets/Logo.png" width="170" alt="Hourstone: blue rune stone with a golden hourglass"></p>
 
-# Hourstone – Azeroth Hours
+# Hourstone – Azeroth Playtime Tracker
 
 **Your characters. Your time.**
 
@@ -8,7 +8,7 @@ Track your World of Warcraft characters and their total `/played` time in one co
 
 [Download](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest) · [CurseForge](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours) · [Deutsche Anleitung](docs/DEUTSCH.md) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
 
-![Hourstone 0.3.1 playtime overview with characters, guilds and realm and client filters](docs/assets/addon-overview-en.png)
+![Hourstone playtime overview with characters, guilds and realm and client filters](docs/assets/addon-overview-en.png)
 
 The character overview puts realm and client filters beside the search and shows each character's guild and playtime. Images show the implemented interface rendered with example characters.
 
@@ -35,7 +35,7 @@ Use the gear button for display settings and drag the title bar to move the wind
 
 ## Retail progress
 
-![Hourstone 0.3.1 Retail progress with keystones, weekly Mythic+ best and Great Vault slots](docs/assets/addon-progress-en.png)
+![Hourstone Retail progress with keystones, weekly Mythic+ best and Great Vault slots](docs/assets/addon-progress-en.png)
 
 The **Progress** tab keeps the character, realm and guild beside the current keystone, the highest completed Mythic+ level this week, and three slots each for Dungeon, Raid and World activities. Hover a progress cell or Vault row for details and its capture time. The gear menu controls size up to 200%; search and realm/client filters work in both views. Classic clients keep the playtime view.
 

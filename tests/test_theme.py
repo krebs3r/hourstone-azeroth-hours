@@ -5,7 +5,7 @@ coordinates, desaturation, text, font size) is compared with the tagged release 
 four client families, each in its own look, and on WoW: Forever with the standard look
 applied after Forever's frame was built, in the states listed below, and in Retail's
 progress view and its tooltip. No difference is allowed, apart from the version the footer
-names: each build shows its own.
+names and the addon's name in the title: each build shows its own.
 """
 import math
 import re
@@ -73,9 +73,17 @@ def release_files():
     return preview.release(RELEASE)
 
 
+# The window title before and after the rename that followed 0.4.1.
+NAMES = ("Hourstone – Azeroth Hours", "Hourstone – Azeroth Playtime Tracker")
+
+
 def unversioned(regions, version):
-    """The footer's version text, which names each build's own version, as one placeholder."""
-    return [tuple("v<version>" if value == f"v{version}" else value for value in region) for region in regions]
+    """The footer's version and the title's name, which each build gives as its own, as placeholders."""
+    def neutral(value):
+        if value == f"v{version}":
+            return "v<version>"
+        return "<name>" if value in NAMES else value
+    return [tuple(neutral(value) for value in region) for region in regions]
 
 
 class StandardIsRelease(unittest.TestCase):

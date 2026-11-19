@@ -216,7 +216,7 @@ class Layout(unittest.TestCase):
                 for opening in ("first","reopen","reload"):
                     with self.subTest(project=project,locale=locale,opening=opening):
                         u=lua.globals().H.UI
-                        self.assertEqual(u.title.text,"Hourstone – Azeroth Hours")
+                        self.assertEqual(u.title.text,"Hourstone – Azeroth Playtime Tracker")
                         self.assertEqual(u.title.width,588)
                         self.assertEqual(u.title.font,"Fonts\\FRIZQT__.TTF")
                         for i,key in enumerate(("total","characters","session"),1):

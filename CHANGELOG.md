@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- New name: **Hourstone – Azeroth Playtime Tracker**. The addon list, the window title, WoW: Forever's title strip and the tooltips of the minimap button and the Addons menu show it; the addon folder, your saved data, `/hourstone` and `/azerothhours` stay as they are.
+
 ## 0.4.1 — 2026-11-10
 
 - Show Death Knights, Monks and Demon Hunters in their class colors on clients whose class table lacks them, such as WoW: Forever for characters synchronized from Retail. Hourstone takes Blizzard's own colors for these classes from the Classic clients' class color table; the client's own colors still come first.

@@ -1,131 +1,67 @@
-# Hourstone – Azeroth Hours
+# Hourstone – Azeroth Playtime Tracker
 
-**Your characters. Your time.** See your World of Warcraft characters' total `/played` time and your current session in one compact window. In Retail, check keystones, your weekly Mythic+ best and Great Vault slots in the **Progress** tab. Hourstone works on its own: no other addon, desktop app or external account is required.
+**Your characters. Your time.**
 
-![Hourstone playtime overview with character, guild and client information](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/v0.3.1/docs/assets/addon-overview-en.png)
+Hourstone keeps the `/played` time of every character you log in with and shows them all in one window: your total playtime, the current session, and each character with class, level, realm and guild. On Retail, the **Progress** tab adds every character's keystone, weekly Mythic+ best and Great Vault slots. No other addon, app or account needed.
 
-Rendered Hourstone character overview with realm and client filters and example characters.
+![Hourstone in Retail: total time played, current session and eight characters with realm, guild and playtime](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/ingame-retail-de.png)
 
-## Your character overview
+In-game screenshot from Retail with the author's own characters, German client.
 
-- Character name, class color, level, realm and last recorded guild.
-- A separate client column beside playtime and the last update.
-- Search by character or guild, filter by realm and client, and sort the list.
-- Total and filtered playtime, displayed as decimal hours or days, hours and minutes.
-- Retail **Time played / Progress** tabs for playtime and weekly progress in the same window.
-- A movable window with **65–200% scaling in 5% steps**, an entry in WoW's Addons menu where the client provides it, and an optional draggable minimap button.
-- German and English interfaces.
+## What it does
 
-Open with `/hourstone` or `/azerothhours`. Use the gear button for display settings and hover a character to see its full recorded details. Every character appears after its first login with Hourstone enabled. The server's total includes time played before installation; offline time is excluded. WoW saves the data per installation and account when you log out or use `/reload`. Characters you have not visited with Hourstone cannot be discovered automatically.
+- **Every character's `/played`.** A character appears after its first login with Hourstone, with the server's full total, including the time you played before installing it. At the top: your total time played and the current session.
+- **Find any alt.** Search by character or guild, filter by realm and client, and sort by any column. Hover a character for everything recorded about it.
+- **Mythic+ and Great Vault on Retail.** For each character: the current keystone, the highest Mythic+ level completed this week, and all nine Vault slots for Dungeons, Raid and World, read straight from WoW. After the weekly reset, old values are marked outdated until you log that character in again.
+- **Days or hours.** Show playtime as days, hours and minutes, or as decimal hours. The footer adds up the characters your filters show.
+- **Keep the list tidy.** Right-click a character to remove it from the overview and its totals. Your WoW character and its saved playtime stay, and you can restore the entry at any time.
+- **One download, five clients.** Retail, Mists of Pandaria Classic, TBC Anniversary, Classic Era and WoW: Forever.
 
-Drag the title bar to move the window; its position is saved when you release it. Version **0.3.1** fixes the window jumping back during a drag. Larger size settings show fewer rows, with scrolling to reach every character. The window automatically fits the screen if its width or minimum height would otherwise be too large.
+![Hourstone's Progress tab: keystone, best Mythic+ level this week and Great Vault slots for each character](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/addon-progress-en.png)
 
-Guild information updates when you play the character. **No guild** means the character was confirmed to be guildless; **Not yet recorded** means Hourstone has not recorded its guild status yet.
+The Progress tab, rendered from Hourstone's own layout with example characters.
 
-Right-click a character and confirm **Delete** to exclude the entry from the overview and totals. Your WoW character and saved playtime remain intact. Under the gear menu, choose **Deleted characters** and right-click an entry to restore it. A new character login also restores a deletion already known to the addon; `/reload` alone does not.
+## Options
 
-## Retail: keystones and Great Vault
+Click the gear in the window, or type `/hourstone` (or `/azerothhours`) to open and close it:
 
-![Hourstone Retail progress with keystones, weekly Mythic+ best and Great Vault slots](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/v0.3.1/docs/assets/addon-progress-en.png)
+- Hourstone's size, from 65 to 200 % in 5 % steps; drag the title bar to move the window;
+- a minimap button to switch on or off; where the client has an Addons menu below the minimap clock, Hourstone opens from there too;
+- the list of deleted characters, to restore them.
 
-Rendered Progress view with example characters. Character, realm and guild stay visible beside:
+`/hourstone minimap` shows or hides the minimap button, `/hourstone reset` puts the window back in its place.
 
-- The character's current keystone, with dungeon name and level.
-- The highest completed Mythic+ level this week, including overtime completions.
-- Three Great Vault slots each for **Dungeon, Raid and World** activities.
+## Your client's look
 
-Dungeon names, keystone levels, weekly runs and Vault requirements are read directly from WoW. Hover a cell for full names, slot progress, difficulty and the time the data was recorded. Search and realm/client filters work in both views. Classic clients retain the playtime view with the same size settings.
+Hourstone wears the look of the client it runs in: Retail's gold, Classic's iron and stone, and on WoW: Forever, Forever's own bronze window frame. In Forever, its characters show as **WoW: Forever** in the client column and filter.
 
-Log in with each Retail character to record its progress. Other characters show their last recorded state. **No keystone**, **Not yet recorded** and **Outdated** remain distinct; old weekly data is marked outdated after the reset until it is recorded again. Abandoned runs and claimable rewards from the previous week do not count as current weekly progress.
+![Hourstone in TBC Anniversary, listing characters from Retail, TBC Anniversary, Mists Classic and WoW: Forever](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/ingame-anniversary-de.png)
 
-WoW saves locally recorded progress at logout or `/reload`. **Hourstone 0.3.2 and a protocol-4 Companion can synchronize progress** between selected installations and PCs. Received progress stays separate from local measurements.
+![Hourstone in WoW: Forever's bronze window frame](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/main/docs/assets/ingame-forever-de.png)
 
-## Optional Windows Companion
+In-game screenshots from TBC Anniversary and WoW: Forever with the author's own characters, German client. Characters from other clients appear with the optional Companion.
 
-**Progress synchronization requires Companion 0.2.0 or newer on every participating PC.**
-Use Companion 0.2.1 or newer with WoW 12.1.5 and WoW: Forever. Its data addon
-declares their interfaces, so WoW no longer lists it as out of date. After
-updating the Companion, fully close and restart WoW once. Companion versions
-before 0.2.0 keep their playtime, guild and visibility features; Hourstone
-remains fully usable on its own.
+## Good to know
 
-**Playing several WoW versions or using more than one PC? We recommend the optional [Hourstone Companion](https://github.com/krebs3r/hourstone-companion).** It brings the saved Hourstone data from your selected installations and accounts into one overview, including characters, guilds and playtime. The same character is counted once even if it is played on several devices.
+- **Log in once with each character.** Hourstone can only record characters you have played with it enabled. WoW saves the data when you log out or type `/reload`.
+- **More than one PC or WoW version?** The optional [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) for Windows brings the saved data of your installations, accounts and PCs into one overview, Mythic+ progress included. Setup and requirements are on its page; Hourstone works fully without it.
+- English and German.
 
-![Hourstone Companion overview for Windows](https://raw.githubusercontent.com/krebs3r/hourstone-companion/a97844e76462aa7cf3900e4554c9efa524dc3941/docs/assets/overview.png)
+From the same author: [Buttonstone – Azeroth Minimap Buttons](https://www.curseforge.com/wow/addons/buttonstone-azeroth-minimap-buttons), [Soundstone – Azeroth Audio](https://www.curseforge.com/wow/addons/soundstone-azeroth-audio) and [Umbra Unit Frames](https://www.curseforge.com/wow/addons/umbra-unit-frames). Source, installation guide and issues: [GitHub](https://github.com/krebs3r/hourstone-azeroth-hours).
 
-Hourstone Companion: your characters and playtime across WoW clients.
-
-For multiple PCs, choose a shared folder that Dropbox, OneDrive or another folder-sync service keeps synchronized and available locally on every device. The Companion exchanges its data through that folder; no Hourstone server or separate Companion account is needed. Without a shared folder, it can still combine data from local installations.
-
-The exchange is automatic but not live: WoW must first save by logging out or using `/reload`, the Companion processes the saved data, and the folder service transfers changes between PCs. Hourstone reads the combined overview at the next login or `/reload`; after the first setup of the Companion data addon, fully close and restart WoW once. A deletion made while another PC was offline must reach that PC before a new character login can restore the entry.
-
-Download **[Companion 0.2.1 for Windows 11 x64](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.2.1)** as an installer or portable package. This is an unsigned preview release; installations from GitHub update automatically. A Microsoft Store version is submitted separately and requires certification. Setup instructions and source code are in the [Companion repository](https://github.com/krebs3r/hourstone-companion).
-
-Use **Hourstone 0.2.2 or newer** and **Companion 0.1.3 or newer** on all participating PCs. Hourstone **0.3.2** remains compatible with protocol-3 Companions and additionally receives progress from protocol-4 Companions. Older Hourstone 0.1.x versions do not support the Companion. If the newest addon version is awaiting CurseForge approval, download [the latest Hourstone release from GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest). The addon remains fully usable without Companion and continues to update separately through CurseForge.
-
-## Supported clients
-
-Retail, Mists of Pandaria Classic, TBC Anniversary and Classic Era are supported client families, plus WoW: Forever with the playtime view in Forever's own window frame. In the Forever client, Hourstone shows its characters as WoW: Forever and offers a WoW: Forever client filter; Companion 0.2.1 and newer label them the same way. Since Hourstone 0.3.7 and Companion 0.2.2, synchronized Forever characters of other accounts or PCs show as WoW: Forever on every client; with an older Companion they stay under Retail. Hourstone has been tested in the live Forever client. Beta characters do not carry over to the live game: if you copied the beta's `WTF` folder into `_forever_`, close WoW and move `Hourstone.lua` out of `_forever_\WTF\Account\*\SavedVariables` before your first live login. Hardcore and Season of Discovery use the Era family. See each release's notes for compatibility and validation.
-
-![Hourstone in WoW: Forever's own window frame, with search field, filters and format toggle in Forever's dropdown style](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/3e3de26b6b08fb355593804f215615cc3dc52912/docs/assets/addon-forever-en.png)
-
-In-game screenshot from WoW: Forever with example characters and the author's own character.
-
-[Source and installation guide](https://github.com/krebs3r/hourstone-azeroth-hours) · [Report an issue](https://github.com/krebs3r/hourstone-azeroth-hours/issues)
-
-Also from krebs3r: [Soundstone – Azeroth Audio](https://www.curseforge.com/wow/addons/soundstone-azeroth-audio).
+---
 
 ## Deutsch
 
-**Deine Charaktere. Deine Spielzeit.** Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten Charaktere und die aktuelle Sitzung in einem kompakten Fenster. In Retail zeigt die Ansicht **Fortschritt** zusätzlich Schlüsselsteine, die beste M+-Stufe dieser Woche und Schatzkammer-Slots. Das Addon funktioniert eigenständig; eine zusätzliche App oder ein externes Konto ist nicht erforderlich.
+**Deine Charaktere. Deine Spielzeit.**
 
-![Hourstone-Spielzeitübersicht mit Charakteren, Gilden und eigener Clientspalte](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/v0.3.1/docs/assets/addon-overview-de.png)
+Hourstone merkt sich die `/played`-Zeit jedes Charakters, mit dem du dich einloggst, und zeigt alle in einem Fenster: Gesamtspielzeit, aktuelle Sitzung und jeden Charakter mit Klasse, Level, Realm und Gilde. In Retail zeigt der Reiter **Fortschritt** dazu Schlüsselstein, beste M+-Stufe der Woche und Schatzkammer-Slots all deiner Twinks. Kein weiteres Addon, keine App, kein Konto nötig.
 
-Gerenderte Hourstone-Charakterübersicht mit Realm- und Clientfiltern und Beispielcharakteren.
+- **Die `/played`-Zeit jedes Charakters**, ab seinem ersten Login mit Hourstone, mit der vollen Spielzeit vom Server, auch der vor der Installation.
+- **Jeden Twink finden:** Suche nach Charakter oder Gilde, Realm- und Clientfilter, sortierbare Spalten.
+- **M+ und Schatzkammer in Retail:** aktueller Schlüsselstein, höchste abgeschlossene M+-Stufe der Woche und alle neun Slots für Dungeon, Raid und Welt, direkt aus WoW gelesen. Nach dem Wochenreset gelten alte Werte als veraltet, bis du den Charakter wieder einloggst.
+- **Tage oder Stunden**, und unten die Summe der gefilterten Charaktere.
+- **Aufräumen:** Per Rechtsklick verschwindet ein Charakter aus Übersicht und Summen. Dein WoW-Charakter und seine Spielzeit bleiben erhalten, und du kannst den Eintrag jederzeit wiederherstellen.
+- **Ein Download, fünf Clients:** Retail, Mists of Pandaria Classic, TBC Anniversary, Classic Era und WoW: Forever, dort im bronzenen Fensterrahmen von Forever.
 
-Die Übersicht zeigt Name, Klassenfarbe, Level, Realm, zuletzt erfasste Gilde, Client, Spielzeit und letzte Aktualisierung. Suche nach Charakter oder Gilde, kombiniere Realm- und Clientfilter und sortiere die Spalten. Wähle zwischen Dezimalstunden und Tagen, Stunden und Minuten. Fensterposition, Größe und Minimap-Einstellung bleiben gespeichert. Wo der Client ein Addons-Menü hat, öffnet Hourstone auch von dort; der Minimap-Button ist dann optional. Unterstützt werden Retail, Mists Classic, TBC Anniversary, Classic Era und WoW: Forever. Im Forever-Client zeigt Hourstone seine Charaktere als WoW: Forever an und bietet einen Clientfilter für WoW: Forever; Companion ab 0.2.1 kennzeichnet sie ebenso. Seit Hourstone 0.3.7 und Companion 0.2.2 erscheinen synchronisierte Forever-Charaktere anderer Accounts oder PCs auf jedem Client als WoW: Forever; mit einem älteren Companion bleiben sie unter Retail. Hourstone wurde im Live-Client von Forever getestet. Beta-Charaktere werden nicht ins Live-Spiel übernommen: Falls der `WTF`-Ordner der Beta nach `_forever_` kopiert wurde, WoW schließen und vor dem ersten Live-Login `Hourstone.lua` aus `_forever_\WTF\Account\*\SavedVariables` herausverschieben.
-
-![Hourstone im eigenen Fensterrahmen von WoW: Forever, mit Suchfeld, Filtern und Formatumschalter im Dropdown-Stil von Forever](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/3e3de26b6b08fb355593804f215615cc3dc52912/docs/assets/addon-forever-de.png)
-
-Screenshot aus WoW: Forever mit Beispielcharakteren und dem eigenen Charakter des Autors.
-
-Die Fenstergröße lässt sich am Zahnrad in **5-%-Schritten von 65 bis 200 %** einstellen. Bei hoher Skalierung erscheinen weniger Zeilen; durch Scrollen erreichst du alle Charaktere. Passt die Breite oder Mindesthöhe nicht auf den Bildschirm, wird das Fenster automatisch verkleinert. Ziehe die Titelleiste zum Verschieben. Version **0.3.1** behebt das Zurückspringen beim Ziehen; beim Loslassen wird die Position gespeichert.
-
-Öffnen mit `/hourstone` oder `/azerothhours`. Jeder Charakter erscheint nach dem ersten Login mit aktiviertem Addon; auch zuvor gespielte Zeit zählt. WoW speichert die Daten je Installation und Account beim Ausloggen oder mit `/reload`. **Keine Gilde** ist ein bestätigter Zustand; **Noch nicht erfasst** bedeutet, dass noch keine Gildeninformation vorliegt.
-
-Per Rechtsklick und **Löschen** lässt sich ein Eintrag aus der Übersicht und ihren Summen ausblenden. Dein WoW-Charakter und die gespeicherte Spielzeit bleiben erhalten. Unter Zahnrad → **Gelöschte Charaktere** stellt ein Rechtsklick den Eintrag wieder her. Ein neuer Charakter-Login stellt bereits bekannte Löschungen ebenfalls wieder her; `/reload` allein genügt nicht.
-
-### Retail: Schlüsselsteine und Schatzkammer
-
-![Hourstone-Fortschritt mit Schlüsselsteinen, M+-Wochenbestleistung und Schatzkammer-Slots](https://raw.githubusercontent.com/krebs3r/hourstone-azeroth-hours/v0.3.1/docs/assets/addon-progress-de.png)
-
-Gerenderte Fortschrittsansicht mit Beispielcharakteren. Neben Charakter, Realm und Gilde siehst du:
-
-- Den aktuellen Schlüsselstein mit Dungeonname und Stufe.
-- Die höchste abgeschlossene M+-Stufe dieser Woche, auch bei Abschlüssen außerhalb der Zeit.
-- Je drei Schatzkammer-Slots für **Dungeon, Raid und Welt**.
-
-Hourstone fragt Namen, Stufen, Wochenabschlüsse und Slot-Anforderungen direkt in WoW ab. Du musst keine Instanzen oder Saisonlisten kennen oder pflegen. Tooltips zeigen vollständige Namen, Fortschritt, Schwierigkeit und Erfassungszeit. Suche und Realm-/Clientfilter gelten in beiden Ansichten. Classic behält seine Spielzeitansicht mit derselben Größeneinstellung.
-
-Logge dich mit jedem gewünschten Retail-Charakter ein, um seinen Fortschritt zu erfassen. Andere Charaktere zeigen den letzten gespeicherten Stand. **Kein Schlüsselstein**, **Noch nicht erfasst** und **Veraltet** bleiben unterscheidbar. Nach dem Wochenreset werden alte Wochenwerte bis zur nächsten Erfassung als veraltet markiert. Abgebrochene Läufe und abholbare Vorwochenbelohnungen zählen nicht als aktueller Wochenfortschritt.
-
-WoW speichert lokal erfassten Fortschritt beim Ausloggen oder mit `/reload`. **Hourstone 0.3.2 und ein Companion mit Protokoll 4 können Fortschritt abgleichen**, auch zwischen PCs. Empfangene Daten bleiben von lokalen Messungen getrennt.
-
-### Empfehlung: Hourstone Companion für Windows
-
-**Für den Fortschrittsabgleich ist Companion ab 0.2.0 auf jedem beteiligten PC nötig.**
-Companion ab 0.2.1 für WoW 12.1.5 und WoW: Forever verwenden: Sein Datenaddon gibt
-deren Interfaces an, sodass WoW es nicht mehr als veraltet einstuft. Nach dem
-Companion-Update WoW einmal vollständig schließen und neu starten.
-Companion-Versionen vor 0.2.0 behalten Spielzeit-, Gilden- und Sichtbarkeitsabgleich;
-Hourstone bleibt allein nutzbar.
-
-**Wenn du mehrere WoW-Versionen oder mehrere PCs nutzt, empfehlen wir den optionalen [Hourstone Companion](https://github.com/krebs3r/hourstone-companion).** Er führt die gespeicherten Charakter-, Gilden- und Spielzeitdaten deiner ausgewählten Installationen und Accounts zusammen. Derselbe Charakter wird auch bei Nutzung auf mehreren Geräten nur einmal gezählt.
-
-Für den Austausch zwischen PCs wählst du einen gemeinsamen Ordner, den beispielsweise Dropbox oder OneDrive auf allen Geräten synchronisiert und dauerhaft lokal verfügbar hält. Ein eigener Hourstone-Server oder ein zusätzliches Companion-Konto ist nicht nötig. Ohne gemeinsamen Ordner bleibt der Abgleich lokaler Installationen verfügbar.
-
-Der Austausch erfolgt automatisch und zeitversetzt: WoW speichert beim Ausloggen oder mit `/reload`, der Companion liest den gespeicherten Stand ein und der Ordnerdienst überträgt die Änderungen. Das Addon übernimmt die gemeinsame Übersicht beim nächsten Login oder `/reload`. Nach der ersten Einrichtung des Companion-Datenaddons WoW einmal vollständig schließen und neu starten. Nach einer Löschung während des Offline-Betriebs zuerst synchronisieren, danach erneut mit dem Charakter einloggen, um den Eintrag wiederherzustellen.
-
-**[Companion 0.2.1 für Windows 11 x64 herunterladen](https://github.com/krebs3r/hourstone-companion/releases/tag/v0.2.1)** – als Installer oder portables Paket. Dies ist eine unsignierte Vorschauversion; Installationen von GitHub aktualisieren sich automatisch. Eine Version für den Microsoft Store wird separat eingereicht und benötigt eine Zertifizierung. Anleitung und Quellcode stehen im [Companion-Repository](https://github.com/krebs3r/hourstone-companion).
-
-Benötigt werden **Hourstone ab 0.2.2** und **Companion ab 0.1.3** auf allen beteiligten PCs. Hourstone **0.3.2** bleibt mit Companions mit Protokoll 3 kompatibel und empfängt zusätzlich Fortschritt von Companions mit Protokoll 4. Die alten Addon-Versionen 0.1.x unterstützen den Companion noch nicht. Sollte die neueste Addon-Version auf CurseForge noch auf Freigabe warten, lade [das neueste Hourstone-Release bei GitHub](https://github.com/krebs3r/hourstone-azeroth-hours/releases/latest) herunter. Das Addon bleibt ohne Companion nutzbar und wird weiterhin separat über CurseForge aktualisiert.
+Einstellungen über das Zahnrad oder mit `/hourstone`: Größe von 65 bis 200 %, Minimap-Button und gelöschte Charaktere. Wo der Client ein Addons-Menü unter der Minimap-Uhr hat, öffnet Hourstone auch von dort. Mehrere PCs oder WoW-Versionen? Der optionale [Hourstone Companion](https://github.com/krebs3r/hourstone-companion) für Windows führt die gespeicherten Daten zusammen, M+-Fortschritt inklusive; Hourstone funktioniert auch ohne ihn.

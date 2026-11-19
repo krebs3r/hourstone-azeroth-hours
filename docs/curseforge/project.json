@@ -1,6 +1,6 @@
 {
-  "name": "Hourstone – Azeroth Hours",
-  "summary": "Track character playtime and guilds, plus Retail keystones, weekly Mythic+ best and Great Vault progress in a compact window.",
+  "name": "Hourstone – Azeroth Playtime Tracker",
+  "summary": "Every character's /played time in one window, plus keystones, weekly Mythic+ best and Great Vault slots for your Retail alts.",
   "game": "World of Warcraft",
   "category": "Miscellaneous",
   "license": "MIT License",

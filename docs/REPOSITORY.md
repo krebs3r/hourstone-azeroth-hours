@@ -2,7 +2,7 @@
 
 The repository contains product code, reproducible build assets, synthetic test fixtures and maintained documentation. Keep personal SavedVariables, account paths, screenshots containing real character data, local reports, credentials and environment output outside version control.
 
-One exception: the WoW: Forever screenshots `docs/assets/addon-forever-en.png` and `docs/assets/addon-forever-de.png` are in-game captures with fictional example characters and one real character, Magni Wildschuss, the author's own, shown with the author's consent.
+One exception: the in-game screenshots `docs/assets/ingame-retail-de.png`, `docs/assets/ingame-anniversary-de.png` and `docs/assets/ingame-forever-de.png` show the author's own characters with their realms and guilds; the author agreed to publish them on 19 November 2026. Other in-game captures with real character data stay outside version control.
 
 Run `python tools/install_hooks.py` once per checkout to enable the versioned pre-push hook. Run `python tools/privacy_guard.py` at any time. The validation and release workflows run the same standard-library check with full Git history.
 

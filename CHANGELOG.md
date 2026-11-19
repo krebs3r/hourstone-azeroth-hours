@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.4.2 — 2026-11-19
 
 - New name: **Hourstone – Azeroth Playtime Tracker**. The addon list, the window title, WoW: Forever's title strip and the tooltips of the minimap button and the Addons menu show it; the addon folder, your saved data, `/hourstone` and `/azerothhours` stay as they are.
+- Record the author's in-game test of this build on 19 November 2026 in Retail, TBC Anniversary and WoW: Forever, where the window showed the new name and version 0.4.2. The screenshots on the CurseForge page come from these clients.
 
 ## 0.4.1 — 2026-11-10
 

@@ -1,6 +1,6 @@
 # Publishing Hourstone on CurseForge
 
-Project: [Hourstone – Azeroth Hours](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours), ID **1697059**. [project.json](project.json) contains the configured game versions and public project metadata.
+Project: [Hourstone – Azeroth Playtime Tracker](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours), ID **1697059**. [project.json](project.json) contains the configured game versions and public project metadata.
 
 ## Setup and release
 
@@ -13,7 +13,7 @@ The resulting `curseforge-upload.json` release asset records the file ID and ZIP
 
 ## Project description
 
-[description.md](description.md) is the English/German product description, including the optional Windows Companion, guilds and reversible overview deletion. Keep the project page consistent with this file when publishing. Copy it into the description editor in the [CurseForge authors dashboard](https://authors.curseforge.com/#/projects/1697059), save, and verify the resulting public page after any required moderation.
+[description.md](description.md) is the English/German product description, including the optional Windows Companion, guilds and reversible overview deletion. Keep the project page consistent with this file when publishing. Copy it into the description editor in the [CurseForge authors dashboard](https://authors.curseforge.com/#/projects/1697059), save, and verify the resulting public page after any required moderation. Its images load from `main`, so push changed images before saving the description, and rename the project in the dashboard when the name in [project.json](project.json) changes.
 
 The existing workflow and `tools/curseforge.py` upload the release ZIP and its release notes; they do **not** update the project description. Changing this Markdown file alone does not change CurseForge's project page. A description update is a separate publishing step and must not be reported as complete until it is visible on CurseForge.
 

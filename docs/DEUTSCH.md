@@ -1,8 +1,8 @@
-# Hourstone – Azeroth Hours
+# Hourstone – Azeroth Playtime Tracker
 
 Hourstone zeigt die gesamte `/played`-Zeit deiner erfassten World-of-Warcraft-Charaktere, die Gesamtspielzeit und die aktuelle Sitzung in einem kompakten Fenster. In Retail zeigt die Ansicht **Fortschritt** außerdem Schlüsselsteine, die beste M+-Stufe dieser Woche und Schatzkammer-Slots. Suche, Filter, Sortierung und eine Fenstergröße bis 200 % erleichtern die Übersicht.
 
-![Hourstone 0.3.1 mit Charakteren, Gilden sowie Realm- und Clientfiltern](assets/addon-overview-de.png)
+![Hourstone mit Charakteren, Gilden sowie Realm- und Clientfiltern](assets/addon-overview-de.png)
 
 Die Charakterübersicht vereint Suche, Realm- und Clientfilter und zeigt Gilde und Spielzeit jedes Charakters. Die Bilder zeigen gerenderte Ansichten der Addon-Oberfläche mit Beispielcharakteren.
 
@@ -20,7 +20,7 @@ Lade das ZIP aus [GitHub Releases](https://github.com/krebs3r/hourstone-azeroth-
 
 ## Fortschritt in Retail
 
-![Hourstone 0.3.1 mit Schlüsselsteinen, M+-Wochenbestleistung und Schatzkammer-Slots](assets/addon-progress-de.png)
+![Hourstone mit Schlüsselsteinen, M+-Wochenbestleistung und Schatzkammer-Slots](assets/addon-progress-de.png)
 
 Mit **Spielzeit | Fortschritt** wechselst du die Ansicht im selben Fenster. Fortschritt zeigt neben Charakter, Realm und Gilde den eigenen Schlüsselstein, die höchste abgeschlossene M+-Stufe dieser Woche und je drei Schatzkammer-Slots für Dungeon, Raid und Welt. Tooltips zeigen vollständige Namen, Fortschritt, Schwierigkeit und Erfassungszeit. Suche und Realm-/Clientfilter gelten in beiden Ansichten. Classic behält die Spielzeitansicht.
 

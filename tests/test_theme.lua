@@ -427,7 +427,7 @@ assert(close.highlight.atlas=="RedButton-Highlight" and close.highlight.blend=="
 assert(gear.frameLevel==f.frameLevel+12 and close.frameLevel==f.frameLevel+12 and U.header.frameLevel==f.frameLevel+12)
 assert(at(U.header,border,"TOPLEFT",40,1) and near(U.header.width,720+.5+4.4-40-28) and U.header.height==22)
 local title=U.frameTitle
-assert(title.parent==U.header and title.fontSize==12 and title.text=="Hourstone – Azeroth Hours" and at(title,border,"TOP",0,-6))
+assert(title.parent==U.header and title.fontSize==12 and title.text=="Hourstone – Azeroth Playtime Tracker" and at(title,border,"TOP",0,-6))
 assert(title.align=="CENTER" and same(title.color,1,210/255,0))
 for _,region in ipairs({U.gear,U.logo,U.title,U.close,U.headerRule}) do assert(not visible(region)) end
 for _,region in ipairs({gear,close,title}) do assert(visible(region)) end

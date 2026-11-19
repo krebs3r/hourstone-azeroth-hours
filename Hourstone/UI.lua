@@ -392,7 +392,7 @@ function U:BuildArt(art)
         local border=f.window.border
         self.frameGear=frameButton(f,border,"Interface\\WorldMap\\GEAR_64GREY",17,function() self:ToggleSettings() end)
         self.frameClose=frameClose(f,border,function() f:Hide() end)
-        self.frameTitle=frameTitle(self.header,border,"Hourstone – Azeroth Hours","title",560)
+        self.frameTitle=frameTitle(self.header,border,"Hourstone – Azeroth Playtime Tracker","title",560)
         for _,b in ipairs({self.frameGear,self.frameClose}) do b:SetFrameLevel(f:GetFrameLevel()+12) end
         local s,d=self.settings.window,self.removeDialog.window
         self.settingsFrameTitle=frameTitle(s.top,s.border,L.settings,"heading",190)
@@ -570,7 +570,7 @@ function U:Create()
     self.gear:SetScript("OnLeave",function(b) Th.Paint(b:GetNormalTexture(),"gear","vertex") end)
     self.gear:SetScript("OnClick",function() self:ToggleSettings() end)
     self.logo=artwork(self.header,"Logo",28,28,48,5.5)
-    self.title=text(self.header,"Hourstone – Azeroth Hours",17,84,7.5,588,"title",24)
+    self.title=text(self.header,"Hourstone – Azeroth Playtime Tracker",17,84,7.5,588,"title",24)
     self.close=closeButton(self.header,678,9.5,20,function() f:Hide() end)
     self.headerRule=line(self.header,0,39,700,1,"ruleHeader")
 
@@ -1162,7 +1162,7 @@ function U:CreateCompartment()
     local ok=pcall(AddonCompartmentFrame.RegisterAddon,AddonCompartmentFrame,{
         text="Hourstone",icon=ROOT.."Logo.tga",notCheckable=true,registerForAnyClick=true,
         func=function(...) if not rightClick(...) then self:Toggle() end end,
-        funcOnEnter=function(frame) tooltip(owner(frame),{"Hourstone – Azeroth Hours",L.open,L.commands}) end,
+        funcOnEnter=function(frame) tooltip(owner(frame),{"Hourstone – Azeroth Playtime Tracker",L.open,L.commands}) end,
         funcOnLeave=function() GameTooltip:Hide() end,
     })
     self.compartment=ok or nil
@@ -1197,7 +1197,7 @@ function U:Init(db)
     b:SetHighlightTexture(136477,"ADD")
     b:RegisterForClicks("LeftButtonUp"); b:RegisterForDrag("LeftButton")
     b:SetScript("OnClick",function() if not b.suppressUntil or C.Now()>=b.suppressUntil then self:Toggle() end end)
-    b:SetScript("OnEnter",function() tooltip(b,{"Hourstone – Azeroth Hours",L.open,L.move,L.commands,L.hint}) end)
+    b:SetScript("OnEnter",function() tooltip(b,{"Hourstone – Azeroth Playtime Tracker",L.open,L.move,L.commands,L.hint}) end)
     b:SetScript("OnLeave",function() GameTooltip:Hide() end)
     b:SetScript("OnDragStart",function()
         GameTooltip:Hide()

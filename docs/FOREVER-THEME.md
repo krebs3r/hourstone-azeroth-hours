@@ -65,14 +65,14 @@ The menus and the dropdown buttons go one step beyond Soundstone, which wears no
 
 Positions in the window's own units, computed from the anchors above; none of them has been seen in the game.
 
-- **Header:** the red gear at the border's TOPLEFT (8, 1), that is 3.6 to 35.6 from the left and 2.35 to 24.35 below the top; the red close button at the border's TOPRIGHT (0, 3), that is 692.5 to 720.5 from the left; between them the title strip, which drags the window and carries "Hourstone – Azeroth Hours" at size 12, centered. Gear, close button and strip on frame level +12. The 17-unit title, the logo, the rivets, the header rule and the old gear and close button are hidden.
+- **Header:** the red gear at the border's TOPLEFT (8, 1), that is 3.6 to 35.6 from the left and 2.35 to 24.35 below the top; the red close button at the border's TOPRIGHT (0, 3), that is 692.5 to 720.5 from the left; between them the title strip, which drags the window and carries "Hourstone – Azeroth Playtime Tracker" at size 12, centered. Gear, close button and strip on frame level +12. The 17-unit title, the logo, the rivets, the header rule and the old gear and close button are hidden.
 - **Content:** the summary starts 30 below the top instead of 50; toolbar, table and footer move up by the same 20 units. The window becomes 20 units shorter: 192 units plus the rows instead of 212 (decision 6). `U:Position` keeps the top edge where it was, because it already anchors by the saved height; its lower bound for a saved height (248) drops to the framed window's 242.
 - **Clearance:** the content keeps 10 units from the sides (needed: about 8.6) and the footer ends 10 above the bottom (needed: 8.3).
 - **Settings:** at (10, 28), aligned with the content's left edge and below the gear; 214 high, they end flush with the bottom of a one-row window. Their controls stay where 0.3.7 puts them: the first one starts 35 below their top (needed: about 30), the last ends 12 above their bottom.
 - **Delete dialog:** where it is (110, 30); its body starts 49 below its top and its buttons end 16 above its bottom.
 - **Levels:** border +10 over the window's content; menus +30, settings +35 and dialog +50 stay above it; the settings' and dialog's own borders sit 10 above them, under their header controls at +12.
 - **Corner cropping:** called again whenever the window's height changes (`U:LayoutRows`). At 242 units and more it probably crops nothing.
-- **Fitting text:** "Hourstone – Azeroth Hours", "Settings"/"Einstellungen" and the dialog's title fit their strips at size 12 by a wide margin, so Soundstone's `FitText` is not needed.
+- **Fitting text:** "Hourstone – Azeroth Playtime Tracker", "Settings"/"Einstellungen" and the dialog's title fit their strips at size 12 by a wide margin, so Soundstone's `FitText` is not needed.
 
 ### Scale (decision 1)
 

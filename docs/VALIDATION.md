@@ -32,6 +32,14 @@ The simulator's font metrics and the Lua-derived browser preview approximate nat
 
 Version 0.4.2 keeps the declared interfaces of 0.4.1 and changes only the addon's name: the TOC title, the window title, WoW: Forever's title strip and the tooltips of the minimap button and the Addons menu say "Hourstone – Azeroth Playtime Tracker". 154 Lua scenario suites in seven simulated configurations and 77 Python tests pass; the comparison with the tagged 0.3.7 release now lets the title differ, as it already let the footer's version. On 19 November 2026 the author ran the build in Retail 12.1.5.70961 (time played and Progress views), TBC Anniversary 2.5.6.70577 and WoW: Forever 1.60.1.70959 (time played view); each window showed the new title and version 0.4.2, as the in-game screenshots on the CurseForge page show. The addon list, the two tooltips, Mists Classic and Classic Era were not checked in-game. The tested build differs from the release only in `Compat.lua`, whose fallback version, used only where WoW cannot read the TOC metadata, still read 0.4.1.
 
+The v0.4.2 GitHub release ZIP has SHA-256
+`b79aa23dff893ad9aba6f276376e0be0c3959851528a670d09574e2b79ae35eb`, the same bytes as
+a local build with Python 3.12 before the tag; it differs from 0.4.1 only in
+`Compat.lua`, `Hourstone.toc` and `UI.lua`. The CurseForge upload created
+[file 9706224](https://www.curseforge.com/wow/addons/hourstone-azeroth-hours/files/9706224)
+with game versions 12.1.5, 2.5.6, 5.5.4, 1.15.9 and 1.60.1, awaiting CurseForge
+approval. The receipt is recorded in [releases/v0.4.2.json](curseforge/releases/v0.4.2.json).
+
 Version 0.4.1 keeps the declared interfaces of 0.4.0 and changes only the class color fallback: a Death Knight, Monk or Demon Hunter that the client's class table lacks takes Blizzard's color from the Classic clients' table, while the client's own colors come first. WoW: Forever's table has no Death Knight or Demon Hunter, as the author's in-game screenshots of 10 November 2026 showed with two fictional characters of these classes in the neutral color. 154 Lua scenario suites in seven simulated configurations and 77 Python tests pass, among them a synchronized Death Knight listed in its class color on a client without the class. The window is the one the author accepted in live Forever for 0.4.0.
 
 The v0.4.1 GitHub release ZIP has SHA-256
